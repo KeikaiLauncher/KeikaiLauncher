@@ -65,6 +65,7 @@ import com.hayaisoftware.launcher.PackageChangedReceiver;
 import com.hayaisoftware.launcher.R;
 import com.hayaisoftware.launcher.ShortcutNotificationManager;
 import com.hayaisoftware.launcher.Trie;
+import com.hayaisoftware.launcher.fragments.SettingsFragment;
 import com.hayaisoftware.launcher.comparators.AlphabeticalOrder;
 import com.hayaisoftware.launcher.comparators.PinToTop;
 import com.hayaisoftware.launcher.comparators.RecentOrder;
@@ -357,7 +358,7 @@ public class SearchActivity extends Activity
         mIsCacheClear = false;
         final Editable searchText = mSearchEditText.getText();
 
-        if (mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_AUTO_KEYBOARD, false) ||
+        if (mSharedPreferences.getBoolean(SettingsFragment.KEY_PREF_AUTO_KEYBOARD, false) ||
                 searchText.length() > 0) {
             // This is a special case to show SearchEditText should have focus.
             if (searchText.length() == 1 && searchText.charAt(0) == '\0') {
@@ -371,7 +372,7 @@ public class SearchActivity extends Activity
             hideKeyboard();
         }
 
-        if (mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_ALLOW_ROTATION, false)) {
+        if (mSharedPreferences.getBoolean(SettingsFragment.KEY_PREF_ALLOW_ROTATION, false)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
@@ -442,10 +443,10 @@ public class SearchActivity extends Activity
 
     private void setupPreferences() {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        if (mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_NOTIFICATION, false)) {
+        if (mSharedPreferences.getBoolean(SettingsFragment.KEY_PREF_NOTIFICATION, false)) {
             final ShortcutNotificationManager shortcutNotificationManager = new ShortcutNotificationManager();
             final String strPriority =
-                    mSharedPreferences.getString(SettingsActivity.KEY_PREF_NOTIFICATION_PRIORITY,
+                    mSharedPreferences.getString(SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY,
                             "low");
             final int priority = ShortcutNotificationManager.getPriorityFromString(strPriority);
             shortcutNotificationManager.showNotification(this, priority);
