@@ -730,8 +730,11 @@ public class SearchActivity extends Activity
 
     @Override
     public void onBackPressed() {
-        if (!isCurrentLauncher())
+        if (isCurrentLauncher()) {
+            hideKeyboard();
+        } else {
             moveTaskToBack(false);
+        }
     }
 
     @Override
@@ -779,7 +782,18 @@ public class SearchActivity extends Activity
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
 
-        mSearchEditText.setText(null);
+        // If search has been typed, and home is hit, clear it.
+        if (mSearchEditText.length() > 0) {
+            mSearchEditText.setText(null);
+        }
+
+        // If the y coordinate is not at 0, let's reset it.
+        final GridView view = (GridView) findViewById(R.id.appsContainer);
+        final int[] loc = { 0, 0 };
+        view.getLocationInWindow(loc);
+        if (loc[1] != 0) {
+            view.smoothScrollToPosition(0);
+        }
     }
 
     public boolean onKeyUp(int keyCode, KeyEvent event) {
