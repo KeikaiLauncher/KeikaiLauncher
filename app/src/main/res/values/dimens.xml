@@ -25,4 +25,5 @@
     <dimen name="app_icon_label_size">12sp</dimen>
     <dimen name="app_row_column_width">64dp</dimen>
     <dimen name="app_row_column_height">95dp</dimen>
+    <dimen name="app_pin_size">18dp</dimen>
 </resources>

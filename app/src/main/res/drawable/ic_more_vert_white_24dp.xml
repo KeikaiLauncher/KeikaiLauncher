@@ -12,13 +12,12 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <!--
-         Customize for devices 600dp wide (7" tablets) and larger.
-    -->
-    <dimen name="app_icon_size">72dp</dimen>
-    <dimen name="app_icon_label_size">14sp</dimen>
-    <dimen name="app_row_column_width">96dp</dimen>
-    <dimen name="app_row_column_height">130dp</dimen>
-    <dimen name="app_pin_size">24dp</dimen>
-</resources>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="24dp"
+        android:height="24dp"
+        android:viewportHeight="24.0"
+        android:viewportWidth="24.0">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,10c-1.1,0 -2,0.9 -2,2s0.9,2 2,2 2,-0.9 2,-2 -0.9,-2 -2,-2zM12,16c-1.1,0 -2,0.9 -2,2s0.9,2 2,2 2,-0.9 2,-2 -0.9,-2 -2,-2z"/>
+</vector>

@@ -39,11 +39,10 @@
 
         <ImageView
             android:id="@+id/appPinToTop"
-            android:layout_width="wrap_content"
-            android:layout_height="18dp"
+            android:layout_width="@dimen/app_pin_size"
+            android:layout_height="@dimen/app_pin_size"
             android:contentDescription="@string/appmenu_pin_to_top"
-            android:src="@drawable/ic_star_white_18dp"
-            android:tint="@color/pin_to_top"
+            android:src="@drawable/ic_star_yellow_18dp"
             android:visibility="gone"/>
     </FrameLayout>
 
