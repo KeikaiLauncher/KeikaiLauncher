@@ -20,18 +20,13 @@
     <string name="action_settings">Einstellungen</string>
     <string name="action_system_settings">Geräte-Einstellungen</string>
     <string name="activity_not_found">Aktivität nicht gefunden.</string>
-    <string name="app_item_bottom_never">Noch nie gestartet.</string>
-    <string name="application_icon_content_description">Icon der App</string>
     <string name="application_icon_desc">Icon der App</string>
-    <string name="appmenu_favorite">Favoriten</string>
     <string name="appmenu_info">Informationen zur App</string>
     <string name="appmenu_launch">Starten</string>
     <string name="launch">Start</string>
-    <string name="pref_basetheme">Basis-Thema</string>
     <string name="pref_notification_priority">Priorität der Benachrichtigung.</string>
     <string name="search_view_hint">Geben Sie etwas ein...</string>
     <string name="settings_category_notification_category">Benachrichtigungen</string>
-    <string name="settings_enable_icons_title">App-Icons anzeigen</string>
     <string name="settings_enable_notification_title">Im Benachrichtigungsfeld Verknüpfung anzeigen</string>
     <string name="title_activity_about">Über diese App</string>
     <string name="title_activity_settings">Einstellungen</string>
@@ -39,7 +34,6 @@
     <string name="settings_category_general_category">Allgemein</string>
     <string name="settings_disable_icon_loading">Laden von Icons verhindern</string>
     <string name="pref_preferred_app_order_dialog">Anordnung der Apps</string>
-    <string name="pref_preferred_order_dialog">Anordnung der Apps</string>
     <string name="appmenu_pin_to_top">Am oberen Bildschirmrand anheften</string>
     <string name="pref_notification_priority_entries_high">Hoch</string>
     <string name="pref_app_preferred_order_entries_alphabetical">Alphabetische Sortierung</string>

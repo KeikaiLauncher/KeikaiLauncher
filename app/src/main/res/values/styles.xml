@@ -43,13 +43,4 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
-    <style name="TextSelectedList">
-	    	<item name="android:textSize">26sp</item>
-	    	<item name="android:textStyle">bold</item>
-	    	<item name="android:text">bold</item>
-		</style>
-		<style name="TextUnselectedList">
-	    	<item name="android:textSize">26sp</item>
-		</style>
-		
 </resources>

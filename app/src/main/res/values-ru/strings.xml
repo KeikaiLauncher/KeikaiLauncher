@@ -21,12 +21,8 @@
     <string name="title_activity_settings">Настройки</string>
     <string name="settings_category_notification_category">Уведомления</string>
     <string name="settings_enable_notification_title">Показывать иконку в панели уведомлений</string>
-    <string name="settings_enable_icons_title">Показывать иконки приложений</string>
-    <string name="application_icon_content_description">Иконка приложения</string>
     <string name="appmenu_launch">Запуск</string>
-    <string name="appmenu_favorite">Избранное</string>
     <string name="appmenu_info">Информация о приложении</string>
-    <string name="app_item_bottom_never">Не запускалось</string>
     <string name="title_activity_about">О приложении</string>
     <string name="launch">Запуск</string>
     <string name="action_refresh_app_list">Обновить список приложений</string>
@@ -60,11 +56,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 \n</string>
     <string name="action_manage_apps">Управление приложениями</string>
     <string name="appmenu_onplaystore">Посмотреть в Google Play Store</string>
-    <string name="pref_basetheme" >Базовая тема</string>
     <string name="pref_notification_priority">Приоритет уведомлений</string>
     <string name="settings_autokeyboard">Открывать клавиатуру автоматически</string>
     <string name="settings_category_general_category">Общее</string>
-    <string name="pref_preferred_order_dialog">Сортировка приложений</string>
     <string name="pref_preferred_app_order_dialog">Сортировка приложений</string>
     <string name="settings_disable_icon_loading">Отключить загрузку иконок у приложений</string>
     <string name="appmenu_pin_to_top">Закрепить наверху</string>
