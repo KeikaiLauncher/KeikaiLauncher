@@ -28,7 +28,6 @@
     <string name="search_view_hint">Geben Sie etwas ein...</string>
     <string name="settings_category_notification_category">Benachrichtigungen</string>
     <string name="settings_enable_notification_title">Im Benachrichtigungsfeld Verknüpfung anzeigen</string>
-    <string name="title_activity_about">Über diese App</string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="settings_autokeyboard">Tastatur automatisch anzeigen</string>
     <string name="settings_category_general_category">Allgemein</string>

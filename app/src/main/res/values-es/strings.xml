@@ -17,7 +17,6 @@
     <string name="action_about">Acerca de</string>
     <string name="action_manage_apps">Administrar aplicaciones</string>
     <string name="action_settings">Preferencias</string>
-    <string name="title_activity_about">Acerca de</string>
     <string name="title_activity_settings">Preferencias</string>
     <string name="settings_enable_notification_title">Mostrar</string>
     <string name="settings_category_notification_category">Notificaciones</string>

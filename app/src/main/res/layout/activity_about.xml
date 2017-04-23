@@ -1,5 +1,3 @@
-
-
 <!--
   ~ Copyright (c) 2015-2017 Hayai Software
   ~
@@ -14,25 +12,53 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:scrollbars="vertical"
-    tools:context="com.hayaisoftware.launcher.activities.AboutActivity">
-    <ScrollView
-        android:id="@+id/SCROLLER_ID"
-        android:layout_width="fill_parent"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="vertical"
-        android:fillViewport="true">
+        android:orientation="vertical"
+        android:paddingBottom="4dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:paddingTop="4dp">
 
-    <TextView android:id="@+id/about_textview" android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="@string/about_content"/>
+        <TextView
+            style="@style/CaptionText"
+            android:text="@string/about_version_code"/>
 
-    </ScrollView>
-</LinearLayout>
+        <TextView
+            android:id="@+id/about_version"
+            style="@style/BodyText"
+            android:textIsSelectable="true"/>
 
+        <TextView
+            style="@style/CaptionText"
+            android:text="@string/about_project_website"/>
+
+        <TextView
+            android:id="@+id/about_project_website_url"
+            style="@style/BodyText"
+            android:text="@string/about_project_website_url"/>
+
+        <TextView
+            style="@style/CaptionText"
+            android:text="@string/about_license"/>
+
+        <TextView
+            android:id="@+id/license_type"
+            style="@style/BodyText"
+            android:text="@string/about_license_type"/>
+
+        <TextView
+            style="@style/CaptionText"
+            android:text="@string/about_contributors"/>
+
+        <TextView
+            android:id="@+id/about_contributors"
+            style="@style/BodyText"
+            android:textIsSelectable="false"/>
+    </LinearLayout>
+</ScrollView>

@@ -38,4 +38,28 @@
         <item>usage</item>
     </string-array>
 
+    <!--
+    This is an array of the contributors. This array directly coordinates with
+    {@code about_contributor_usernames}. An entry must be made there when adding a contributor.
+
+    Maintainer should always be item 0.
+    -->
+    <string-array name="about_contributor_names">
+        <item>Edgar Villani Peres</item>
+        <item>Dalton de Oliveira Silva</item>
+        <item>Avuton Olrich</item>
+    </string-array>
+
+    <!--
+    This is an array of contributor user names. This array directly coordinates with
+    {@code about_contributor_names}. If a contributor doesn't have a Github user name, add
+    null to the relational place in the list.
+
+    Maintainer should always be item 0.
+    -->
+    <string-array name="about_contributor_usernames">
+        <item>seizonsenryaku</item>
+        <item>daltonos</item>
+        <item>avuton</item>
+    </string-array>
 </resources>

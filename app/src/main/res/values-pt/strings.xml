@@ -26,31 +26,6 @@
     <string name="action_about">Sobre</string>
     <string name="action_system_settings">Ajustes do dispositivo</string>
     <string name="activity_not_found">Atividade não encontrada.</string>
-    <string name="title_activity_about">Sobre</string><string name="about_content">Hayai Launcher [APP_VERSION]
-\n
-\nWebsite do projeto:
-\nhttps://github.com/seizonsenryaku/HayaiLauncher
-\n
-\nContribuidores:
-\n\tEdgar Villani Peres (seizonsenryaku)
-\n\tDalton de Oliveira Silva(daltonos)
-\n
-\n-
-\n
-\n Copyright 2015 Hayai Software
-\n
-\n Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-\n You may obtain a copy of the License at
-\n
-\n http://www.apache.org/licenses/LICENSE-2.0
-\n
-\n Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-\n See the License for the specific language governing permissions and
-\n limitations under the License.
-\n</string>
     <string name="action_manage_apps">Gerenciar apps</string>
     <string name="appmenu_onplaystore">Abrir na loja de aplicativos</string>
     <string name="launch">Abrir</string>

@@ -38,7 +38,6 @@
     <string name="settings_enable_notification_title">Montrer la notification</string>
     <string name="appmenu_launch">Lancer</string>
     <string name="appmenu_info">Informations sur l\'application</string>
-    <string name="title_activity_about">À propos</string>
     <string name="launch">Aller</string>
     <string name="action_refresh_app_list">Rafraîchir la liste des apps</string>
     <string name="activity_not_found">Activité non trouvée.</string>
