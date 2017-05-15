@@ -23,7 +23,6 @@ import android.util.Log;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
-import java.util.List;
 
 public class LaunchableActivityPrefs extends SQLiteOpenHelper {
 
@@ -92,7 +91,7 @@ public class LaunchableActivityPrefs extends SQLiteOpenHelper {
 
     }
 
-    public void setAllPreferences(List<LaunchableActivity> activityList) {
+    public void setAllPreferences(LaunchableAdapter<LaunchableActivity> activityList) {
 
         final SQLiteDatabase db = getReadableDatabase();
 
@@ -114,7 +113,8 @@ public class LaunchableActivityPrefs extends SQLiteOpenHelper {
         }
         cursor.close();
         db.close();
-        for (LaunchableActivity activity : activityList) {
+        for (int i = 0; i < activityList.getCount(); i++) {
+            final LaunchableActivity activity = activityList.getItem(i);
             ActivityPref activityPref = activityPrefMap.get(activity.getClassName());
             if (activityPref != null) {
                 activityPref.wasUsed = true;

@@ -179,4 +179,9 @@ public class LaunchableActivity{
     public void setusagesQuantity(int usagesQuantity){
         this.usagesQuantity = usagesQuantity;
     }
+
+    @Override
+    public String toString() {
+        return mActivityLabel;
+    }
 }

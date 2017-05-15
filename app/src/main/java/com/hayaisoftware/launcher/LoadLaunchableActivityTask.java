@@ -19,8 +19,6 @@ import android.content.pm.ResolveInfo;
 
 import com.hayaisoftware.launcher.threading.SimpleTaskConsumerManager;
 
-import java.util.ArrayList;
-
 
 public class LoadLaunchableActivityTask extends SimpleTaskConsumerManager.Task {
     private final ResolveInfo info;
@@ -34,19 +32,20 @@ public class LoadLaunchableActivityTask extends SimpleTaskConsumerManager.Task {
 
     public boolean doTask() {
         final LaunchableActivity launchableActivity = new LaunchableActivity(
-                info.activityInfo, info.activityInfo.loadLabel(mSharedData.mPackageManager).toString(), false);
-        synchronized (mSharedData.launchablesFromResolve) {
-            mSharedData.launchablesFromResolve.add(launchableActivity);
-        }
+                info.activityInfo, info.activityInfo.loadLabel(mSharedData.mPackageManager)
+                .toString(), false);
+
+        mSharedData.launchablesFromResolve.add(launchableActivity);
+
         return true;
     }
 
     public static class SharedData {
         private final PackageManager mPackageManager;
-        private final ArrayList<LaunchableActivity> launchablesFromResolve;
+        private final LaunchableAdapter<LaunchableActivity> launchablesFromResolve;
 
         public SharedData(final PackageManager packageManager,
-                          final ArrayList<LaunchableActivity> launchablesFromResolve) {
+                          final LaunchableAdapter<LaunchableActivity> launchablesFromResolve) {
             this.mPackageManager = packageManager;
             this.launchablesFromResolve=launchablesFromResolve;
 
