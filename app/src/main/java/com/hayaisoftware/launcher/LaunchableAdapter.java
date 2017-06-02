@@ -117,6 +117,12 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
     private final List<T> mObjects;
 
     /**
+     * This field contains the database used to store persistent values for
+     * {@link LaunchableActivity} objects.
+     */
+    private final LaunchableActivityPrefs mPrefs;
+
+    /**
      * The resource indicating what views to inflate to display the content of this
      * array adapter in a drop down widget.
      */
@@ -167,6 +173,7 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
                 new SimpleTaskConsumerManager(getOptimalNumberOfThreads(res), 300);
         mImageTasksSharedData = new ImageLoadingTask.SharedData((Activity) mContext, mContext,
                 mIconSizePixels);
+        mPrefs = new LaunchableActivityPrefs(context);
     }
 
     /**
@@ -211,6 +218,8 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
      * @param object The object to add at the end of the array.
      */
     public void add(@Nullable final T object) {
+        mPrefs.setPreferences(object);
+
         synchronized (mLock) {
             if (mOriginalValues == null) {
                 mObjects.add(object);
@@ -502,6 +511,8 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
      * @param index  The index at which the object must be inserted.
      */
     public void insert(@Nullable final T object, final int index) {
+        mPrefs.setPreferences(object);
+
         synchronized (mLock) {
             if (mOriginalValues == null) {
                 mObjects.add(index, object);
@@ -528,6 +539,8 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
      * This method should be called before the parent context is destroyed.
      */
     public void onDestroy() {
+        mPrefs.close();
+
         if (mImageLoadingConsumersManager != null) {
             mImageLoadingConsumersManager.destroyAllConsumers(false);
         }

@@ -72,7 +72,6 @@ public class SearchActivity extends Activity
 
     private static final String SEARCH_EDIT_TEXT_KEY = "SearchEditText";
     private LaunchableAdapter<LaunchableActivity> mAdapter;
-    private LaunchableActivityPrefs mLaunchableActivityPrefs;
     private SharedPreferences mSharedPreferences;
     private EditText mSearchEditText;
     private BroadcastReceiver mPackageChangedReceiver;
@@ -205,7 +204,6 @@ public class SearchActivity extends Activity
         mSearchEditText = (EditText) findViewById(R.id.user_search_input);
         mOverflowButtonTopleft = findViewById(R.id.overflow_button_topleft);
         mInputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        mLaunchableActivityPrefs = new LaunchableActivityPrefs(this);
         mAdapter = loadLaunchableAdapter();
 
         final boolean noMultiWindow = Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
@@ -509,7 +507,6 @@ public class SearchActivity extends Activity
             //Log.d("MultithreadStartup", "all tasks ok");
         }
 
-        mLaunchableActivityPrefs.setAllPreferences(adapter);
         adapter.sortApps();
         adapter.notifyDataSetChanged();
 
@@ -735,9 +732,9 @@ public class SearchActivity extends Activity
                 startActivity(intentPlayStore);
                 return true;
             case R.id.appmenu_pin_to_top:
+                final LaunchableActivityPrefs prefs = new LaunchableActivityPrefs(this);
                 launchableActivity.setPriority(launchableActivity.getPriority() == 0 ? 1 : 0);
-                mLaunchableActivityPrefs.writePreference(launchableActivity.getClassName(),
-                        launchableActivity.getLaunchTime(), launchableActivity.getPriority(), launchableActivity.getusagesQuantity());
+                prefs.writePreference(launchableActivity);
                 mAdapter.sortApps();
                 return true;
             default:
@@ -753,6 +750,7 @@ public class SearchActivity extends Activity
     }
 
     public void launchActivity(final LaunchableActivity launchableActivity) {
+        final LaunchableActivityPrefs prefs = new LaunchableActivityPrefs(this);
 
         hideKeyboard();
         try {
@@ -760,8 +758,7 @@ public class SearchActivity extends Activity
             mSearchEditText.setText(null);
             launchableActivity.setLaunchTime();
             launchableActivity.addUsage();
-            mLaunchableActivityPrefs.writePreference(launchableActivity.getClassName(),
-                    launchableActivity.getLaunchTime(), launchableActivity.getPriority(), launchableActivity.getusagesQuantity());
+            prefs.writePreference(launchableActivity);
             mAdapter.sortApps();
         } catch (ActivityNotFoundException e) {
             //this should only happen when the launcher still hasn't updated the file list after
@@ -769,8 +766,6 @@ public class SearchActivity extends Activity
             Toast.makeText(this, getString(R.string.activity_not_found),
                     Toast.LENGTH_SHORT).show();
         }
-
-
     }
 
     public void onClickClearButton(View view) {

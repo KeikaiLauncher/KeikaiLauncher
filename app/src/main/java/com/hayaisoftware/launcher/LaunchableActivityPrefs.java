@@ -14,131 +14,141 @@
 
 package com.hayaisoftware.launcher;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
 
-import java.util.AbstractMap;
-import java.util.HashMap;
-
+/**
+ * This is a convenience class write persistent information to save to restore
+ * {@link LaunchableActivity} objects.
+ */
 public class LaunchableActivityPrefs extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 3;
-    private static final String TABLE_NAME = "ActivityLaunchNumbers";
+
     private static final String KEY_CLASSNAME = "ClassName";
-    private static final String KEY_ID = "Id";
-    private static final String KEY_LASTLAUNCHTIMESTAMP = "LastLaunchTimestamp";
-    private static final String KEY_USAGEQUANTIY = "UsageQuantity";
+
     private static final String KEY_FAVORITE = "Favorite";
-    private static final String TABLE_CREATE = String
-            .format("CREATE TABLE %s "
-                            + "(%S INTEGER PRIMARY KEY, %s TEXT UNIQUE, %s INTEGER, %s INTEGER, %s INTEGER);",
-                    TABLE_NAME, KEY_ID, KEY_CLASSNAME, KEY_LASTLAUNCHTIMESTAMP,
-                    KEY_FAVORITE, KEY_USAGEQUANTIY);
-    private static final String TABLE_DROP = String.format("DROP TABLE IF EXISTS %s", TABLE_NAME);
-    public LaunchableActivityPrefs(Context context) {
+
+    private static final String KEY_ID = "Id";
+
+    private static final String KEY_LASTLAUNCHTIMESTAMP = "LastLaunchTimestamp";
+
+    private static final String KEY_USAGEQUANTIY = "UsageQuantity";
+
+    private static final String TABLE_NAME = "ActivityLaunchNumbers";
+
+    public LaunchableActivityPrefs(final Context context) {
         super(context, TABLE_NAME, null, DATABASE_VERSION);
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL(TABLE_CREATE);
+    /**
+     * This method deletes a column based on the classname.
+     *
+     * @param db        The database.
+     * @param className The classname of the column to delete.
+     */
+    private static void deletePreference(final SQLiteDatabase db, final String className) {
+        db.delete(TABLE_NAME, KEY_CLASSNAME + "=?", new String[]{className});
     }
 
-    public void writePreference(String className, long number, int priority, int usageQuantity) {
-        Log.d("LaunchablePrefs", "writePreference running");
+    /**
+     * This method deletes the {@link LaunchableActivity} from persistent storage.
+     *
+     * @param launchableActivity The LaunchableActivity to remove from persistent storage.
+     */
+    public void deletePreference(final LaunchableActivity launchableActivity) {
         final SQLiteDatabase db = getWritableDatabase();
-        final SQLiteStatement countStatement = db.compileStatement(String.format(
-                "SELECT COUNT(*) FROM %s WHERE %s = ?", TABLE_NAME,
-                KEY_CLASSNAME));
-        countStatement.bindString(1, className);
-        final long count = countStatement.simpleQueryForLong();
-        countStatement.close();
-        final SQLiteStatement statement;
-        if (count == 0) {
-            statement = db.compileStatement("INSERT INTO "
-                    + TABLE_NAME + " (" + KEY_CLASSNAME + ", "
-                    + KEY_LASTLAUNCHTIMESTAMP + "," + KEY_FAVORITE + "," + KEY_USAGEQUANTIY + ") VALUES(?,?,?,?)");
-            statement.bindString(1, className);
-            statement.bindLong(2, number);
-            statement.bindLong(3, priority);
-            statement.bindLong(4, usageQuantity);
-        } else {
-            statement = db.compileStatement("UPDATE "
-                    + TABLE_NAME + " SET " + KEY_LASTLAUNCHTIMESTAMP + "=? , " + KEY_FAVORITE + "=? , " + KEY_USAGEQUANTIY + "=? WHERE "
-                    + KEY_CLASSNAME + "=?");
-            statement.bindLong(1, number);
-            statement.bindLong(2, priority);
-            statement.bindLong(3, usageQuantity);
-            statement.bindString(4, className);
-        }
-        statement.executeInsert();
-        statement.close();
+
+        deletePreference(db, launchableActivity.getComponent().getClassName());
+
         db.close();
-    }
-
-    public void deletePreference(String className) {
-        final SQLiteDatabase db = getWritableDatabase();
-        final SQLiteStatement statement = db.compileStatement("DELETE FROM "
-                + TABLE_NAME + " WHERE " + KEY_CLASSNAME + "=?");
-        statement.bindString(1, className);
-        statement.executeInsert();
-        statement.close();
-        db.close();
-
-    }
-
-    public void setAllPreferences(LaunchableAdapter<LaunchableActivity> activityList) {
-
-        final SQLiteDatabase db = getReadableDatabase();
-
-        final Cursor cursor = db.query(TABLE_NAME,
-                new String[]{KEY_CLASSNAME, KEY_LASTLAUNCHTIMESTAMP, KEY_USAGEQUANTIY, KEY_FAVORITE},
-                null, null, null, null, null);
-
-        final AbstractMap<String, ActivityPref> activityPrefMap = new HashMap<>(cursor.getCount());
-
-        if (cursor.moveToFirst()) {
-            do {
-                ActivityPref activityPref = new ActivityPref();
-                activityPref.className = cursor.getString(cursor.getColumnIndex(KEY_CLASSNAME));
-                activityPref.priority = cursor.getInt(cursor.getColumnIndex(KEY_FAVORITE));
-                activityPref.lastTimestamp = cursor.getInt(cursor.getColumnIndex(KEY_LASTLAUNCHTIMESTAMP));
-                activityPref.usagesQuantity = cursor.getInt(cursor.getColumnIndex(KEY_USAGEQUANTIY));
-                activityPrefMap.put(activityPref.className, activityPref);
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        db.close();
-        for (int i = 0; i < activityList.getCount(); i++) {
-            final LaunchableActivity activity = activityList.getItem(i);
-            ActivityPref activityPref = activityPrefMap.get(activity.getClassName());
-            if (activityPref != null) {
-                activityPref.wasUsed = true;
-                activity.setLaunchTime(activityPref.lastTimestamp);
-                activity.setusagesQuantity(activityPref.usagesQuantity);
-                activity.setPriority(activityPref.priority);
-            }
-        }
-
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion < 3 && newVersion == 3) {
-            db.execSQL(TABLE_DROP);
+    public void onCreate(final SQLiteDatabase db) {
+        final String tableCreate = String.format("CREATE TABLE %s (%S INTEGER PRIMARY KEY, " +
+                        "%s TEXT UNIQUE, %s INTEGER, %s INTEGER, %s INTEGER);",
+                TABLE_NAME, KEY_ID, KEY_CLASSNAME, KEY_LASTLAUNCHTIMESTAMP,
+                KEY_FAVORITE, KEY_USAGEQUANTIY);
+
+        db.execSQL(tableCreate);
+    }
+
+    @Override
+    public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
+        if (oldVersion < DATABASE_VERSION && newVersion == DATABASE_VERSION) {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
             onCreate(db);
         }
     }
 
-    private class ActivityPref {
-        String className;
-        int priority;
-        long lastTimestamp;
-        boolean wasUsed;
-        int usagesQuantity;
+    /**
+     * This method updates a {@link LaunchableActivity} with persistent information.
+     *
+     * @param launchableActivity The {@link LaunchableActivity} to update.
+     */
+    public void setPreferences(final LaunchableActivity launchableActivity) {
+        final SQLiteDatabase db = getReadableDatabase();
+
+        final String[] whereArgs = {launchableActivity.getComponent().getClassName()};
+        final String[] columns = {KEY_LASTLAUNCHTIMESTAMP, KEY_USAGEQUANTIY, KEY_FAVORITE};
+        final Cursor cursor = db.query(TABLE_NAME, columns, KEY_CLASSNAME + "=?", whereArgs, null,
+                null, null);
+
+        if (cursor.moveToFirst()) {
+            int column = cursor.getColumnIndex(KEY_LASTLAUNCHTIMESTAMP);
+
+            if (column != -1) {
+                launchableActivity.setLaunchTime(cursor.getLong(column));
+            }
+
+            column = cursor.getColumnIndex(KEY_FAVORITE);
+
+            if (column != -1) {
+                launchableActivity.setPriority(cursor.getInt(column));
+            }
+
+            column = cursor.getColumnIndex(KEY_USAGEQUANTIY);
+
+            if (column != -1) {
+                launchableActivity.setusagesQuantity(cursor.getInt(column));
+            }
+        }
+
+        cursor.close();
+    }
+
+    /**
+     * Write the preferences from the {@link LaunchableActivity} to persistent storage.
+     *
+     * @param launchableActivity The {@link LaunchableActivity} to write to persistent storage.
+     */
+    public void writePreference(final LaunchableActivity launchableActivity) {
+        final SQLiteDatabase db = getWritableDatabase();
+        final ContentValues values = new ContentValues();
+        final int priority = launchableActivity.getPriority();
+        final int usageQuantity = launchableActivity.getusagesQuantity();
+        final String className = launchableActivity.getComponent().getClassName();
+
+        if (priority > 0) {
+            values.put(KEY_FAVORITE, priority);
+        }
+
+        if (usageQuantity > 0) {
+            values.put(KEY_LASTLAUNCHTIMESTAMP, launchableActivity.getLaunchTime());
+            values.put(KEY_USAGEQUANTIY, usageQuantity);
+        }
+
+        if (values.size() == 0) {
+            deletePreference(db, className);
+        } else {
+            values.put(KEY_CLASSNAME, className);
+            db.replace(TABLE_NAME, null, values);
+        }
+
+        db.close();
     }
 }
