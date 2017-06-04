@@ -50,5 +50,23 @@
             android:name=".activities.AboutActivity"
             android:label="@string/about_header"
             android:theme="@android:style/Theme.DeviceDefault.Light.Dialog"/>
+
+        <receiver
+            android:name=".monitor.PackageChangedReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED"/>
+                <action android:name="android.intent.action.PACKAGE_CHANGED"/>
+                <action android:name="android.intent.action.PACKAGE_REMOVED"/>
+                <action android:name="android.intent.action.PACKAGE_REPLACED"/>
+                <data android:scheme="package"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.EXTERNAL_APPLICATIONS_AVAILABLE"/>
+                <action android:name="android.intent.action.EXTERNAL_APPLICATIONS_UNAVAILABLE"/>
+                <action android:name="android.intent.action.PACKAGES_SUSPENDED"/>
+                <action android:name="android.intent.action.PACKAGES_UNSUSPENDED"/>
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

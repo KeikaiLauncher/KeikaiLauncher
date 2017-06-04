@@ -16,9 +16,8 @@ package com.hayaisoftware.launcher.activities;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
-import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -30,6 +29,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -52,11 +53,13 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hayaisoftware.launcher.BuildConfig;
 import com.hayaisoftware.launcher.LaunchableActivity;
 import com.hayaisoftware.launcher.LaunchableActivityPrefs;
 import com.hayaisoftware.launcher.LaunchableAdapter;
 import com.hayaisoftware.launcher.LoadLaunchableActivityTask;
-import com.hayaisoftware.launcher.PackageChangedReceiver;
+import com.hayaisoftware.launcher.monitor.PackageChangeCallback;
+import com.hayaisoftware.launcher.monitor.PackageChangedReceiver;
 import com.hayaisoftware.launcher.R;
 import com.hayaisoftware.launcher.ShortcutNotificationManager;
 import com.hayaisoftware.launcher.fragments.SettingsFragment;
@@ -68,13 +71,13 @@ import java.util.Collection;
 import static com.hayaisoftware.launcher.util.ContentShare.getLaunchableResolveInfos;
 
 public class SearchActivity extends Activity
-        implements SharedPreferences.OnSharedPreferenceChangeListener {
+        implements SharedPreferences.OnSharedPreferenceChangeListener, PackageChangeCallback {
 
+    private static final String TAG = "SearchActivity";
     private static final String SEARCH_EDIT_TEXT_KEY = "SearchEditText";
     private LaunchableAdapter<LaunchableActivity> mAdapter;
     private SharedPreferences mSharedPreferences;
     private EditText mSearchEditText;
-    private BroadcastReceiver mPackageChangedReceiver;
     private InputMethodManager mInputMethodManager;
     private View mOverflowButtonTopleft;
 
@@ -95,6 +98,17 @@ public class SearchActivity extends Activity
         }
 
         return hasNavBar;
+    }
+
+    public static Collection<ResolveInfo> getLaunchableResolveInfos(final PackageManager pm,
+            @Nullable final String activityName) {
+        final Intent intent = new Intent();
+
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.setPackage(activityName);
+
+        return pm.queryIntentActivities(intent, 0);
     }
 
     /**
@@ -158,6 +172,57 @@ public class SearchActivity extends Activity
     }
 
     /**
+     * Synchronize to this lock when the Adapter is visible and might be called by multiple
+     * threads.
+     */
+    private final Object mLock = new Object();
+
+    /**
+     * Called when a package appears for any reason.
+     *
+     * @param activityName The name of the {@link Activity} of the package which appeared.
+     */
+    @Override
+    public void onPackageAppeared(final String activityName) {
+        final PackageManager pm = getPackageManager();
+        final Iterable<ResolveInfo> resolveInfos = getLaunchableResolveInfos(pm, activityName);
+
+        synchronized (mLock) {
+            if (mAdapter.getClassNamePosition(activityName) == -1) {
+                addToAdapter(resolveInfos);
+                mAdapter.sortApps();
+                updateFilter(mSearchEditText.getText());
+            }
+        }
+    }
+
+    /**
+     * Called when a package disappears for any reason.
+     *
+     * @param activityName The name of the {@link Activity} of the package which disappeared.
+     */
+    @Override
+    public void onPackageDisappeared(final String activityName) {
+        synchronized (mLock) {
+            mAdapter.removeAllByName(activityName);
+            updateFilter(mSearchEditText.getText());
+        }
+    }
+
+    /**
+     * Called when an existing package is updated or its disabled state changes.
+     *
+     * @param activityName The name of the {@link Activity} of the package which was modified.
+     */
+    @Override
+    public void onPackageModified(final String activityName) {
+        synchronized (mLock) {
+            onPackageDisappeared(activityName);
+            onPackageAppeared(activityName);
+        }
+    }
+
+    /**
      * This method returns the size of the dimen
      *
      * @param resources The resources for the containing the named identifier.
@@ -212,14 +277,8 @@ public class SearchActivity extends Activity
 
         setupPadding(transparentPossible && noMultiWindow);
 
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_PACKAGE_ADDED);
-        filter.addAction(Intent.ACTION_PACKAGE_CHANGED);
-        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
-        filter.addAction(Intent.ACTION_PACKAGE_REPLACED);
-        filter.addDataScheme("package");
-        mPackageChangedReceiver = new PackageChangedReceiver();
-        registerReceiver(mPackageChangedReceiver, filter);
+        PackageChangedReceiver.setCallback(this);
+        enableReceiver();
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         setupPreferences();
@@ -227,6 +286,23 @@ public class SearchActivity extends Activity
 
         //loadShareableApps();
         setupViews();
+    }
+
+    private void enableReceiver() {
+        final PackageManager pm  = getPackageManager();
+        final ComponentName componentName = new ComponentName(this, PackageChangedReceiver.class);
+
+        pm.setComponentEnabledSetting(componentName,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+    }
+
+    private void disableReceiver() {
+        final ComponentName name = new ComponentName(this, PackageChangedReceiver.class);
+
+        getPackageManager().setComponentEnabledSetting(name,
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
     }
 
     /**
@@ -285,6 +361,14 @@ public class SearchActivity extends Activity
         }
     }
 
+    private void updateFilter(final CharSequence cs) {
+        final int seqLength = cs.length();
+
+        if (seqLength != 1 || cs.charAt(0) != '\0') {
+            mAdapter.getFilter().filter(cs);
+        }
+    }
+
     private EditText setupSearchEditText() {
         final EditText searchEditText = findViewById(R.id.user_search_input);
 
@@ -294,14 +378,10 @@ public class SearchActivity extends Activity
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                final int seqLength = s.length();
-
-                if (seqLength != 1 || s.charAt(0) != '\0') {
-                    mAdapter.getFilter().filter(s);
-                }
+                updateFilter(s);
 
                 // Avoid performing visible app update
-                mClearButton.setVisibility(seqLength > 0 ? View.VISIBLE : View.GONE);
+                mClearButton.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
             }
 
             @Override
@@ -462,31 +542,40 @@ public class SearchActivity extends Activity
             adapter = loadLaunchableApps();
         } else {
             adapter = new LaunchableAdapter<>(object, this, R.layout.app_grid_item);
+            adapter.setNotifyOnChange(true);
         }
 
         return adapter;
     }
 
+    private void addToAdapter(@NonNull final Iterable<ResolveInfo> infoList) {
+        final PackageManager pm = getPackageManager();
+        final String thisCanonicalName = getClass().getCanonicalName();
+
+        for (final ResolveInfo info : infoList) {
+            // Don't include activities from this package.
+            if (!thisCanonicalName.startsWith(info.activityInfo.packageName)) {
+                final String label = info.activityInfo.loadLabel(pm).toString();
+                final LaunchableActivity launchableActivity =
+                        new LaunchableActivity(info.activityInfo, label, false);
+
+                mAdapter.add(launchableActivity);
+            }
+        }
+    }
+
     private LaunchableAdapter<LaunchableActivity> loadLaunchableApps() {
         final PackageManager pm = getPackageManager();
-        final Collection<ResolveInfo> infoList = getLaunchableResolveInfos(pm);
+        final Collection<ResolveInfo> infoList = getLaunchableResolveInfos(pm, null);
         final int infoListSize = infoList.size();
         final LaunchableAdapter<LaunchableActivity> adapter
                 = new LaunchableAdapter<>(this, R.layout.app_grid_item, infoListSize);
         final int cores = Runtime.getRuntime().availableProcessors();
-        final String thisCanonicalName = getClass().getCanonicalName();
 
         if (cores <= 1) {
-            for (final ResolveInfo info : infoList) {
-                // Don't include activities from this package.
-                if (!thisCanonicalName.startsWith(info.activityInfo.packageName)) {
-                final LaunchableActivity launchableActivity = new LaunchableActivity(
-                        info.activityInfo, info.activityInfo.loadLabel(pm).toString(), false);
-
-                    adapter.add(launchableActivity);
-                }
-            }
+            addToAdapter(infoList);
         } else {
+            final String thisCanonicalName = getClass().getCanonicalName();
             final SimpleTaskConsumerManager simpleTaskConsumerManager =
                     new SimpleTaskConsumerManager(cores, infoListSize);
 
@@ -523,48 +612,6 @@ public class SearchActivity extends Activity
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
-    private void handlePackageChanged() {
-        final SharedPreferences.Editor editor = mSharedPreferences.edit();
-        final String[] packageChangedNames = mSharedPreferences.getString("package_changed_name", "")
-                .split(" ");
-        final Intent intent = new Intent(Intent.ACTION_MAIN);
-
-        editor.remove("package_changed_name");
-        editor.apply();
-
-        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-
-        for (String packageName : packageChangedNames) {
-            packageName = packageName.trim();
-
-            if (!packageName.isEmpty()) {
-                intent.setPackage(packageName);
-                final Collection<ResolveInfo> infoList =
-                        getPackageManager().queryIntentActivities(intent, 0);
-
-                if (infoList.isEmpty()) {
-                    Log.d("SearchActivity",
-                            "No activities in list. Uninstall detected: " + packageName);
-                    mAdapter.remove(packageName);
-                } else {
-                    Log.d("SearchActivity", "Activities in list. Install/update detected!");
-                    final PackageManager pm = getPackageManager();
-
-                    for (final ResolveInfo info : infoList) {
-                        if (mAdapter.getPosition(info.activityInfo.packageName) == -1) {
-                            final LaunchableActivity launchableActivity = new LaunchableActivity(
-                                    info.activityInfo, info.activityInfo.loadLabel(pm).toString(),
-                                    false);
-                            mAdapter.add(launchableActivity);
-                        }
-                    }
-                }
-            }
-        }
-
-        mAdapter.sortApps();
-    }
-
     @Override
     public void onBackPressed() {
         if (isCurrentLauncher()) {
@@ -576,10 +623,10 @@ public class SearchActivity extends Activity
 
     @Override
     protected void onDestroy() {
-        unregisterReceiver(mPackageChangedReceiver);
         if (!isChangingConfigurations()) {
             Log.d("HayaiLauncher", "Hayai is ded");
         }
+        disableReceiver();
         mAdapter.onDestroy();
         super.onDestroy();
     }
@@ -595,9 +642,7 @@ public class SearchActivity extends Activity
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         //does this need to run in uiThread?
-        if (key.equals("package_changed_name") && !sharedPreferences.getString(key, "").isEmpty()) {
-            handlePackageChanged();
-        } else if (key.equals("pref_app_preferred_order")) {
+        if (key.equals("pref_app_preferred_order")) {
             setPreferredOrder();
             mAdapter.sortApps();
         } else if (key.equals("pref_disable_icons")) {
@@ -759,12 +804,22 @@ public class SearchActivity extends Activity
             launchableActivity.setLaunchTime();
             launchableActivity.addUsage();
             prefs.writePreference(launchableActivity);
-            mAdapter.sortApps();
-        } catch (ActivityNotFoundException e) {
-            //this should only happen when the launcher still hasn't updated the file list after
-            //an activity removal.
-            Toast.makeText(this, getString(R.string.activity_not_found),
-                    Toast.LENGTH_SHORT).show();
+
+            if (mAdapter.isOrderedByRecent()) {
+                mAdapter.sort(LaunchableAdapter.RECENT);
+            } else if (mAdapter.isOrderedByUsage()) {
+                mAdapter.sort(LaunchableAdapter.USAGE);
+            }
+        } catch (final ActivityNotFoundException e) {
+            if (BuildConfig.DEBUG) {
+                throw e;
+            } else {
+                final String notFound = getString(R.string.activity_not_found);
+
+                Log.e(TAG, notFound, e);
+                Toast.makeText(this, getString(R.string.activity_not_found),
+                        Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

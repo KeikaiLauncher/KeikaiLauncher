@@ -15,11 +15,13 @@
 package com.hayaisoftware.launcher;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -54,28 +55,30 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
     /**
      * This comparator orders {@link LaunchableActivity} objects in alphabetical order.
      */
-    private static final Comparator<LaunchableActivity> ALPHABETICAL = new AlphabeticalOrder();
-
-    private static final Pattern DIACRITICAL_MARKS =
-            Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+    public static final Comparator<LaunchableActivity> ALPHABETICAL = new AlphabeticalOrder();
 
     /**
      * This comparator orders {@link LaunchableActivity} objects with "pins" at the head of the
      * list.
      */
-    private static final Comparator<LaunchableActivity> PIN_TO_TOP = new PinToTop();
+    public static final Comparator<LaunchableActivity> PIN_TO_TOP = new PinToTop();
 
     /**
      * This comparator orders {@link LaunchableActivity} objects in most recently used at the head
      * of the list.
      */
-    private static final Comparator<LaunchableActivity> RECENT = new RecentOrder();
+    public static final Comparator<LaunchableActivity> RECENT = new RecentOrder();
 
     /**
      * This comparator orders {@link LaunchableActivity} objects in most used order at the head
      * of the list.
      */
-    private static final Comparator<LaunchableActivity> USAGE = new UsageOrder();
+    public static final Comparator<LaunchableActivity> USAGE = new UsageOrder();
+
+    private static final Pattern DIACRITICAL_MARKS =
+            Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+
+    private static final String TAG = "LaunchableAdapter";
 
     /**
      * The context of the parent object.
@@ -346,6 +349,34 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
     }
 
     /**
+     * Returns the position of a {@link LaunchableActivity} where the
+     * {@link LaunchableActivity#getComponent()}.{@link ComponentName#getClassName()} is equal to
+     * the {@code className} parameter.
+     *
+     * @param className The classname to find.
+     * @return The LaunchableActivity matching the classname parameter, {@code -1} if not found.
+     */
+    public int getClassNamePosition(@NonNull final String className) {
+        final List<T> current;
+        int position = -1;
+
+        if (mOriginalValues == null) {
+            current = mObjects;
+        } else {
+            current = mOriginalValues;
+        }
+
+        final int currentSize = current.size();
+        for (int i = 0; i < currentSize && position == -1; i++) {
+            if (current.get(i).getComponent().getClassName().equals(className)) {
+                position = i;
+            }
+        }
+
+        return position;
+    }
+
+    /**
      * Returns the context associated with this array adapter. The context is used
      * to create views from the resource passed to the constructor.
      *
@@ -422,12 +453,13 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
 
     /**
      * Returns the position of a {@link LaunchableActivity} where the
-     * {@link LaunchableActivity#getClassName()} is equal to the {@code className} parameter.
+     * {@link LaunchableActivity#getComponent()}.{@link ComponentName#getPackageName()} is
+     * equal to the {@code className} parameter.
      *
-     * @param className The classname to find.
+     * @param packageName The package name to find in this adapter.
      * @return The LaunchableActivity matching the classname parameter, {@code -1} if not found.
      */
-    public int getPosition(@NonNull final String className) {
+    public int getPackageNamePosition(@NonNull final String packageName) {
         final List<T> current;
         int position = -1;
 
@@ -437,10 +469,10 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
             current = mOriginalValues;
         }
 
-        for (int i = 0; i < current.size(); i++) {
-            if (className.equals(current.get(i).getClassName())) {
+        final int currentSize = current.size();
+        for (int i = 0; i < currentSize && position == -1; i++) {
+            if (current.get(i).getComponent().getPackageName().equals(packageName)) {
                 position = i;
-                break;
             }
         }
 
@@ -468,7 +500,10 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
         }
 
         view.setVisibility(View.VISIBLE);
-        final LaunchableActivity launchableActivity = getItem(position);
+        final LaunchableActivity launchableActivity;
+        synchronized (mLock) {
+            launchableActivity = getItem(position);
+        }
         final CharSequence label = launchableActivity.getActivityLabel();
         final TextView appLabelView = view.findViewById(R.id.appLabel);
         final ImageView appIconView = view.findViewById(R.id.appIcon);
@@ -525,12 +560,21 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
         }
     }
 
+    public boolean isOrderedByRecent() {
+        return mOrderByRecent;
+    }
+
+    public boolean isOrderedByUsage() {
+        return mOrderByUsage;
+    }
+
     /**
      * Notifies the attached observers that the underlying data has been changed
      * and any View reflecting the data set should refresh itself.
      */
     @Override
     public void notifyDataSetChanged() {
+        Log.v(TAG, "Notifying about adapter change");
         super.notifyDataSetChanged();
         mNotifyOnChange = true;
     }
@@ -546,44 +590,25 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
         }
     }
 
-    /**
-     * This method removes all applications belonging to a package name.
-     *
-     * @param packageName The package name to remove.
-     * @return Whether the adapter was modified.
-     */
-    public boolean remove(@NonNull final String packageName) {
-        final int initCount;
-        final int resultCount;
-        final Iterator<T> iter;
+    public boolean remove(final int index) {
+        final List<T> current;
+        final T result;
 
         synchronized (mLock) {
             if (mOriginalValues == null) {
-                iter = mObjects.listIterator();
-                initCount = mObjects.size();
+                current = mObjects;
             } else {
-                iter = mOriginalValues.listIterator();
-                initCount = mOriginalValues.size();
+                current = mOriginalValues;
             }
 
-            while (iter.hasNext()) {
-                if (iter.next().getClassName().startsWith(packageName)) {
-                    iter.remove();
-                }
-            }
-
-            if (mOriginalValues == null) {
-                resultCount = mObjects.size();
-            } else {
-                resultCount = mOriginalValues.size();
-            }
+            result = current.remove(index);
         }
 
         if (mNotifyOnChange) {
             notifyDataSetChanged();
         }
 
-        return initCount != resultCount;
+        return result != null;
     }
 
     /**
@@ -603,6 +628,64 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
         if (mNotifyOnChange) {
             notifyDataSetChanged();
         }
+    }
+
+    /**
+     * This method removes all items by name.
+     *
+     * This method removes all items by name. This method has been made very specifically to meet
+     * the need of this Adapter.
+     *
+     * This method will remove a package name if it has an equal {@code name} in this Adapter.
+     *
+     * This method will remove a class name if it has a classname that starts with {@code name} in
+     * this adapter.
+     *
+     * This complexity is required because some packages install multiple activities (see "A Photo
+     * Manager"
+     *
+     * Some packages install activities with duplicate names (see Google Drive/Google Sheets).
+     *
+     * This method should not be part of this class, but we rely on locking the collections during
+     * this critical method.
+     *
+     * @param name The name. See the description for more information.
+     * @return The number of packages removed by this method.
+     */
+    public int removeAllByName(@NonNull final String name) {
+        ComponentName component;
+        final List<T> current;
+        int removedCount = 0;
+
+        synchronized (mLock) {
+            if (mOriginalValues == null) {
+                current = mObjects;
+            } else {
+                current = mOriginalValues;
+            }
+
+            for (int i = current.size() - 1; i >= 0; i--) {
+                //noinspection ConstantConditions
+                component = current.get(i).getComponent();
+
+                if (component.getClassName().startsWith(name)) {
+                    Log.d(TAG, "Removing " + name +
+                            " by starting with classname: " + component.getClassName());
+                    current.remove(i);
+                    removedCount++;
+                } else if (component.getPackageName().equals(name)) {
+                    Log.d(TAG, "Found position of " + name);
+                    current.remove(i);
+                    removedCount++;
+                }
+            }
+        }
+
+        if (mNotifyOnChange) {
+            notifyDataSetChanged();
+        }
+
+        return removedCount;
     }
 
     /**
@@ -695,11 +778,11 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
         }
     }
 
-    /*
+    /**
      * Returns a string representation of the current LaunchActivity collection.
      *
-             * @return A string representation of the current LaunchActivity collection.
-            */
+     * @return A string representation of the current LaunchActivity collection.
+     */
     @Override
     public String toString() {
         final String toString;
