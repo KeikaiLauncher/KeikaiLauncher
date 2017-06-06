@@ -14,9 +14,9 @@
 
 package com.hayaisoftware.launcher;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.widget.ImageView;
 
 import com.hayaisoftware.launcher.threading.SimpleTaskConsumerManager;
@@ -35,11 +35,12 @@ public class ImageLoadingTask extends SimpleTaskConsumerManager.Task {
     }
 
     public boolean doTask() {
+        final Context context = mImageView.getContext();
         final Drawable activityIcon =
-                mLaunchableActivity.getActivityIcon(mSharedData.mContext,
-                        mSharedData.mIconSizePixels);
-        mSharedData.mActivity.runOnUiThread(new Runnable() {
+                mLaunchableActivity.getActivityIcon(context, mSharedData.mIconSizePixels);
+        final Handler handler = new Handler(context.getMainLooper());
 
+        handler.post(new Runnable() {
             @Override
             public void run() {
                 if (mImageView.getTag() == mLaunchableActivity)
@@ -50,14 +51,9 @@ public class ImageLoadingTask extends SimpleTaskConsumerManager.Task {
     }
 
     public static class SharedData {
-        private final Activity mActivity;
-        private final Context mContext;
         private final int mIconSizePixels;
 
-        public SharedData(final Activity activity, final Context context,
-                          final int iconSizePixels) {
-            this.mActivity = activity;
-            this.mContext = context;
+        public SharedData(final int iconSizePixels) {
             this.mIconSizePixels = iconSizePixels;
         }
     }

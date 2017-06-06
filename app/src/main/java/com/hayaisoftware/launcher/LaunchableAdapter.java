@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.zip.Inflater;
 
 /**
  * This class is an adapter for LaunchableActivities, originally inspired by the ArrayAdapter
@@ -81,11 +82,6 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
     private static final String TAG = "LaunchableAdapter";
 
     /**
-     * The context of the parent object.
-     */
-    private final Context mContext;
-
-    /**
      * The {@link Filter} used by this list {@code Adapter}.
      */
     private final LaunchableFilter mFilter = new LaunchableFilter();
@@ -98,12 +94,6 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
     private final SimpleTaskConsumerManager mImageLoadingConsumersManager;
 
     private final ImageLoadingTask.SharedData mImageTasksSharedData;
-
-    /**
-     * The {@code LayoutInflater} to use if there is no {@code ConvertView} to use for inflating
-     * {@code View}s created by this {@code Adapter}.
-     */
-    private final LayoutInflater mInflater;
 
     /**
      * Lock used to modify the content of {@link #mObjects}. Any write operation
@@ -165,17 +155,15 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
      * @param resource The resource ID for a layout file containing a TextView to use when
      *                 instantiating views.
      */
-    public LaunchableAdapter(@NonNull final Context context, @LayoutRes final int resource, final int initialSize) {
+    public LaunchableAdapter(@NonNull final Context context, @LayoutRes final int resource,
+            final int initialSize) {
         final Resources res = context.getResources();
-        mContext = context;
-        mInflater = LayoutInflater.from(context);
         mDropDownResource = resource;
         mObjects = Collections.synchronizedList(new ArrayList<T>(initialSize));
         mIconSizePixels = res.getDimensionPixelSize(R.dimen.app_icon_size);
         mImageLoadingConsumersManager =
                 new SimpleTaskConsumerManager(getOptimalNumberOfThreads(res), 300);
-        mImageTasksSharedData = new ImageLoadingTask.SharedData((Activity) mContext, mContext,
-                mIconSizePixels);
+        mImageTasksSharedData = new ImageLoadingTask.SharedData(mIconSizePixels);
         mPrefs = new LaunchableActivityPrefs(context);
     }
 
@@ -183,7 +171,7 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
      * This constructor is for reloading this Adapter using the {@link #export()} method.
      *
      * @param object   The Object from the {@code export()} method.
-     * @param context  The current context.
+     * @param context  The current activity.
      * @param resource The resource ID for a layout file containing a TextView to use when
      *                 instantiating views.
      */
@@ -376,17 +364,6 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
         return position;
     }
 
-    /**
-     * Returns the context associated with this array adapter. The context is used
-     * to create views from the resource passed to the constructor.
-     *
-     * @return The Context associated with this adapter.
-     */
-    @NonNull
-    public Context getContext() {
-        return mContext;
-    }
-
     @Override
     public int getCount() {
         return mObjects.size();
@@ -396,9 +373,10 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
     public View getDropDownView(final int position, @Nullable final View convertView,
             @NonNull final ViewGroup parent) {
         final TextView text;
+        final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         if (convertView == null) {
-            text = (TextView) mInflater.inflate(mDropDownResource, parent, false);
+            text = (TextView) inflater.inflate(mDropDownResource, parent, false);
         } else {
             text = (TextView) convertView;
         }
@@ -493,8 +471,10 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
     public View getView(final int position, final View convertView,
             @NonNull final ViewGroup parent) {
         final View view;
+        final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+
         if (convertView == null) {
-            view = mInflater.inflate(R.layout.app_grid_item, parent, false);
+            view = inflater.inflate(R.layout.app_grid_item, parent, false);
         } else {
             view = convertView;
         }
@@ -515,7 +495,7 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
         appIconView.setTag(launchableActivity);
         if (launchableActivity.isIconLoaded()) {
             appIconView.setImageDrawable(
-                    launchableActivity.getActivityIcon(mContext, mIconSizePixels));
+                    launchableActivity.getActivityIcon(parent.getContext(), mIconSizePixels));
         } else {
             if (mIconsEnabled) {
                 mImageLoadingConsumersManager.addTask(

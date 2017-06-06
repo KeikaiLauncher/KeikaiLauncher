@@ -76,10 +76,7 @@ public class SearchActivity extends Activity
     private static final String TAG = "SearchActivity";
     private static final String SEARCH_EDIT_TEXT_KEY = "SearchEditText";
     private LaunchableAdapter<LaunchableActivity> mAdapter;
-    private SharedPreferences mSharedPreferences;
     private EditText mSearchEditText;
-    private InputMethodManager mInputMethodManager;
-    private View mOverflowButtonTopleft;
 
     /**
      * Retrieves the visibility status of the navigation bar.
@@ -267,8 +264,6 @@ public class SearchActivity extends Activity
 
         //fields:
         mSearchEditText = (EditText) findViewById(R.id.user_search_input);
-        mOverflowButtonTopleft = findViewById(R.id.overflow_button_topleft);
-        mInputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         mAdapter = loadLaunchableAdapter();
 
         final boolean noMultiWindow = Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
@@ -280,10 +275,7 @@ public class SearchActivity extends Activity
         PackageChangedReceiver.setCallback(this);
         enableReceiver();
 
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         setupPreferences();
-        mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
-
         //loadShareableApps();
         setupViews();
     }
@@ -338,10 +330,14 @@ public class SearchActivity extends Activity
     @Override
     protected void onResume() {
         super.onResume();
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         final Editable searchText = mSearchEditText.getText();
 
-        if (mSharedPreferences.getBoolean(SettingsFragment.KEY_PREF_AUTO_KEYBOARD, false) ||
+        if (preferences.getBoolean(SettingsFragment.KEY_PREF_AUTO_KEYBOARD, false) ||
                 searchText.length() > 0) {
+            final InputMethodManager imm =
+                    (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
             // This is a special case to show SearchEditText should have focus.
             if (searchText.length() == 1 && searchText.charAt(0) == '\0') {
                 mSearchEditText.setText(null);
@@ -349,12 +345,12 @@ public class SearchActivity extends Activity
 
             mSearchEditText.requestFocus();
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-            mInputMethodManager.showSoftInput(mSearchEditText, 0);
+            imm.showSoftInput(mSearchEditText, 0);
         } else {
             hideKeyboard();
         }
 
-        if (mSharedPreferences.getBoolean(SettingsFragment.KEY_PREF_ALLOW_ROTATION, false)) {
+        if (preferences.getBoolean(SettingsFragment.KEY_PREF_ALLOW_ROTATION, false)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
@@ -461,27 +457,28 @@ public class SearchActivity extends Activity
     }
 
     private void setupPreferences() {
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        if (mSharedPreferences.getBoolean(SettingsFragment.KEY_PREF_NOTIFICATION, false)) {
+        if (preferences.getBoolean(SettingsFragment.KEY_PREF_NOTIFICATION, false)) {
             final ShortcutNotificationManager shortcutNotificationManager = new ShortcutNotificationManager();
             final String strPriority =
-                    mSharedPreferences.getString(SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY,
-                            "low");
+                    preferences.getString(SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY, "low");
             final int priority = ShortcutNotificationManager.getPriorityFromString(strPriority);
             shortcutNotificationManager.showNotification(this, priority);
         }
 
-        if (mSharedPreferences.getBoolean("pref_disable_icons", false)) {
+        if (preferences.getBoolean("pref_disable_icons", false)) {
             mAdapter.setIconsDisabled();
         } else {
             mAdapter.setIconsEnabled();
         }
 
-        setPreferredOrder();
+        setPreferredOrder(preferences);
+        preferences.registerOnSharedPreferenceChangeListener(this);
     }
 
-    private void setPreferredOrder() {
-        final String order = mSharedPreferences.getString("pref_app_preferred_order", "recent");
+    private void setPreferredOrder(final SharedPreferences preferences) {
+        final String order = preferences.getString("pref_app_preferred_order", "recent");
 
         if ("recent".equals(order)) {
             mAdapter.enableOrderByRecent();
@@ -606,7 +603,10 @@ public class SearchActivity extends Activity
         final View focus = getCurrentFocus();
 
         if (focus != null) {
-            mInputMethodManager.hideSoftInputFromWindow(focus.getWindowToken(), 0);
+            final InputMethodManager imm =
+                    (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+            imm.hideSoftInputFromWindow(focus.getWindowToken(), 0);
         }
         findViewById(R.id.appsContainer).requestFocus();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -643,7 +643,7 @@ public class SearchActivity extends Activity
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         //does this need to run in uiThread?
         if (key.equals("pref_app_preferred_order")) {
-            setPreferredOrder();
+            setPreferredOrder(sharedPreferences);
             mAdapter.sortApps();
         } else if (key.equals("pref_disable_icons")) {
             recreate();
@@ -678,7 +678,7 @@ public class SearchActivity extends Activity
 
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_MENU) {
-            showPopup(mOverflowButtonTopleft);
+            showPopup(findViewById(R.id.overflow_button_topleft));
             return true;
         }
         return super.onKeyUp(keyCode, event);
@@ -789,7 +789,7 @@ public class SearchActivity extends Activity
     }
 
     public void onClickSettingsButton(View view) {
-        showPopup(mOverflowButtonTopleft);
+        showPopup(findViewById(R.id.overflow_button_topleft));
 
 
     }
