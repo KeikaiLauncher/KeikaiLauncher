@@ -487,7 +487,6 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
         final CharSequence label = launchableActivity.getActivityLabel();
         final TextView appLabelView = view.findViewById(R.id.appLabel);
         final ImageView appIconView = view.findViewById(R.id.appIcon);
-        final View appShareIndicator = view.findViewById(R.id.appShareIndicator);
         final View appPinToTop = view.findViewById(R.id.appPinToTop);
 
         appLabelView.setText(label);
@@ -502,12 +501,6 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
                         new ImageLoadingTask(appIconView, launchableActivity,
                                 mImageTasksSharedData));
             }
-        }
-
-        if (launchableActivity.isShareable()) {
-            appShareIndicator.setVisibility(View.VISIBLE);
-        } else {
-            appShareIndicator.setVisibility(View.GONE);
         }
 
         if (launchableActivity.getPriority() > 0) {

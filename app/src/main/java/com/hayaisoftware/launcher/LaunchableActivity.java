@@ -26,8 +26,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 
-import com.hayaisoftware.launcher.util.ContentShare;
-
 
 public class LaunchableActivity{
 
@@ -38,16 +36,13 @@ public class LaunchableActivity{
     private Intent mLaunchIntent;
     private long lastLaunchTime;
     private int usagesQuantity;
-    private boolean mShareable;
     private Drawable mActivityIcon;
     private int mPriority;
 
-    public LaunchableActivity(final ActivityInfo activityInfo, final String activityLabel,
-                              final boolean isShareable) {
+    public LaunchableActivity(final ActivityInfo activityInfo, final String activityLabel) {
         mIconResource = activityInfo.getIconResource();
         this.mActivityLabel = activityLabel;
         mComponentName = new ComponentName(activityInfo.packageName, activityInfo.name);
-        this.mShareable = isShareable;
     }
 
     public LaunchableActivity(final ComponentName componentName, final String label,
@@ -59,14 +54,9 @@ public class LaunchableActivity{
         mIconResource = -1;
     }
 
-    public Intent getLaunchIntent(final String searchString) {
+    public Intent getLaunchIntent() {
         if (mLaunchIntent != null)
             return mLaunchIntent;
-        if (isShareable()) {
-            final Intent launchIntent = ContentShare.shareTextIntent(searchString);
-            launchIntent.setComponent(getComponent());
-            return launchIntent;
-        }
         final Intent launchIntent = new Intent(Intent.ACTION_MAIN);
         launchIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
@@ -164,10 +154,6 @@ public class LaunchableActivity{
 
     public String getClassName() {
         return mComponentName.getClassName();
-    }
-
-    public boolean isShareable() {
-        return mShareable;
     }
 
     public void addUsage() {

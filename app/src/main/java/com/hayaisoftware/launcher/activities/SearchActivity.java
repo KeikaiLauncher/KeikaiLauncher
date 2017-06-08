@@ -64,11 +64,8 @@ import com.hayaisoftware.launcher.R;
 import com.hayaisoftware.launcher.ShortcutNotificationManager;
 import com.hayaisoftware.launcher.fragments.SettingsFragment;
 import com.hayaisoftware.launcher.threading.SimpleTaskConsumerManager;
-import com.hayaisoftware.launcher.util.ContentShare;
 
 import java.util.Collection;
-
-import static com.hayaisoftware.launcher.util.ContentShare.getLaunchableResolveInfos;
 
 public class SearchActivity extends Activity
         implements SharedPreferences.OnSharedPreferenceChangeListener, PackageChangeCallback {
@@ -276,7 +273,6 @@ public class SearchActivity extends Activity
         enableReceiver();
 
         setupPreferences();
-        //loadShareableApps();
         setupViews();
     }
 
@@ -554,7 +550,7 @@ public class SearchActivity extends Activity
             if (!thisCanonicalName.startsWith(info.activityInfo.packageName)) {
                 final String label = info.activityInfo.loadLabel(pm).toString();
                 final LaunchableActivity launchableActivity =
-                        new LaunchableActivity(info.activityInfo, label, false);
+                        new LaunchableActivity(info.activityInfo, label);
 
                 mAdapter.add(launchableActivity);
             }
@@ -799,7 +795,7 @@ public class SearchActivity extends Activity
 
         hideKeyboard();
         try {
-            startActivity(launchableActivity.getLaunchIntent(mSearchEditText.getText().toString()));
+            startActivity(launchableActivity.getLaunchIntent());
             mSearchEditText.setText(null);
             launchableActivity.setLaunchTime();
             launchableActivity.addUsage();

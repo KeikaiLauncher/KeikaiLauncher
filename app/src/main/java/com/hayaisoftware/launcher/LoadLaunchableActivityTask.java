@@ -33,7 +33,7 @@ public class LoadLaunchableActivityTask extends SimpleTaskConsumerManager.Task {
     public boolean doTask() {
         final LaunchableActivity launchableActivity = new LaunchableActivity(
                 info.activityInfo, info.activityInfo.loadLabel(mSharedData.mPackageManager)
-                .toString(), false);
+                .toString());
 
         mSharedData.launchablesFromResolve.add(launchableActivity);
 

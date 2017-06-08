@@ -31,13 +31,6 @@
             android:src="@android:mipmap/sym_def_app_icon"/>
 
         <ImageView
-            android:id="@+id/appShareIndicator"
-            android:layout_width="wrap_content"
-            android:layout_height="18dp"
-            android:src="@drawable/ic_send_white_18dp"
-            android:visibility="gone"/>
-
-        <ImageView
             android:id="@+id/appPinToTop"
             android:layout_width="@dimen/app_pin_size"
             android:layout_height="@dimen/app_pin_size"
