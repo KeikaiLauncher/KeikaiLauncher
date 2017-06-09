@@ -20,7 +20,7 @@ android {
     defaultConfig {
         applicationId 'com.hayaisoftware.launcher'
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 10405
         versionName "1.4.5"
     }
