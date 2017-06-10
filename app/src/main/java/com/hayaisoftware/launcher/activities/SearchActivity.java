@@ -70,6 +70,10 @@ import java.util.Collection;
 public class SearchActivity extends Activity
         implements SharedPreferences.OnSharedPreferenceChangeListener, PackageChangeCallback {
 
+    private static final String KEY_PREF_DISABLE_ICONS = "pref_disable_icons";
+    private static final String KEY_PREF_PREFERRED_ORDER = "pref_app_preferred_order";
+    private static final String KEY_PREF_PREFERRED_ORDER_RECENT = "recent";
+    private static final String KEY_PREF_PREFERRED_ORDER_USAGE = "usage";
     private static final String TAG = "SearchActivity";
     private static final String SEARCH_EDIT_TEXT_KEY = "SearchEditText";
     private LaunchableAdapter<LaunchableActivity> mAdapter;
@@ -463,7 +467,7 @@ public class SearchActivity extends Activity
             shortcutNotificationManager.showNotification(this, priority);
         }
 
-        if (preferences.getBoolean("pref_disable_icons", false)) {
+        if (preferences.getBoolean(KEY_PREF_DISABLE_ICONS, false)) {
             mAdapter.setIconsDisabled();
         } else {
             mAdapter.setIconsEnabled();
@@ -474,15 +478,16 @@ public class SearchActivity extends Activity
     }
 
     private void setPreferredOrder(final SharedPreferences preferences) {
-        final String order = preferences.getString("pref_app_preferred_order", "recent");
+        final String order = preferences.getString(KEY_PREF_PREFERRED_ORDER,
+                KEY_PREF_PREFERRED_ORDER_RECENT);
 
-        if ("recent".equals(order)) {
+        if (KEY_PREF_PREFERRED_ORDER_RECENT.equals(order)) {
             mAdapter.enableOrderByRecent();
         } else {
             mAdapter.disableOrderByRecent();
         }
 
-        if ("usage".equals(order)) {
+        if (KEY_PREF_PREFERRED_ORDER_USAGE.equals(order)) {
             mAdapter.enableOrderByUsage();
         } else {
             mAdapter.disableOrderByUsage();
@@ -638,10 +643,10 @@ public class SearchActivity extends Activity
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         //does this need to run in uiThread?
-        if (key.equals("pref_app_preferred_order")) {
+        if (key.equals(KEY_PREF_PREFERRED_ORDER)) {
             setPreferredOrder(sharedPreferences);
             mAdapter.sortApps();
-        } else if (key.equals("pref_disable_icons")) {
+        } else if (key.equals(KEY_PREF_DISABLE_ICONS)) {
             recreate();
         }
     }
