@@ -787,6 +787,8 @@ public class SearchActivity extends Activity
             mSearchEditText.setText(null);
         }
 
+        closeContextMenu();
+
         // If the y coordinate is not at 0, let's reset it.
         final GridView view = (GridView) findViewById(R.id.appsContainer);
         final int[] loc = { 0, 0 };
