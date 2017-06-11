@@ -114,7 +114,7 @@ public class LaunchableActivityPrefs extends SQLiteOpenHelper {
             column = cursor.getColumnIndex(KEY_USAGEQUANTIY);
 
             if (column != -1) {
-                launchableActivity.setusagesQuantity(cursor.getInt(column));
+                launchableActivity.setUsageQuantity(cursor.getInt(column));
             }
         }
 
@@ -130,7 +130,7 @@ public class LaunchableActivityPrefs extends SQLiteOpenHelper {
         final SQLiteDatabase db = getWritableDatabase();
         final ContentValues values = new ContentValues();
         final int priority = launchableActivity.getPriority();
-        final int usageQuantity = launchableActivity.getusagesQuantity();
+        final int usageQuantity = launchableActivity.getUsageQuantity();
         final String className = launchableActivity.getComponent().getClassName();
 
         if (priority > 0) {

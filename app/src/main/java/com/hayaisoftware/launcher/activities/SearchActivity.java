@@ -505,9 +505,8 @@ public class SearchActivity extends Activity
         for (final ResolveInfo info : infoList) {
             // Don't include activities from this package.
             if (!thisCanonicalName.startsWith(info.activityInfo.packageName)) {
-                final String label = info.activityInfo.loadLabel(pm).toString();
                 final LaunchableActivity launchableActivity =
-                        new LaunchableActivity(info.activityInfo, label);
+                        LaunchableActivity.getLaunchable(info.activityInfo, pm);
 
                 mAdapter.add(launchableActivity);
             }
@@ -659,7 +658,7 @@ public class SearchActivity extends Activity
                     .findViewById(R.id.appIcon).getTag();
             final MenuItem item = menu.findItem(R.id.appmenu_pin_to_top);
 
-            menu.setHeaderTitle(activity.getActivityLabel());
+            menu.setHeaderTitle(activity.toString());
 
             if (activity.getPriority() == 0) {
                 item.setTitle(R.string.appmenu_pin_to_top);

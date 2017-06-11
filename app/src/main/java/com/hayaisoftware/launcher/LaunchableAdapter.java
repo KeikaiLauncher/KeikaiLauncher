@@ -484,7 +484,7 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
         synchronized (mLock) {
             launchableActivity = getItem(position);
         }
-        final CharSequence label = launchableActivity.getActivityLabel();
+        final CharSequence label = launchableActivity.toString();
         final TextView appLabelView = view.findViewById(R.id.appLabel);
         final ImageView appIconView = view.findViewById(R.id.appIcon);
         final View appPinToTop = view.findViewById(R.id.appPinToTop);

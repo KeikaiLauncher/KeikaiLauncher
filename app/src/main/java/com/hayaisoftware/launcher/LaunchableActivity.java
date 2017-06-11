@@ -14,7 +14,6 @@
 
 package com.hayaisoftware.launcher;
 
-import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -25,145 +24,140 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.util.Log;
 
 
-public class LaunchableActivity{
+public class LaunchableActivity {
+
+    private static final String TAG = "LaunchableActivity";
+
+    private final String mActivityLabel;
 
     @DrawableRes
     private final int mIconResource;
-    private final String mActivityLabel;
-    private final ComponentName mComponentName;
-    private Intent mLaunchIntent;
-    private long lastLaunchTime;
-    private int usagesQuantity;
+
+    private final Intent mLaunchIntent;
+
+    private final Object mLock = new Object();
+
+    private long mLastLaunchTime;
+
     private Drawable mActivityIcon;
+
     private int mPriority;
 
-    public LaunchableActivity(final ActivityInfo activityInfo, final String activityLabel) {
-        mIconResource = activityInfo.getIconResource();
-        this.mActivityLabel = activityLabel;
-        mComponentName = new ComponentName(activityInfo.packageName, activityInfo.name);
+    private int mUsagesQuantity;
+
+    public LaunchableActivity(@NonNull final Intent intent, @NonNull final String activityLabel,
+            @DrawableRes final int iconResource) {
+        mLaunchIntent = intent;
+        mActivityLabel = activityLabel;
+        mIconResource = iconResource;
     }
 
-    public LaunchableActivity(final ComponentName componentName, final String label,
-                              final Drawable activityIcon, final Intent launchIntent){
-        this.mComponentName = componentName;
-        this.mActivityLabel = label;
-        this.mLaunchIntent = launchIntent;
-        this.mActivityIcon = activityIcon;
-        mIconResource = -1;
+    /**
+     * This is a convenience method to create a LaunchableActivity.
+     *
+     * @param info The {@link ActivityInfo} to extract information from.
+     * @param pm   The PackageManager to use to extract information from.
+     * @return A LaunchableActivity based off the ActivityInfo given.
+     */
+    public static LaunchableActivity getLaunchable(@NonNull final ActivityInfo info,
+            @NonNull final PackageManager pm) {
+        final Intent launchIntent = new Intent(Intent.ACTION_MAIN);
+        final String label = info.loadLabel(pm).toString();
+        final int iconResource = info.getIconResource();
+
+        launchIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+        launchIntent.setComponent(new ComponentName(info.packageName, info.name));
+
+        return new LaunchableActivity(launchIntent, label, iconResource);
+    }
+
+    public void addUsage() {
+        mUsagesQuantity++;
+    }
+
+    public void deleteActivityIcon() {
+        synchronized (mLock) {
+            mActivityIcon = null;
+        }
+    }
+
+    @Nullable
+    public Drawable getActivityIcon(final Context context, final int iconSizePixels) {
+        if (!isIconLoaded()) {
+            synchronized (mLock) {
+                try {
+                    final PackageManager pm = context.getPackageManager();
+                    final Resources resources = pm.getResourcesForActivity(getComponent());
+
+                    //noinspection deprecation
+                    mActivityIcon = resources.getDrawable(mIconResource);
+
+                } catch (PackageManager.NameNotFoundException | Resources.NotFoundException e) {
+                    Log.e(TAG, "Error when trying to inflate a launcher icon.", e);
+                }
+
+                //rescaling the icon if it is bigger than the target size
+                //TODO do this when it is not a bitmap drawable?
+                if (mActivityIcon instanceof BitmapDrawable) {
+                    if (mActivityIcon.getIntrinsicHeight() > iconSizePixels &&
+                            mActivityIcon.getIntrinsicWidth() > iconSizePixels) {
+                        //noinspection deprecation
+                        mActivityIcon = new BitmapDrawable(
+                                Bitmap.createScaledBitmap(
+                                        ((BitmapDrawable) mActivityIcon).getBitmap()
+                                        , iconSizePixels, iconSizePixels, false));
+                    }
+                }
+            }
+        }
+        return mActivityIcon;
+    }
+
+    public ComponentName getComponent() {
+        return mLaunchIntent.getComponent();
     }
 
     public Intent getLaunchIntent() {
-        if (mLaunchIntent != null)
-            return mLaunchIntent;
-        final Intent launchIntent = new Intent(Intent.ACTION_MAIN);
-        launchIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-        launchIntent.setComponent(mComponentName);
-        return launchIntent;
+        return mLaunchIntent;
     }
 
-    public void setLaunchTime() {
-        lastLaunchTime = System.currentTimeMillis() / 1000;
+    public long getLaunchTime() {
+        return mLastLaunchTime;
     }
 
     public int getPriority() {
         return mPriority;
     }
 
-    public void setPriority(final int priority) {
-        this.mPriority = priority;
-    }
-
-    public long getLaunchTime() {
-        return lastLaunchTime;
-    }
-
-    public void setLaunchTime(long timestamp) {
-        lastLaunchTime = timestamp;
-    }
-
-    public String getActivityLabel() {
-        return mActivityLabel;
+    public int getUsageQuantity() {
+        return mUsagesQuantity;
     }
 
     public boolean isIconLoaded() {
         return mActivityIcon != null;
     }
 
-    public synchronized void deleteActivityIcon(){
-        mActivityIcon=null;
+    public void setLaunchTime() {
+        mLastLaunchTime = System.currentTimeMillis() / 1000;
     }
 
-    public synchronized Drawable getActivityIcon(final Context context, final int iconSizePixels) {
-        if (!isIconLoaded()) {
-            Drawable _activityIcon = null;
-                final ActivityManager activityManager =
-                        (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                final int iconDpi = activityManager.getLauncherLargeIconDensity();
-                try {
-                    final PackageManager pm = context.getPackageManager();
-                    final Resources resources = pm.getResourcesForActivity(mComponentName);
-                    @DrawableRes
-                    final int iconRes;
-
-                    if (mIconResource == -1) {
-                        iconRes = pm.getActivityInfo(mComponentName, 0).getIconResource();
-                    } else {
-                        iconRes = mIconResource;
-                    }
-
-                    //noinspection deprecation
-                    _activityIcon =
-                            resources.getDrawableForDensity(iconRes, iconDpi);
-
-                } catch (PackageManager.NameNotFoundException | Resources.NotFoundException e) {
-                    //if we get here, there's no icon to load.
-                    //there's nothing to do, as the android default icon will be loaded
-                }
-
-                if (_activityIcon == null) {
-                    //noinspection deprecation
-                    _activityIcon = Resources.getSystem().getDrawable(
-                            android.R.mipmap.sym_def_app_icon);
-                }
-
-
-            //rescaling the icon if it is bigger than the target size
-            //TODO do this when it is not a bitmap drawable?
-            if (_activityIcon instanceof BitmapDrawable) {
-                //Log.d("SIZE"," "+_activityIcon.getIntrinsicHeight()+ " not "+iconSizePixels);
-                //Log.d("SIZE"," "+_activityIcon.getIntrinsicHeight()+ " not "+iconSizePixels);
-                if (_activityIcon.getIntrinsicHeight() > iconSizePixels &&
-                        _activityIcon.getIntrinsicWidth() > iconSizePixels) {
-                    //noinspection deprecation
-                    _activityIcon = new BitmapDrawable(
-                            Bitmap.createScaledBitmap(((BitmapDrawable) _activityIcon).getBitmap()
-                                    , iconSizePixels, iconSizePixels, false));
-                }
-            }
-            mActivityIcon = _activityIcon;
-        }
-        return mActivityIcon;
+    public void setLaunchTime(final long timestamp) {
+        mLastLaunchTime = timestamp;
     }
 
-    public ComponentName getComponent() {
-        return mComponentName;
+    public void setPriority(final int priority) {
+        mPriority = priority;
     }
 
-    public String getClassName() {
-        return mComponentName.getClassName();
-    }
-
-    public void addUsage() {
-        usagesQuantity ++;
-    }
-    public int getusagesQuantity(){
-        return usagesQuantity;
-    }
-    public void setusagesQuantity(int usagesQuantity){
-        this.usagesQuantity = usagesQuantity;
+    public void setUsageQuantity(final int usagesQuantity) {
+        mUsagesQuantity = usagesQuantity;
     }
 
     @Override

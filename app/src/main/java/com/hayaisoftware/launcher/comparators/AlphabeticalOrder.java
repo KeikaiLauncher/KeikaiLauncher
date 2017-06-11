@@ -22,6 +22,6 @@ import java.util.Comparator;
 public class AlphabeticalOrder implements Comparator<LaunchableActivity> {
     @Override
     public int compare(LaunchableActivity lhs, LaunchableActivity rhs) {
-        return lhs.getActivityLabel().compareToIgnoreCase(rhs.getActivityLabel());
+        return lhs.toString().compareToIgnoreCase(rhs.toString());
     }
 }
