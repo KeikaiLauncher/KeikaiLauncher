@@ -825,14 +825,24 @@ public class SearchActivity extends Activity
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        if (menuInfo instanceof AdapterContextMenuInfo) {
-            AdapterContextMenuInfo adapterMenuInfo = (AdapterContextMenuInfo) menuInfo;
-            menu.setHeaderTitle(
-                    ((LaunchableActivity) adapterMenuInfo.targetView
-                            .findViewById(R.id.appIcon).getTag()).getActivityLabel());
-        }
+
         final MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.app, menu);
+
+        if (menuInfo instanceof AdapterContextMenuInfo) {
+            final AdapterContextMenuInfo adapterMenuInfo = (AdapterContextMenuInfo) menuInfo;
+            final LaunchableActivity activity = (LaunchableActivity) adapterMenuInfo.targetView
+                    .findViewById(R.id.appIcon).getTag();
+            final MenuItem item = menu.findItem(R.id.appmenu_pin_to_top);
+
+            menu.setHeaderTitle(activity.getActivityLabel());
+
+            if (activity.getPriority() == 0) {
+                item.setTitle(R.string.appmenu_pin_to_top);
+            } else {
+                item.setTitle(R.string.appmenu_remove_pin);
+            }
+        }
     }
 
     @Override
