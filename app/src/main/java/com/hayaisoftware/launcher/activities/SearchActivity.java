@@ -366,52 +366,12 @@ public class SearchActivity extends Activity
     }
 
     private EditText setupSearchEditText() {
+        final SearchEditTextListeners listeners = new SearchEditTextListeners();
         final EditText searchEditText = findViewById(R.id.user_search_input);
 
-        searchEditText.addTextChangedListener(new TextWatcher() {
-
-            final View mClearButton = findViewById(R.id.clear_button);
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                updateFilter(s);
-
-                // Avoid performing visible app update
-                mClearButton.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                //do nothing
-            }
-
-            @Override
-            public void afterTextChanged(final Editable s) {
-                //do nothing
-            }
-        });
-        searchEditText.setImeActionLabel(getString(R.string.launch), EditorInfo.IME_ACTION_GO);
-        searchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-
-                if (actionId == EditorInfo.IME_ACTION_GO) {
-                    Log.d("KEYBOARD", "ACTION_GO");
-                    return openFirstActivity();
-                }
-                return false;
-            }
-        });
-        searchEditText.setOnKeyListener(new View.OnKeyListener() {
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    Log.d("KEYBOARD", "ENTER_KEY");
-                    return openFirstActivity();
-                }
-                return false;
-            }
-        });
+        searchEditText.addTextChangedListener(listeners);
+        searchEditText.setOnEditorActionListener(listeners);
+        searchEditText.setOnKeyListener(listeners);
 
         return searchEditText;
     }
@@ -446,14 +406,6 @@ public class SearchActivity extends Activity
             }
 
         });
-    }
-
-    private boolean openFirstActivity() {
-        if (!mAdapter.isEmpty()) {
-            launchActivity(mAdapter.getItem(0));
-            return true;
-        }
-        return false;
     }
 
     private void setupPreferences() {
@@ -832,6 +784,74 @@ public class SearchActivity extends Activity
         @Override
         public boolean onMenuItemClick(MenuItem item) {
             return onOptionsItemSelected(item);
+        }
+    }
+
+    private final class SearchEditTextListeners
+            implements TextView.OnEditorActionListener, TextWatcher, View.OnKeyListener {
+
+        @Override
+        public void afterTextChanged(final Editable s) {
+            //do nothing
+        }
+
+        @Override
+        public void beforeTextChanged(final CharSequence s, final int start, final int count,
+                final int after) {
+            //do nothing
+        }
+
+        @Override
+        public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
+            final boolean actionConsumed;
+
+            if (actionId == EditorInfo.IME_ACTION_GO) {
+                Log.d("KEYBOARD", "ACTION_GO");
+                actionConsumed = openFirstActivity();
+            } else {
+                actionConsumed = false;
+            }
+
+            return actionConsumed;
+        }
+
+        @Override
+        public boolean onKey(final View v, final int keyCode, final KeyEvent event) {
+            final boolean actionConsumed;
+
+            if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                actionConsumed = openFirstActivity();
+            } else {
+                actionConsumed = false;
+            }
+
+            return actionConsumed;
+        }
+
+        @Override
+        public void onTextChanged(final CharSequence s, final int start, final int before,
+                final int count) {
+            updateFilter(s);
+            final View clearButton = findViewById(R.id.clear_button);
+
+            if (s.length() > 0) {
+                clearButton.setVisibility(View.VISIBLE);
+            } else {
+                clearButton.setVisibility(View.GONE);
+            }
+        }
+
+        private boolean openFirstActivity() {
+            final boolean actionConsumed;
+
+            if (mAdapter.isEmpty()) {
+                actionConsumed = false;
+            } else {
+                launchActivity(mAdapter.getItem(0));
+                actionConsumed = true;
+            }
+
+            return actionConsumed;
         }
     }
 }
