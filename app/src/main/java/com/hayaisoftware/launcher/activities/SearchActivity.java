@@ -412,11 +412,11 @@ public class SearchActivity extends Activity
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         if (preferences.getBoolean(SettingsFragment.KEY_PREF_NOTIFICATION, false)) {
-            final ShortcutNotificationManager shortcutNotificationManager = new ShortcutNotificationManager();
             final String strPriority =
-                    preferences.getString(SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY, "low");
-            final int priority = ShortcutNotificationManager.getPriorityFromString(strPriority);
-            shortcutNotificationManager.showNotification(this, priority);
+                    preferences.getString(SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY,
+                            SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY_LOW);
+
+            ShortcutNotificationManager.showNotification(this, strPriority);
         }
 
         if (preferences.getBoolean(KEY_PREF_DISABLE_ICONS, false)) {

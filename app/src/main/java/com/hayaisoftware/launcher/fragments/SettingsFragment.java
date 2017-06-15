@@ -15,6 +15,8 @@
 package com.hayaisoftware.launcher.fragments;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,6 +40,10 @@ public class SettingsFragment extends PreferenceFragment implements
     public static final String KEY_PREF_NOTIFICATION = "pref_notification";
 
     public static final String KEY_PREF_NOTIFICATION_PRIORITY = "pref_notification_priority";
+
+    public static final String KEY_PREF_NOTIFICATION_PRIORITY_LOW = "min";
+
+    public static final String KEY_PREF_NOTIFICATION_PRIORITY_HIGH = "max";
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -84,23 +90,21 @@ public class SettingsFragment extends PreferenceFragment implements
         if (key.equals(KEY_PREF_NOTIFICATION) || key.equals(KEY_PREF_NOTIFICATION_PRIORITY)) {
             final boolean notificationEnabled =
                     sharedPreferences.getBoolean(KEY_PREF_NOTIFICATION, false);
-            final ShortcutNotificationManager shortcutNotificationManager =
-                    new ShortcutNotificationManager();
-            final Activity activity = getActivity();
+            final Context context = getActivity();
 
             // Fragments suck.
-            if (activity != null) {
-                shortcutNotificationManager.cancelNotification(activity);
+            if (context != null) {
+                ShortcutNotificationManager.cancelNotification(context);
             }
 
             if (notificationEnabled) {
                 final String strPriority =
-                        sharedPreferences.getString(KEY_PREF_NOTIFICATION_PRIORITY, "low");
-                final int priority = ShortcutNotificationManager.getPriorityFromString(strPriority);
+                        sharedPreferences.getString(KEY_PREF_NOTIFICATION_PRIORITY,
+                                KEY_PREF_NOTIFICATION_PRIORITY_LOW);
 
                 // Fragments suck.
-                if (activity != null) {
-                    shortcutNotificationManager.showNotification(activity, priority);
+                if (context != null) {
+                    ShortcutNotificationManager.showNotification(context, strPriority);
                 }
             }
         }
