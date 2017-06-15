@@ -75,20 +75,20 @@ public class AboutActivity extends Activity {
         // Setup the project name/url
         final CharSequence projectUrl = getString(R.string.about_project_website_url);
         final CharSequence projectMaintainer = contributorUserNames[0];
-        final TextView projectUrlView = ((TextView) findViewById(R.id.about_project_website_url));
+        final TextView projectUrlView = findViewById(R.id.about_project_website_url);
 
         projectUrlView.setText(getUrl(projectUrl, "github.com/" + projectMaintainer));
         projectUrlView.setMovementMethod(LinkMovementMethod.getInstance());
 
         // Set the version
-        final TextView version = ((TextView) findViewById(R.id.about_version));
+        final TextView version = findViewById(R.id.about_version);
 
         version.setText(BuildConfig.VERSION_NAME);
 
         // Setup the license name/url
         final String licenseUrl = getString(R.string.about_license_url);
         final String licenseName = getString(R.string.about_license_type);
-        final TextView licenseType = ((TextView) findViewById(R.id.license_type));
+        final TextView licenseType = findViewById(R.id.license_type);
 
         licenseType.setText(getUrl(licenseUrl, licenseName));
         licenseType.setMovementMethod(LinkMovementMethod.getInstance());

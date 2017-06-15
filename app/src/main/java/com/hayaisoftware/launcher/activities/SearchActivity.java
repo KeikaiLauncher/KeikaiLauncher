@@ -264,7 +264,7 @@ public class SearchActivity extends Activity
         setContentView(R.layout.activity_search);
 
         //fields:
-        mSearchEditText = (EditText) findViewById(R.id.user_search_input);
+        mSearchEditText = findViewById(R.id.user_search_input);
         mAdapter = loadLaunchableAdapter();
 
         final boolean noMultiWindow = Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
@@ -620,7 +620,7 @@ public class SearchActivity extends Activity
         closeContextMenu();
 
         // If the y coordinate is not at 0, let's reset it.
-        final GridView view = (GridView) findViewById(R.id.appsContainer);
+        final GridView view = findViewById(R.id.appsContainer);
         final int[] loc = { 0, 0 };
         view.getLocationInWindow(loc);
         if (loc[1] != 0) {
