@@ -351,15 +351,16 @@ public class SearchActivity extends Activity
 
     @Override
     public boolean onContextItemSelected(final MenuItem item) {
-        final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
-                .getMenuInfo();
+        final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
         final View itemView = info.targetView;
         final LaunchableActivity launchableActivity =
                 (LaunchableActivity) itemView.findViewById(R.id.appIcon).getTag();
+        boolean consumed = true;
+
         switch (item.getItemId()) {
             case R.id.appmenu_launch:
                 launchActivity(launchableActivity);
-                return true;
+                break;
             case R.id.appmenu_info:
                 final Intent intent = new Intent(
                         Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -367,23 +368,25 @@ public class SearchActivity extends Activity
                         + launchableActivity.getComponent().getPackageName()));
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
-                return true;
+                break;
             case R.id.appmenu_onplaystore:
                 final Intent intentPlayStore = new Intent(Intent.ACTION_VIEW);
                 intentPlayStore.setData(Uri.parse("market://details?id=" +
                         launchableActivity.getComponent().getPackageName()));
                 startActivity(intentPlayStore);
-                return true;
+                break;
             case R.id.appmenu_pin_to_top:
                 final LaunchableActivityPrefs prefs = new LaunchableActivityPrefs(this);
                 launchableActivity.setPriority(launchableActivity.getPriority() == 0 ? 1 : 0);
                 prefs.writePreference(launchableActivity);
                 mAdapter.sortApps();
-                return true;
+                break;
             default:
-                return false;
+                consumed = super.onContextItemSelected(item);
+                break;
         }
 
+        return consumed;
     }
 
     @Override
@@ -444,11 +447,16 @@ public class SearchActivity extends Activity
     }
 
     public boolean onKeyUp(final int keyCode, final KeyEvent event) {
+        final boolean consumed;
+
         if (keyCode == KeyEvent.KEYCODE_MENU) {
             showPopup(findViewById(R.id.overflow_button_topleft));
-            return true;
+            consumed = true;
+        } else {
+            consumed = super.onKeyUp(keyCode, event);
         }
-        return super.onKeyUp(keyCode, event);
+
+        return consumed;
     }
 
     @Override
@@ -486,36 +494,41 @@ public class SearchActivity extends Activity
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
+        boolean consumed = true;
+
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_settings:
                 final Intent intentSettings = new Intent(this, SettingsActivity.class);
                 startActivity(intentSettings);
-                return true;
+                break;
             case R.id.action_refresh_app_list:
                 recreate();
-                return true;
+                break;
             case R.id.action_system_settings:
                 final Intent intentSystemSettings = new Intent(Settings.ACTION_SETTINGS);
                 intentSystemSettings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intentSystemSettings);
-                return true;
+                break;
             case R.id.action_manage_apps:
                 final Intent intentManageApps = new Intent(Settings.ACTION_APPLICATION_SETTINGS);
                 intentManageApps.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intentManageApps);
-                return true;
+                break;
             case R.id.action_set_wallpaper:
                 final Intent intentWallpaperPicker = new Intent(Intent.ACTION_SET_WALLPAPER);
                 startActivity(intentWallpaperPicker);
-                return true;
+                break;
             case R.id.action_about:
                 final Intent intentAbout = new Intent(this, AboutActivity.class);
                 startActivity(intentAbout);
-                return true;
+                break;
             default:
-                return super.onOptionsItemSelected(item);
+                consumed = super.onOptionsItemSelected(item);
+                break;
         }
+
+        return consumed;
     }
 
     /**

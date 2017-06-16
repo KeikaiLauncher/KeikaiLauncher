@@ -48,14 +48,12 @@ public class SimpleTaskConsumerManager {
     }
 
     public void addTask(final Task task) {
-        if (mConsumersShouldDie) {
-            return; //TODO throw exception
-        }
-
-        try {
-            mTasks.put(task);
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
+        if (!mConsumersShouldDie) {
+            try {
+                mTasks.put(task);
+            } catch (final InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -65,32 +63,30 @@ public class SimpleTaskConsumerManager {
 
     public void destroyAllConsumers(final boolean finishCurrentTasks,
             final boolean blockUntilFinished) {
-        if (mConsumersShouldDie) {
-            return;
-        }
-        mConsumersShouldDie = true;
+        if (!mConsumersShouldDie) {
+            mConsumersShouldDie = true;
 
-        if (!finishCurrentTasks) {
-            removeAllTasks();
-        }
-
-        final DieTask dieTask = new DieTask();
-        for (final Thread thread : threads) {
-            try {
-                mTasks.put(dieTask);
-                //Log.d("Multithread", "Added DieTask");
-            } catch (final InterruptedException e) {
-                e.printStackTrace();
+            if (!finishCurrentTasks) {
+                removeAllTasks();
             }
-        }
-        //Log.d("Multithread","Added All DieTasks");
-        if (blockUntilFinished) {
 
+            final DieTask dieTask = new DieTask();
             for (final Thread thread : threads) {
                 try {
-                    thread.join();
+                    mTasks.put(dieTask);
+                    //Log.d("Multithread", "Added DieTask");
                 } catch (final InterruptedException e) {
                     e.printStackTrace();
+                }
+            }
+            //Log.d("Multithread","Added All DieTasks");
+            if (blockUntilFinished) {
+                for (final Thread thread : threads) {
+                    try {
+                        thread.join();
+                    } catch (final InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -119,7 +115,7 @@ public class SimpleTaskConsumerManager {
     }
 
     //Dummy task, does nothing. Used to properly wake the threads to kill them.
-    public class DieTask extends Task {
+    public static final class DieTask extends Task {
 
         public boolean doTask() {
             //Log.d("Multithread"," Run DieTask");
