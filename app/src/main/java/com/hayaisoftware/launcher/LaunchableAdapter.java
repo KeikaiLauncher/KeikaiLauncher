@@ -93,7 +93,7 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
 
     private final SimpleTaskConsumerManager mImageLoadingConsumersManager;
 
-    private final ImageLoadingTask.SharedData mImageTasksSharedData;
+    private final ImageLoadingTask.Factory mImageTasks;
 
     /**
      * Lock used to modify the content of {@link #mObjects}. Any write operation
@@ -163,7 +163,7 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
         mIconSizePixels = res.getDimensionPixelSize(R.dimen.app_icon_size);
         mImageLoadingConsumersManager =
                 new SimpleTaskConsumerManager(getOptimalNumberOfThreads(res), 300);
-        mImageTasksSharedData = new ImageLoadingTask.SharedData(mIconSizePixels);
+        mImageTasks = new ImageLoadingTask.Factory(mIconSizePixels);
         mPrefs = new LaunchableActivityPrefs(context);
     }
 
@@ -497,9 +497,8 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
                     launchableActivity.getActivityIcon(parent.getContext(), mIconSizePixels));
         } else {
             if (mIconsEnabled) {
-                mImageLoadingConsumersManager.addTask(
-                        new ImageLoadingTask(appIconView, launchableActivity,
-                                mImageTasksSharedData));
+                mImageLoadingConsumersManager.addTask(mImageTasks.create(appIconView,
+                        launchableActivity));
             }
         }
 

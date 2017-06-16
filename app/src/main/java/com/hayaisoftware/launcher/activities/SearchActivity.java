@@ -527,22 +527,17 @@ public class SearchActivity extends Activity
             final String thisCanonicalName = getClass().getCanonicalName();
             final SimpleTaskConsumerManager simpleTaskConsumerManager =
                     new SimpleTaskConsumerManager(cores, infoListSize);
-
-            final LoadLaunchableActivityTask.SharedData sharedAppLoadData =
-                    new LoadLaunchableActivityTask.SharedData(pm, adapter);
+            final LoadLaunchableActivityTask.Factory launchableTask =
+                    new LoadLaunchableActivityTask.Factory(pm, adapter);
 
             for (final ResolveInfo info : infoList) {
                 // Don't include activities from this package.
                 if (!thisCanonicalName.startsWith(info.activityInfo.packageName)) {
-                    final LoadLaunchableActivityTask loadLaunchableActivityTask =
-                            new LoadLaunchableActivityTask(info, sharedAppLoadData);
-                    simpleTaskConsumerManager.addTask(loadLaunchableActivityTask);
+                    simpleTaskConsumerManager.addTask(launchableTask.create(info));
                 }
             }
 
-            //Log.d("MultithreadStartup","waiting for completion of all tasks");
             simpleTaskConsumerManager.destroyAllConsumers(true, true);
-            //Log.d("MultithreadStartup", "all tasks ok");
         }
 
         adapter.sortApps();

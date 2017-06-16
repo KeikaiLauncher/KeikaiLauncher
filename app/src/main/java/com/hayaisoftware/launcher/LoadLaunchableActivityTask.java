@@ -14,41 +14,52 @@
 
 package com.hayaisoftware.launcher;
 
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 
 import com.hayaisoftware.launcher.threading.SimpleTaskConsumerManager;
 
 
-public class LoadLaunchableActivityTask extends SimpleTaskConsumerManager.Task {
-    private final ResolveInfo info;
-    private final SharedData mSharedData;
+public final class LoadLaunchableActivityTask extends SimpleTaskConsumerManager.Task {
 
-    public LoadLaunchableActivityTask(final ResolveInfo info,
-                                      final SharedData sharedData) {
-        this.info = info;
-        this.mSharedData = sharedData;
+    private final LaunchableAdapter<LaunchableActivity> mAdapter;
+
+    private final ActivityInfo mInfo;
+
+    private final PackageManager mPackageManager;
+
+    private LoadLaunchableActivityTask(final ActivityInfo info, final PackageManager packageManager,
+            final LaunchableAdapter<LaunchableActivity> adapter) {
+        mInfo = info;
+        mPackageManager = packageManager;
+        mAdapter = adapter;
     }
 
+    @Override
     public boolean doTask() {
-        final LaunchableActivity launchableActivity =
-                LaunchableActivity.getLaunchable(info.activityInfo, mSharedData.mPackageManager);
+        final LaunchableActivity activity =
+                LaunchableActivity.getLaunchable(mInfo, mPackageManager);
 
-        mSharedData.launchablesFromResolve.add(launchableActivity);
+        mAdapter.add(activity);
 
         return true;
     }
 
-    public static class SharedData {
+    public static final class Factory {
+
+        private final LaunchableAdapter<LaunchableActivity> mAdapter;
+
         private final PackageManager mPackageManager;
-        private final LaunchableAdapter<LaunchableActivity> launchablesFromResolve;
 
-        public SharedData(final PackageManager packageManager,
-                          final LaunchableAdapter<LaunchableActivity> launchablesFromResolve) {
-            this.mPackageManager = packageManager;
-            this.launchablesFromResolve=launchablesFromResolve;
+        public Factory(final PackageManager packageManager,
+                final LaunchableAdapter<LaunchableActivity> adapter) {
+            mPackageManager = packageManager;
+            mAdapter = adapter;
+        }
 
+        public LoadLaunchableActivityTask create(final ResolveInfo info) {
+            return new LoadLaunchableActivityTask(info.activityInfo, mPackageManager, mAdapter);
         }
     }
-
 }

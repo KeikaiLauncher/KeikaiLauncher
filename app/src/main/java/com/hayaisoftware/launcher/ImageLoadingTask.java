@@ -22,39 +22,53 @@ import android.widget.ImageView;
 import com.hayaisoftware.launcher.threading.SimpleTaskConsumerManager;
 
 
-public class ImageLoadingTask extends SimpleTaskConsumerManager.Task {
-    private final ImageView mImageView;
-    private final LaunchableActivity mLaunchableActivity;
-    private final SharedData mSharedData;
+public final class ImageLoadingTask extends SimpleTaskConsumerManager.Task implements Runnable {
 
-    public ImageLoadingTask(final ImageView imageView, final LaunchableActivity launchableActivity,
-                            final SharedData sharedData) {
-        this.mImageView = imageView;
-        this.mLaunchableActivity = launchableActivity;
-        this.mSharedData = sharedData;
+    private final Context mContext;
+
+    private final int mIconSizePixels;
+
+    private final ImageView mImageView;
+
+    private final LaunchableActivity mLaunchableActivity;
+    private Drawable mActivityIcon;
+
+    private ImageLoadingTask(final ImageView imageView, final LaunchableActivity launchableActivity,
+            final int iconSizePixels) {
+        mContext = imageView.getContext();
+        mImageView = imageView;
+        mLaunchableActivity = launchableActivity;
+        mIconSizePixels = iconSizePixels;
     }
 
+    @Override
     public boolean doTask() {
-        final Context context = mImageView.getContext();
-        final Drawable activityIcon =
-                mLaunchableActivity.getActivityIcon(context, mSharedData.mIconSizePixels);
-        final Handler handler = new Handler(context.getMainLooper());
+        mActivityIcon = mLaunchableActivity.getActivityIcon(mContext, mIconSizePixels);
+        final Handler handler = new Handler(mContext.getMainLooper());
 
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (mImageView.getTag() == mLaunchableActivity)
-                    mImageView.setImageDrawable(activityIcon);
-            }
-        });
+        handler.post(this);
+
         return true;
     }
 
-    public static class SharedData {
+    @Override
+    public void run() {
+        if (mImageView.getTag() == mLaunchableActivity) {
+            mImageView.setImageDrawable(mActivityIcon);
+        }
+    }
+
+    public static class Factory {
+
         private final int mIconSizePixels;
 
-        public SharedData(final int iconSizePixels) {
-            this.mIconSizePixels = iconSizePixels;
+        public Factory(final int iconSizePixels) {
+            mIconSizePixels = iconSizePixels;
+        }
+
+        public ImageLoadingTask create(final ImageView imageView,
+                final LaunchableActivity activity) {
+            return new ImageLoadingTask(imageView, activity, mIconSizePixels);
         }
     }
 
