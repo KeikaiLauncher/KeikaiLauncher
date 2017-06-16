@@ -21,7 +21,7 @@ import java.util.Comparator;
 public class PinToTop implements Comparator<LaunchableActivity> {
 
     @Override
-    public int compare(LaunchableActivity lhs, LaunchableActivity rhs) {
+    public int compare(final LaunchableActivity lhs, final LaunchableActivity rhs) {
         return rhs.getPriority() - lhs.getPriority();
     }
 }

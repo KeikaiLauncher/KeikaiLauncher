@@ -22,9 +22,9 @@ import java.util.Comparator;
 public class UsageOrder implements Comparator<LaunchableActivity> {
 
     @Override
-    public int compare(LaunchableActivity lhs, LaunchableActivity rhs) {
-        int lhsUsageQuantity = lhs.getUsageQuantity();
-        int rhsUsageQuantity = rhs.getUsageQuantity();
+    public int compare(final LaunchableActivity lhs, final LaunchableActivity rhs) {
+        final int lhsUsageQuantity = lhs.getUsageQuantity();
+        final int rhsUsageQuantity = rhs.getUsageQuantity();
 
         return rhsUsageQuantity - lhsUsageQuantity;
     }

@@ -341,16 +341,16 @@ public class SearchActivity extends Activity
         }
     }
 
-    public void onClickClearButton(View view) {
+    public void onClickClearButton(final View view) {
         mSearchEditText.setText("");
     }
 
-    public void onClickSettingsButton(View view) {
+    public void onClickSettingsButton(final View view) {
         showPopup(findViewById(R.id.overflow_button_topleft));
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean onContextItemSelected(final MenuItem item) {
         final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
                 .getMenuInfo();
         final View itemView = info.targetView;
@@ -387,7 +387,7 @@ public class SearchActivity extends Activity
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_search);
@@ -410,8 +410,8 @@ public class SearchActivity extends Activity
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-            ContextMenuInfo menuInfo) {
+    public void onCreateContextMenu(final ContextMenu menu, final View v,
+            final ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
         final MenuInflater inflater = getMenuInflater();
@@ -443,7 +443,7 @@ public class SearchActivity extends Activity
         super.onDestroy();
     }
 
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
+    public boolean onKeyUp(final int keyCode, final KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_MENU) {
             showPopup(findViewById(R.id.overflow_button_topleft));
             return true;
@@ -485,7 +485,7 @@ public class SearchActivity extends Activity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_settings:
@@ -631,7 +631,8 @@ public class SearchActivity extends Activity
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
+            final String key) {
         //does this need to run in uiThread?
         if (key.equals(KEY_PREF_PREFERRED_ORDER)) {
             setPreferredOrder(sharedPreferences);
@@ -642,7 +643,7 @@ public class SearchActivity extends Activity
     }
 
     @Override
-    public void onTrimMemory(int level) {
+    public void onTrimMemory(final int level) {
         super.onTrimMemory(level);
         if (level == TRIM_MEMORY_COMPLETE) {
             mAdapter.clearCaches();
@@ -737,13 +738,12 @@ public class SearchActivity extends Activity
 
         appContainer.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
-            public void onScroll(AbsListView view, int firstVisibleItem,
-                    int visibleItemCount, int totalItemCount) {
-
+            public void onScroll(final AbsListView view, final int firstVisibleItem,
+                    final int visibleItemCount, final int totalItemCount) {
             }
 
             @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
+            public void onScrollStateChanged(final AbsListView view, final int scrollState) {
                 if (scrollState != SCROLL_STATE_IDLE) {
                     hideKeyboard();
                 }
@@ -754,14 +754,14 @@ public class SearchActivity extends Activity
         appContainer.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(final AdapterView<?> parent, final View view,
+                    final int position, final long id) {
                 launchActivity(mAdapter.getItem(position));
             }
-
         });
     }
 
-    public void showPopup(View v) {
+    public void showPopup(final View v) {
         final PopupMenu popup = new PopupMenu(this, v);
         popup.setOnMenuItemClickListener(new PopupEventListener());
         final MenuInflater inflater = popup.getMenuInflater();
@@ -780,7 +780,7 @@ public class SearchActivity extends Activity
     class PopupEventListener implements PopupMenu.OnMenuItemClickListener {
 
         @Override
-        public boolean onMenuItemClick(MenuItem item) {
+        public boolean onMenuItemClick(final MenuItem item) {
             return onOptionsItemSelected(item);
         }
     }

@@ -22,9 +22,9 @@ import java.util.Comparator;
 public class RecentOrder implements Comparator<LaunchableActivity> {
 
     @Override
-    public int compare(LaunchableActivity lhs, LaunchableActivity rhs) {
-        long lhsLaunchTime = lhs.getLaunchTime();
-        long rhsLaunchTime = rhs.getLaunchTime();
+    public int compare(final LaunchableActivity lhs, final LaunchableActivity rhs) {
+        final long lhsLaunchTime = lhs.getLaunchTime();
+        final long rhsLaunchTime = rhs.getLaunchTime();
 
         if (lhsLaunchTime > rhsLaunchTime) {
             return -1;

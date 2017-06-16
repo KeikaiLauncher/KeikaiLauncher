@@ -54,7 +54,7 @@ public class SimpleTaskConsumerManager {
 
         try {
             mTasks.put(task);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -79,7 +79,7 @@ public class SimpleTaskConsumerManager {
             try {
                 mTasks.put(dieTask);
                 //Log.d("Multithread", "Added DieTask");
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -89,7 +89,7 @@ public class SimpleTaskConsumerManager {
             for (final Thread thread : threads) {
                 try {
                     thread.join();
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     e.printStackTrace();
                 }
             }
@@ -118,12 +118,6 @@ public class SimpleTaskConsumerManager {
         }
     }
 
-    public static abstract class Task {
-
-        //Returns true if you want the thread that run the task to continue running.
-        public abstract boolean doTask();
-    }
-
     //Dummy task, does nothing. Used to properly wake the threads to kill them.
     public class DieTask extends Task {
 
@@ -133,11 +127,17 @@ public class SimpleTaskConsumerManager {
         }
     }
 
+    public abstract static class Task {
+
+        //Returns true if you want the thread that run the task to continue running.
+        public abstract boolean doTask();
+    }
+
     private class SimpleTaskConsumer implements Runnable {
 
         @Override
         public void run() {
-            int threadId = mNumThreadsAlive++;
+            final int threadId = mNumThreadsAlive++;
             //Log.d("Thread"+threadId, " is ready!");
             do {
                 try {
@@ -146,7 +146,7 @@ public class SimpleTaskConsumerManager {
                         break;
                     }
 
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     e.printStackTrace();
                 }
 
