@@ -27,9 +27,9 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-			shrinkResources true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
-				'proguard-rules.txt'
+                    'proguard-rules.txt'
         }
         debug {
             versionNameSuffix "~" + gitShortHash()

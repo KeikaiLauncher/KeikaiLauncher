@@ -14,8 +14,6 @@
 
 package com.hayaisoftware.launcher.fragments;
 
-import android.app.Activity;
-import android.app.Notification;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -41,9 +39,9 @@ public class SettingsFragment extends PreferenceFragment implements
 
     public static final String KEY_PREF_NOTIFICATION_PRIORITY = "pref_notification_priority";
 
-    public static final String KEY_PREF_NOTIFICATION_PRIORITY_LOW = "min";
-
     public static final String KEY_PREF_NOTIFICATION_PRIORITY_HIGH = "max";
+
+    public static final String KEY_PREF_NOTIFICATION_PRIORITY_LOW = "min";
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -54,7 +52,7 @@ public class SettingsFragment extends PreferenceFragment implements
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-                             final Bundle savedInstanceState) {
+            final Bundle savedInstanceState) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
             //remove priority preference (not supported)
             final PreferenceCategory notificationCategory =
@@ -86,7 +84,7 @@ public class SettingsFragment extends PreferenceFragment implements
 
     @Override
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
-                                          final String key) {
+            final String key) {
         if (key.equals(KEY_PREF_NOTIFICATION) || key.equals(KEY_PREF_NOTIFICATION_PRIORITY)) {
             final boolean notificationEnabled =
                     sharedPreferences.getBoolean(KEY_PREF_NOTIFICATION, false);

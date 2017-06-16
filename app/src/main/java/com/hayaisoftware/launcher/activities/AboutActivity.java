@@ -38,7 +38,7 @@ public class AboutActivity extends Activity {
      * @return A link to the Github user profile for the user detailed in the parameters.
      */
     private static CharSequence getGithubUserUrl(final CharSequence userName,
-                                                 final CharSequence name) {
+            final CharSequence name) {
         final CharSequence results;
 
         if (userName == null) {

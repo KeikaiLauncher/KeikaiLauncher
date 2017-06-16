@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2015-2017 Hayai Software
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -27,7 +26,9 @@
     <string name="pref_notification_priority">Priorität der Benachrichtigung.</string>
     <string name="search_view_hint">Geben Sie etwas ein...</string>
     <string name="settings_category_notification_category">Benachrichtigungen</string>
-    <string name="settings_enable_notification_title">Im Benachrichtigungsfeld Verknüpfung anzeigen</string>
+    <string name="settings_enable_notification_title">Im Benachrichtigungsfeld Verknüpfung
+        anzeigen
+    </string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="settings_autokeyboard">Tastatur automatisch anzeigen</string>
     <string name="settings_category_general_category">Allgemein</string>

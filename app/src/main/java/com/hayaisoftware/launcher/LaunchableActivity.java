@@ -42,9 +42,9 @@ public class LaunchableActivity {
 
     private final Object mLock = new Object();
 
-    private long mLastLaunchTime;
-
     private Drawable mActivityIcon;
+
+    private long mLastLaunchTime;
 
     private int mPriority;
 

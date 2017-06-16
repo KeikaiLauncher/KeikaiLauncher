@@ -22,16 +22,21 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class SimpleTaskConsumerManager {
 
     private final BlockingQueue<Task> mTasks;
-    private volatile int mNumThreadsAlive;
+
     private boolean mConsumersShouldDie;
+
+    private volatile int mNumThreadsAlive;
+
     private SimpleTaskConsumer[] mSimpleTaskConsumers;
+
     private Thread[] threads;
 
     public SimpleTaskConsumerManager(final int numConsumers, final int queueSize) {
-        if(queueSize<1)
+        if (queueSize < 1) {
             mTasks = new LinkedBlockingQueue<>();
-        else
+        } else {
             mTasks = new ArrayBlockingQueue<>(queueSize);
+        }
         startConsumers(numConsumers);
 
     }
@@ -42,18 +47,10 @@ public class SimpleTaskConsumerManager {
 
     }
 
-    private void startConsumers(final int numConsumers) {
-        mSimpleTaskConsumers = new SimpleTaskConsumer[numConsumers];
-        threads=new Thread[numConsumers];
-        for (int i = 0; i < numConsumers; i++) {
-            mSimpleTaskConsumers[i] = new SimpleTaskConsumer();
-            threads[i] = new Thread(mSimpleTaskConsumers[i]);
-            threads[i].start();
-        }
-    }
-
     public void addTask(final Task task) {
-        if (mConsumersShouldDie) return; //TODO throw exception
+        if (mConsumersShouldDie) {
+            return; //TODO throw exception
+        }
 
         try {
             mTasks.put(task);
@@ -62,25 +59,23 @@ public class SimpleTaskConsumerManager {
         }
     }
 
-    public void removeAllTasks() {
-        mTasks.clear();
-    }
-
     public void destroyAllConsumers(final boolean finishCurrentTasks) {
         destroyAllConsumers(finishCurrentTasks, false);
     }
 
-
     public void destroyAllConsumers(final boolean finishCurrentTasks,
-                                    final boolean blockUntilFinished) {
-        if (mConsumersShouldDie) return;
+            final boolean blockUntilFinished) {
+        if (mConsumersShouldDie) {
+            return;
+        }
         mConsumersShouldDie = true;
 
-        if (!finishCurrentTasks) removeAllTasks();
-
+        if (!finishCurrentTasks) {
+            removeAllTasks();
+        }
 
         final DieTask dieTask = new DieTask();
-        for(final Thread thread:threads){
+        for (final Thread thread : threads) {
             try {
                 mTasks.put(dieTask);
                 //Log.d("Multithread", "Added DieTask");
@@ -91,7 +86,7 @@ public class SimpleTaskConsumerManager {
         //Log.d("Multithread","Added All DieTasks");
         if (blockUntilFinished) {
 
-            for(final Thread thread:threads){
+            for (final Thread thread : threads) {
                 try {
                     thread.join();
                 } catch (InterruptedException e) {
@@ -101,14 +96,26 @@ public class SimpleTaskConsumerManager {
         }
     }
 
-
-
     @Override
     protected void finalize() throws Throwable {
         //make sure the threads are properly killed
         destroyAllConsumers(false);
 
         super.finalize();
+    }
+
+    public void removeAllTasks() {
+        mTasks.clear();
+    }
+
+    private void startConsumers(final int numConsumers) {
+        mSimpleTaskConsumers = new SimpleTaskConsumer[numConsumers];
+        threads = new Thread[numConsumers];
+        for (int i = 0; i < numConsumers; i++) {
+            mSimpleTaskConsumers[i] = new SimpleTaskConsumer();
+            threads[i] = new Thread(mSimpleTaskConsumers[i]);
+            threads[i].start();
+        }
     }
 
     public static abstract class Task {
@@ -135,7 +142,7 @@ public class SimpleTaskConsumerManager {
             do {
                 try {
                     final Task task = mTasks.take();
-                    if(!task.doTask()){
+                    if (!task.doTask()) {
                         break;
                     }
 
@@ -147,7 +154,6 @@ public class SimpleTaskConsumerManager {
 
             //Log.d("Multithread",threadId + " quit the loop!");
             mNumThreadsAlive--;
-
 
         }
     }

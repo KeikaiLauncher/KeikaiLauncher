@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2015-2017 Hayai Software
+  ~ Copyright 2015  Nicola Spanti (RyDroid) <translations@nicola-spanti.info>
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
   ~ in compliance with the License. You may obtain a copy of the License at
@@ -14,24 +14,8 @@
   -->
 
 <resources>
-    <!--
-    Copyright 2015  Nicola Spanti (RyDroid) <translations@nicola-spanti.info>
-    
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-    
-    https://www.apache.org/licenses/LICENSE-2.0
-    
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-    -->
-    
     <string name="action_settings">Paramètres</string>
-    <string name="application_icon_desc" >Icône de l\'application</string>
+    <string name="application_icon_desc">Icône de l\'application</string>
     <string name="search_view_hint">Rechercher une application…</string>
     <string name="title_activity_settings">Paramètres</string>
     <string name="settings_category_notification_category">Notifications</string>
@@ -42,31 +26,6 @@
     <string name="action_refresh_app_list">Rafraîchir la liste des apps</string>
     <string name="activity_not_found">Activité non trouvée.</string>
     <string name="action_about">À propos</string>
-    <!--<string name="about_content">Hayai Launcher [APP_VERSION]
-\n
-\nSite web du projet:
-\nhttps://github.com/seizonsenryaku/HayaiLauncher
-\n
-\nContributeurs :
-\n\tEdgar Villani Peres (seizonsenryaku)
-\n\tDalton de Oliveira Silva(daltonos)
-\n
-\n-
-\n
-\n Copyright 2015 Hayai Software
-\n
-\n Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-\n You may obtain a copy of the License at
-\n
-\n https://www.apache.org/licenses/LICENSE-2.0
-\n
-\n Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-\n See the License for the specific language governing permissions and
-\n limitations under the License.
-\n</string>-->
     <string name="action_manage_apps">Gérer les applications</string>
     <string name="appmenu_onplaystore">Voir dans le magasin</string>
     <string name="pref_notification_priority">Priorité des notifications</string>
@@ -81,5 +40,4 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     <string name="pref_app_preferred_order_entries_alphabetical">Ordre alphabétique</string>
     <string name="action_set_wallpaper">Changer le fond d\'écran</string>
     <string name="action_system_settings">Paramètres de l\'appareil</string>
-
 </resources>

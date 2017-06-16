@@ -19,7 +19,7 @@ So far, this fork has quite a few features not found in mainline, including:
 ### Development stuff
 
 * Tons of cleanups.
-* Actual project wide code formatting and inspections. (next branch)
+* Actual project wide code formatting and inspections.
 * Update all build requirements.
 * Fewer depreciations.
 * Better compartmentalization.

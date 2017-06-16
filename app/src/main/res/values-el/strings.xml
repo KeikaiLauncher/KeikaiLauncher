@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2015-2017 Hayai Software
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -15,11 +14,12 @@
 
 <resources>
     <string name="action_settings">Ρυθμίσεις</string>
-    <string name="application_icon_desc" >Εικονίδιο Εφαρμογής</string>
+    <string name="application_icon_desc">Εικονίδιο Εφαρμογής</string>
     <string name="search_view_hint">Πληκτρολογήστε κάτι…</string>
     <string name="title_activity_settings">Ρυθμίσεις</string>
     <string name="settings_category_notification_category">Ειδοποιήσεις</string>
-    <string name="settings_enable_notification_title">Εμφάνιση ειδοποίησης στην μπάρα ειδοποιήσεων</string>
+    <string name="settings_enable_notification_title">Εμφάνιση ειδοποίησης στην μπάρα ειδοποιήσεων
+    </string>
     <string name="appmenu_launch">Εκκίνηση</string>
     <string name="appmenu_info">Πληροφορίες εφαρμογής</string>
     <string name="launch">Εκκίνηση</string>
@@ -35,5 +35,4 @@
     <string name="pref_preferred_app_order_dialog">Σειρά εφαρμογών</string>
     <string name="settings_disable_icon_loading">Απενεργοποίηση φόρτωσης εικονιδίων</string>
     <string name="appmenu_pin_to_top">Μαρκάρισμα στην κορυφή</string>
-
 </resources>

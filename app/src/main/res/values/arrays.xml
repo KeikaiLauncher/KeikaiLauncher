@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2015-2017 Hayai Software
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -44,7 +43,7 @@
 
     Maintainer should always be item 0.
     -->
-    <string-array name="about_contributor_names">
+    <string-array name="about_contributor_names" translatable="false">
         <item>Edgar Villani Peres</item>
         <item>Dalton de Oliveira Silva</item>
         <item>Avuton Olrich</item>
@@ -57,7 +56,7 @@
 
     Maintainer should always be item 0.
     -->
-    <string-array name="about_contributor_usernames">
+    <string-array name="about_contributor_usernames" translatable="false">
         <item>seizonsenryaku</item>
         <item>daltonos</item>
         <item>avuton</item>

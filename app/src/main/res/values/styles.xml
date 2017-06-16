@@ -29,7 +29,7 @@
 
     </style>
 
-        <style name="AppSettingsTheme" parent="@android:style/Theme.Holo.Light">
+    <style name="AppSettingsTheme" parent="@android:style/Theme.Holo.Light">
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
@@ -37,7 +37,7 @@
         -->
         19
     </style>
-    
+
     <!-- Application theme. -->
     <style name="AppTheme" parent="@android:style/Theme.Holo.Light.NoActionBar">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
@@ -49,10 +49,12 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">16dp</item>
         <item name="android:paddingBottom">4dp</item>
-        <item name="android:textAppearance">@android:style/TextAppearance.DeviceDefault.Medium</item>
+        <item name="android:textAppearance">@android:style/TextAppearance.DeviceDefault.Medium
+        </item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
-    <style name="CaptionText" parent="CaptionTextBase" />
+
+    <style name="CaptionText" parent="CaptionTextBase"/>
 
     <!-- use this style for a text views that is a paragraph of text -->
     <style name="BodyTextBase">
@@ -60,5 +62,6 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textAppearance">@android:style/TextAppearance.DeviceDefault.Small</item>
     </style>
-    <style name="BodyText" parent="BodyTextBase" />
+
+    <style name="BodyText" parent="BodyTextBase"/>
 </resources>

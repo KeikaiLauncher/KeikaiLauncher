@@ -31,6 +31,7 @@ public final class ImageLoadingTask extends SimpleTaskConsumerManager.Task imple
     private final ImageView mImageView;
 
     private final LaunchableActivity mLaunchableActivity;
+
     private Drawable mActivityIcon;
 
     private ImageLoadingTask(final ImageView imageView, final LaunchableActivity launchableActivity,

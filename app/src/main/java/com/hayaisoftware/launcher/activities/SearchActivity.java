@@ -58,11 +58,11 @@ import com.hayaisoftware.launcher.LaunchableActivity;
 import com.hayaisoftware.launcher.LaunchableActivityPrefs;
 import com.hayaisoftware.launcher.LaunchableAdapter;
 import com.hayaisoftware.launcher.LoadLaunchableActivityTask;
-import com.hayaisoftware.launcher.monitor.PackageChangeCallback;
-import com.hayaisoftware.launcher.monitor.PackageChangedReceiver;
 import com.hayaisoftware.launcher.R;
 import com.hayaisoftware.launcher.ShortcutNotificationManager;
 import com.hayaisoftware.launcher.fragments.SettingsFragment;
+import com.hayaisoftware.launcher.monitor.PackageChangeCallback;
+import com.hayaisoftware.launcher.monitor.PackageChangedReceiver;
 import com.hayaisoftware.launcher.threading.SimpleTaskConsumerManager;
 
 import java.util.Collection;
@@ -71,31 +71,45 @@ public class SearchActivity extends Activity
         implements SharedPreferences.OnSharedPreferenceChangeListener, PackageChangeCallback {
 
     private static final String KEY_PREF_DISABLE_ICONS = "pref_disable_icons";
+
     private static final String KEY_PREF_PREFERRED_ORDER = "pref_app_preferred_order";
+
     private static final String KEY_PREF_PREFERRED_ORDER_RECENT = "recent";
+
     private static final String KEY_PREF_PREFERRED_ORDER_USAGE = "usage";
-    private static final String TAG = "SearchActivity";
+
     private static final String SEARCH_EDIT_TEXT_KEY = "SearchEditText";
+
+    private static final String TAG = "SearchActivity";
+
+    /**
+     * Synchronize to this lock when the Adapter is visible and might be called by multiple
+     * threads.
+     */
+    private final Object mLock = new Object();
+
     private LaunchableAdapter<LaunchableActivity> mAdapter;
+
     private EditText mSearchEditText;
 
     /**
-     * Retrieves the visibility status of the navigation bar.
+     * This method returns the size of the dimen
      *
-     * @param resources The resources for the device.
-     * @return {@code True} if the navigation bar is enabled, {@code false} otherwise.
+     * @param resources The resources for the containing the named identifier.
+     * @param name      The name of the resource to get the id for.
+     * @return The dimension size, {@code 0} if the name for the identifier doesn't exist.
      */
-    private static boolean hasNavBar(final Resources resources) {
-        final boolean hasNavBar;
-        final int id = resources.getIdentifier("config_showNavigationBar", "bool", "android");
+    private static int getDimensionSize(final Resources resources, final String name) {
+        final int resourceId = resources.getIdentifier(name, "dimen", "android");
+        final int dimensionSize;
 
-        if (id > 0) {
-            hasNavBar = resources.getBoolean(id);
+        if (resourceId > 0) {
+            dimensionSize = resources.getDimensionPixelSize(resourceId);
         } else {
-            hasNavBar = false;
+            dimensionSize = 0;
         }
 
-        return hasNavBar;
+        return dimensionSize;
     }
 
     public static Collection<ResolveInfo> getLaunchableResolveInfos(final PackageManager pm,
@@ -137,7 +151,6 @@ public class SearchActivity extends Activity
             navBarHeight = 0;
         }
 
-
         return navBarHeight;
     }
 
@@ -165,128 +178,41 @@ public class SearchActivity extends Activity
             navBarWidth = 0;
         }
 
-
         return navBarWidth;
     }
 
     /**
-     * Synchronize to this lock when the Adapter is visible and might be called by multiple
-     * threads.
-     */
-    private final Object mLock = new Object();
-
-    /**
-     * Called when a package appears for any reason.
+     * Retrieves the visibility status of the navigation bar.
      *
-     * @param activityName The name of the {@link Activity} of the package which appeared.
+     * @param resources The resources for the device.
+     * @return {@code True} if the navigation bar is enabled, {@code false} otherwise.
      */
-    @Override
-    public void onPackageAppeared(final String activityName) {
-        final PackageManager pm = getPackageManager();
-        final Iterable<ResolveInfo> resolveInfos = getLaunchableResolveInfos(pm, activityName);
+    private static boolean hasNavBar(final Resources resources) {
+        final boolean hasNavBar;
+        final int id = resources.getIdentifier("config_showNavigationBar", "bool", "android");
 
-        synchronized (mLock) {
-            if (mAdapter.getClassNamePosition(activityName) == -1) {
-                addToAdapter(mAdapter, resolveInfos);
-                mAdapter.sortApps();
-                updateFilter(mSearchEditText.getText());
+        if (id > 0) {
+            hasNavBar = resources.getBoolean(id);
+        } else {
+            hasNavBar = false;
+        }
+
+        return hasNavBar;
+    }
+
+    private void addToAdapter(@NonNull final Iterable<ResolveInfo> infoList) {
+        final PackageManager pm = getPackageManager();
+        final String thisCanonicalName = getClass().getCanonicalName();
+
+        for (final ResolveInfo info : infoList) {
+            // Don't include activities from this package.
+            if (!thisCanonicalName.startsWith(info.activityInfo.packageName)) {
+                final LaunchableActivity launchableActivity =
+                        LaunchableActivity.getLaunchable(info.activityInfo, pm);
+
+                mAdapter.add(launchableActivity);
             }
         }
-    }
-
-    /**
-     * Called when a package disappears for any reason.
-     *
-     * @param activityName The name of the {@link Activity} of the package which disappeared.
-     */
-    @Override
-    public void onPackageDisappeared(final String activityName) {
-        synchronized (mLock) {
-            mAdapter.removeAllByName(activityName);
-            updateFilter(mSearchEditText.getText());
-        }
-    }
-
-    /**
-     * Called when an existing package is updated or its disabled state changes.
-     *
-     * @param activityName The name of the {@link Activity} of the package which was modified.
-     */
-    @Override
-    public void onPackageModified(final String activityName) {
-        synchronized (mLock) {
-            onPackageDisappeared(activityName);
-            onPackageAppeared(activityName);
-        }
-    }
-
-    /**
-     * This method returns the size of the dimen
-     *
-     * @param resources The resources for the containing the named identifier.
-     * @param name      The name of the resource to get the id for.
-     * @return The dimension size, {@code 0} if the name for the identifier doesn't exist.
-     */
-    private static int getDimensionSize(final Resources resources, final String name) {
-        final int resourceId = resources.getIdentifier(name, "dimen", "android");
-        final int dimensionSize;
-
-        if (resourceId > 0) {
-            dimensionSize = resources.getDimensionPixelSize(resourceId);
-        } else {
-            dimensionSize = 0;
-        }
-
-        return dimensionSize;
-    }
-
-    /**
-     * Retain the state of the adapter on configuration change.
-     *
-     * @return The attached {@link LaunchableAdapter}.
-     */
-    @Override
-    public Object onRetainNonConfigurationInstance() {
-        return mAdapter.export();
-    }
-
-    @Override
-    public void onMultiWindowModeChanged(final boolean isInMultiWindowMode) {
-        super.onMultiWindowModeChanged(isInMultiWindowMode);
-
-        setupPadding(!isInMultiWindowMode);
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_search);
-
-        //fields:
-        mSearchEditText = findViewById(R.id.user_search_input);
-        mAdapter = loadLaunchableAdapter();
-
-        final boolean noMultiWindow = Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
-                !isInMultiWindowMode();
-        final boolean transparentPossible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-
-        setupPadding(transparentPossible && noMultiWindow);
-
-        PackageChangedReceiver.setCallback(this);
-        enableReceiver();
-
-        setupPreferences();
-        setupViews();
-    }
-
-    private void enableReceiver() {
-        final PackageManager pm  = getPackageManager();
-        final ComponentName componentName = new ComponentName(this, PackageChangedReceiver.class);
-
-        pm.setComponentEnabledSetting(componentName,
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP);
     }
 
     private void disableReceiver() {
@@ -297,180 +223,26 @@ public class SearchActivity extends Activity
                 PackageManager.DONT_KILL_APP);
     }
 
-    /**
-     * This method dynamically sets the padding for the outer boundaries of the masterLayout and
-     * appContainer.
-     *
-     * @param isNavBarTranslucent Set this to {@code true} if android.R.windowTranslucentNavigation
-     *                            is expected to be {@code true}, {@code false} otherwise.
-     */
-    private void setupPadding(final boolean isNavBarTranslucent) {
-        final Resources resources = getResources();
-        final View masterLayout = findViewById(R.id.masterLayout);
-        final View appContainer = findViewById(R.id.appsContainer);
-        final int appTop = resources.getDimensionPixelSize(R.dimen.activity_vertical_margin);
+    private void enableReceiver() {
+        final PackageManager pm = getPackageManager();
+        final ComponentName componentName = new ComponentName(this, PackageChangedReceiver.class);
 
-        if (isNavBarTranslucent) {
-            masterLayout.setFitsSystemWindows(false);
-            final int navBarWidth = getNavigationBarWidth(resources);
-            final int searchUpperPadding = getDimensionSize(resources, "status_bar_height");
-            final int navBarHeight = getNavigationBarHeight(resources);
-
-            // If the navigation bar is on the side, don't put apps under it.
-            masterLayout.setPadding(0, searchUpperPadding, navBarWidth, 0);
-
-            // If the navigation bar is at the bottom, stop the icons above it.
-            appContainer.setPadding(0, appTop, 0, navBarHeight);
-        } else {
-            masterLayout.setFitsSystemWindows(true);
-            appContainer.setPadding(0, appTop, 0, 0);
-        }
+        pm.setComponentEnabledSetting(componentName,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        final Editable searchText = mSearchEditText.getText();
+    private void hideKeyboard() {
+        final View focus = getCurrentFocus();
 
-        if (preferences.getBoolean(SettingsFragment.KEY_PREF_AUTO_KEYBOARD, false) ||
-                searchText.length() > 0) {
+        if (focus != null) {
             final InputMethodManager imm =
                     (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
-            // This is a special case to show SearchEditText should have focus.
-            if (searchText.length() == 1 && searchText.charAt(0) == '\0') {
-                mSearchEditText.setText(null);
-            }
-
-            mSearchEditText.requestFocus();
-            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-            imm.showSoftInput(mSearchEditText, 0);
-        } else {
-            hideKeyboard();
+            imm.hideSoftInputFromWindow(focus.getWindowToken(), 0);
         }
-
-        if (preferences.getBoolean(SettingsFragment.KEY_PREF_ALLOW_ROTATION, false)) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
-        }
-    }
-
-    private void updateFilter(final CharSequence cs) {
-        final int seqLength = cs.length();
-
-        if (seqLength != 1 || cs.charAt(0) != '\0') {
-            mAdapter.getFilter().filter(cs);
-        }
-    }
-
-    private EditText setupSearchEditText() {
-        final SearchEditTextListeners listeners = new SearchEditTextListeners();
-        final EditText searchEditText = findViewById(R.id.user_search_input);
-
-        searchEditText.addTextChangedListener(listeners);
-        searchEditText.setOnEditorActionListener(listeners);
-        searchEditText.setOnKeyListener(listeners);
-
-        return searchEditText;
-    }
-
-    private void setupViews() {
-        final GridView appContainer = findViewById(R.id.appsContainer);
-        mSearchEditText = setupSearchEditText();
-
-        registerForContextMenu(appContainer);
-
-        appContainer.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-                if (scrollState != SCROLL_STATE_IDLE) {
-                    hideKeyboard();
-                }
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem,
-                                 int visibleItemCount, int totalItemCount) {
-
-            }
-        });
-        appContainer.setAdapter(mAdapter);
-
-        appContainer.setOnItemClickListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                launchActivity(mAdapter.getItem(position));
-            }
-
-        });
-    }
-
-    private void setupPreferences() {
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        if (preferences.getBoolean(SettingsFragment.KEY_PREF_NOTIFICATION, false)) {
-            final String strPriority =
-                    preferences.getString(SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY,
-                            SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY_LOW);
-
-            ShortcutNotificationManager.showNotification(this, strPriority);
-        }
-
-        if (preferences.getBoolean(KEY_PREF_DISABLE_ICONS, false)) {
-            mAdapter.setIconsDisabled();
-        } else {
-            mAdapter.setIconsEnabled();
-        }
-
-        setPreferredOrder(preferences);
-        preferences.registerOnSharedPreferenceChangeListener(this);
-    }
-
-    private void setPreferredOrder(final SharedPreferences preferences) {
-        final String order = preferences.getString(KEY_PREF_PREFERRED_ORDER,
-                KEY_PREF_PREFERRED_ORDER_RECENT);
-
-        if (KEY_PREF_PREFERRED_ORDER_RECENT.equals(order)) {
-            mAdapter.enableOrderByRecent();
-        } else {
-            mAdapter.disableOrderByRecent();
-        }
-
-        if (KEY_PREF_PREFERRED_ORDER_USAGE.equals(order)) {
-            mAdapter.enableOrderByUsage();
-        } else {
-            mAdapter.disableOrderByUsage();
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(final Bundle outState) {
-        final String searchEdit = mSearchEditText.getText().toString();
-
-        if (!searchEdit.isEmpty()) {
-            outState.putCharSequence(SEARCH_EDIT_TEXT_KEY, searchEdit);
-        } else if (mSearchEditText.hasFocus()) {
-            // This is a special case to show that the box had focus.
-            outState.putCharSequence(SEARCH_EDIT_TEXT_KEY, '\0' + "");
-        }
-
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(final Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-
-        final CharSequence searchEditText =
-                savedInstanceState.getCharSequence(SEARCH_EDIT_TEXT_KEY);
-
-        if (searchEditText != null) {
-            mSearchEditText.setText(searchEditText);
-            mSearchEditText.setSelection(searchEditText.length());
-        }
+        findViewById(R.id.appsContainer).requestFocus();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
     private boolean isCurrentLauncher() {
@@ -482,6 +254,35 @@ public class SearchActivity extends Activity
         return resolveInfo != null &&
                 getPackageName().equals(resolveInfo.activityInfo.packageName);
 
+    }
+
+    public void launchActivity(final LaunchableActivity launchableActivity) {
+        final LaunchableActivityPrefs prefs = new LaunchableActivityPrefs(this);
+
+        hideKeyboard();
+        try {
+            startActivity(launchableActivity.getLaunchIntent());
+            mSearchEditText.setText(null);
+            launchableActivity.setLaunchTime();
+            launchableActivity.addUsage();
+            prefs.writePreference(launchableActivity);
+
+            if (mAdapter.isOrderedByRecent()) {
+                mAdapter.sort(LaunchableAdapter.RECENT);
+            } else if (mAdapter.isOrderedByUsage()) {
+                mAdapter.sort(LaunchableAdapter.USAGE);
+            }
+        } catch (final ActivityNotFoundException e) {
+            if (BuildConfig.DEBUG) {
+                throw e;
+            } else {
+                final String notFound = getString(R.string.activity_not_found);
+
+                Log.e(TAG, notFound, e);
+                Toast.makeText(this, getString(R.string.activity_not_found),
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private LaunchableAdapter<LaunchableActivity> loadLaunchableAdapter() {
@@ -498,22 +299,6 @@ public class SearchActivity extends Activity
         return adapter;
     }
 
-    private void addToAdapter(final LaunchableAdapter<LaunchableActivity> adapter,
-            @NonNull final Iterable<ResolveInfo> infoList) {
-        final PackageManager pm = getPackageManager();
-        final String thisCanonicalName = getClass().getCanonicalName();
-
-        for (final ResolveInfo info : infoList) {
-            // Don't include activities from this package.
-            if (!thisCanonicalName.startsWith(info.activityInfo.packageName)) {
-                final LaunchableActivity launchableActivity =
-                        LaunchableActivity.getLaunchable(info.activityInfo, pm);
-
-                adapter.add(launchableActivity);
-            }
-        }
-    }
-
     private LaunchableAdapter<LaunchableActivity> loadLaunchableApps() {
         final PackageManager pm = getPackageManager();
         final Collection<ResolveInfo> infoList = getLaunchableResolveInfos(pm, null);
@@ -523,7 +308,7 @@ public class SearchActivity extends Activity
         final int cores = Runtime.getRuntime().availableProcessors();
 
         if (cores <= 1) {
-            addToAdapter(adapter, infoList);
+            addToAdapter(infoList);
         } else {
             final String thisCanonicalName = getClass().getCanonicalName();
             final SimpleTaskConsumerManager simpleTaskConsumerManager =
@@ -547,19 +332,6 @@ public class SearchActivity extends Activity
         return adapter;
     }
 
-    private void hideKeyboard() {
-        final View focus = getCurrentFocus();
-
-        if (focus != null) {
-            final InputMethodManager imm =
-                    (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-
-            imm.hideSoftInputFromWindow(focus.getWindowToken(), 0);
-        }
-        findViewById(R.id.appsContainer).requestFocus();
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-    }
-
     @Override
     public void onBackPressed() {
         if (isCurrentLauncher()) {
@@ -569,135 +341,13 @@ public class SearchActivity extends Activity
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        if (!isChangingConfigurations()) {
-            Log.d("HayaiLauncher", "Hayai is ded");
-        }
-        disableReceiver();
-        mAdapter.onDestroy();
-        super.onDestroy();
+    public void onClickClearButton(View view) {
+        mSearchEditText.setText("");
     }
 
-    public void showPopup(View v) {
-        final PopupMenu popup = new PopupMenu(this, v);
-        popup.setOnMenuItemClickListener(new PopupEventListener());
-        final MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.search_activity_menu, popup.getMenu());
-        popup.show();
+    public void onClickSettingsButton(View view) {
+        showPopup(findViewById(R.id.overflow_button_topleft));
     }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        //does this need to run in uiThread?
-        if (key.equals(KEY_PREF_PREFERRED_ORDER)) {
-            setPreferredOrder(sharedPreferences);
-            mAdapter.sortApps();
-        } else if (key.equals(KEY_PREF_DISABLE_ICONS)) {
-            recreate();
-        }
-    }
-
-    /**
-     * This method is called when the user is already in this activity and presses the {@code home}
-     * button. Use this opportunity to return this activity back to a default state.
-     *
-     * @param intent The incoming {@link Intent} sent by this activity
-     */
-    @Override
-    protected void onNewIntent(final Intent intent) {
-        super.onNewIntent(intent);
-
-        // If search has been typed, and home is hit, clear it.
-        if (mSearchEditText.length() > 0) {
-            mSearchEditText.setText(null);
-        }
-
-        closeContextMenu();
-
-        // If the y coordinate is not at 0, let's reset it.
-        final GridView view = findViewById(R.id.appsContainer);
-        final int[] loc = { 0, 0 };
-        view.getLocationInWindow(loc);
-        if (loc[1] != 0) {
-            view.smoothScrollToPosition(0);
-        }
-    }
-
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_MENU) {
-            showPopup(findViewById(R.id.overflow_button_topleft));
-            return true;
-        }
-        return super.onKeyUp(keyCode, event);
-    }
-
-    @Override
-    public void onTrimMemory(int level) {
-        super.onTrimMemory(level);
-        if (level == TRIM_MEMORY_COMPLETE)
-            mAdapter.clearCaches();
-
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-
-        final MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.app, menu);
-
-        if (menuInfo instanceof AdapterContextMenuInfo) {
-            final AdapterContextMenuInfo adapterMenuInfo = (AdapterContextMenuInfo) menuInfo;
-            final LaunchableActivity activity = (LaunchableActivity) adapterMenuInfo.targetView
-                    .findViewById(R.id.appIcon).getTag();
-            final MenuItem item = menu.findItem(R.id.appmenu_pin_to_top);
-
-            menu.setHeaderTitle(activity.toString());
-
-            if (activity.getPriority() == 0) {
-                item.setTitle(R.string.appmenu_pin_to_top);
-            } else {
-                item.setTitle(R.string.appmenu_remove_pin);
-            }
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                final Intent intentSettings = new Intent(this, SettingsActivity.class);
-                startActivity(intentSettings);
-                return true;
-            case R.id.action_refresh_app_list:
-                recreate();
-                return true;
-            case R.id.action_system_settings:
-                final Intent intentSystemSettings = new Intent(Settings.ACTION_SETTINGS);
-                intentSystemSettings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intentSystemSettings);
-                return true;
-            case R.id.action_manage_apps:
-                final Intent intentManageApps = new Intent(Settings.ACTION_APPLICATION_SETTINGS);
-                intentManageApps.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intentManageApps);
-                return true;
-            case R.id.action_set_wallpaper:
-                final Intent intentWallpaperPicker = new Intent(Intent.ACTION_SET_WALLPAPER);
-                startActivity(intentWallpaperPicker);
-                return true;
-            case R.id.action_about:
-                final Intent intentAbout = new Intent(this, AboutActivity.class);
-                startActivity(intentAbout);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
@@ -736,46 +386,399 @@ public class SearchActivity extends Activity
 
     }
 
-    public void onClickSettingsButton(View view) {
-        showPopup(findViewById(R.id.overflow_button_topleft));
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.activity_search);
 
+        //fields:
+        mSearchEditText = findViewById(R.id.user_search_input);
+        mAdapter = loadLaunchableAdapter();
+
+        final boolean noMultiWindow = Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
+                !isInMultiWindowMode();
+        final boolean transparentPossible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+
+        setupPadding(transparentPossible && noMultiWindow);
+
+        PackageChangedReceiver.setCallback(this);
+        enableReceiver();
+
+        setupPreferences();
+        setupViews();
     }
 
-    public void launchActivity(final LaunchableActivity launchableActivity) {
-        final LaunchableActivityPrefs prefs = new LaunchableActivityPrefs(this);
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+            ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
 
-        hideKeyboard();
-        try {
-            startActivity(launchableActivity.getLaunchIntent());
-            mSearchEditText.setText(null);
-            launchableActivity.setLaunchTime();
-            launchableActivity.addUsage();
-            prefs.writePreference(launchableActivity);
+        final MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.app, menu);
 
-            if (mAdapter.isOrderedByRecent()) {
-                mAdapter.sort(LaunchableAdapter.RECENT);
-            } else if (mAdapter.isOrderedByUsage()) {
-                mAdapter.sort(LaunchableAdapter.USAGE);
-            }
-        } catch (final ActivityNotFoundException e) {
-            if (BuildConfig.DEBUG) {
-                throw e;
+        if (menuInfo instanceof AdapterContextMenuInfo) {
+            final AdapterContextMenuInfo adapterMenuInfo = (AdapterContextMenuInfo) menuInfo;
+            final LaunchableActivity activity = (LaunchableActivity) adapterMenuInfo.targetView
+                    .findViewById(R.id.appIcon).getTag();
+            final MenuItem item = menu.findItem(R.id.appmenu_pin_to_top);
+
+            menu.setHeaderTitle(activity.toString());
+
+            if (activity.getPriority() == 0) {
+                item.setTitle(R.string.appmenu_pin_to_top);
             } else {
-                final String notFound = getString(R.string.activity_not_found);
-
-                Log.e(TAG, notFound, e);
-                Toast.makeText(this, getString(R.string.activity_not_found),
-                        Toast.LENGTH_SHORT).show();
+                item.setTitle(R.string.appmenu_remove_pin);
             }
         }
     }
 
-    public void onClickClearButton(View view) {
-        mSearchEditText.setText("");
+    @Override
+    protected void onDestroy() {
+        if (!isChangingConfigurations()) {
+            Log.d("HayaiLauncher", "Hayai is ded");
+        }
+        disableReceiver();
+        mAdapter.onDestroy();
+        super.onDestroy();
+    }
+
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_MENU) {
+            showPopup(findViewById(R.id.overflow_button_topleft));
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
+    }
+
+    @Override
+    public void onMultiWindowModeChanged(final boolean isInMultiWindowMode) {
+        super.onMultiWindowModeChanged(isInMultiWindowMode);
+
+        setupPadding(!isInMultiWindowMode);
+    }
+
+    /**
+     * This method is called when the user is already in this activity and presses the {@code home}
+     * button. Use this opportunity to return this activity back to a default state.
+     *
+     * @param intent The incoming {@link Intent} sent by this activity
+     */
+    @Override
+    protected void onNewIntent(final Intent intent) {
+        super.onNewIntent(intent);
+
+        // If search has been typed, and home is hit, clear it.
+        if (mSearchEditText.length() > 0) {
+            mSearchEditText.setText(null);
+        }
+
+        closeContextMenu();
+
+        // If the y coordinate is not at 0, let's reset it.
+        final GridView view = findViewById(R.id.appsContainer);
+        final int[] loc = {0, 0};
+        view.getLocationInWindow(loc);
+        if (loc[1] != 0) {
+            view.smoothScrollToPosition(0);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                final Intent intentSettings = new Intent(this, SettingsActivity.class);
+                startActivity(intentSettings);
+                return true;
+            case R.id.action_refresh_app_list:
+                recreate();
+                return true;
+            case R.id.action_system_settings:
+                final Intent intentSystemSettings = new Intent(Settings.ACTION_SETTINGS);
+                intentSystemSettings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intentSystemSettings);
+                return true;
+            case R.id.action_manage_apps:
+                final Intent intentManageApps = new Intent(Settings.ACTION_APPLICATION_SETTINGS);
+                intentManageApps.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intentManageApps);
+                return true;
+            case R.id.action_set_wallpaper:
+                final Intent intentWallpaperPicker = new Intent(Intent.ACTION_SET_WALLPAPER);
+                startActivity(intentWallpaperPicker);
+                return true;
+            case R.id.action_about:
+                final Intent intentAbout = new Intent(this, AboutActivity.class);
+                startActivity(intentAbout);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * Called when a package appears for any reason.
+     *
+     * @param activityName The name of the {@link Activity} of the package which appeared.
+     */
+    @Override
+    public void onPackageAppeared(final String activityName) {
+        final PackageManager pm = getPackageManager();
+        final Iterable<ResolveInfo> resolveInfos = getLaunchableResolveInfos(pm, activityName);
+
+        synchronized (mLock) {
+            if (mAdapter.getClassNamePosition(activityName) == -1) {
+                addToAdapter(resolveInfos);
+                mAdapter.sortApps();
+                updateFilter(mSearchEditText.getText());
+            }
+        }
+    }
+
+    /**
+     * Called when a package disappears for any reason.
+     *
+     * @param activityName The name of the {@link Activity} of the package which disappeared.
+     */
+    @Override
+    public void onPackageDisappeared(final String activityName) {
+        synchronized (mLock) {
+            mAdapter.removeAllByName(activityName);
+            updateFilter(mSearchEditText.getText());
+        }
+    }
+
+    /**
+     * Called when an existing package is updated or its disabled state changes.
+     *
+     * @param activityName The name of the {@link Activity} of the package which was modified.
+     */
+    @Override
+    public void onPackageModified(final String activityName) {
+        synchronized (mLock) {
+            onPackageDisappeared(activityName);
+            onPackageAppeared(activityName);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(final Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        final CharSequence searchEditText =
+                savedInstanceState.getCharSequence(SEARCH_EDIT_TEXT_KEY);
+
+        if (searchEditText != null) {
+            mSearchEditText.setText(searchEditText);
+            mSearchEditText.setSelection(searchEditText.length());
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        final Editable searchText = mSearchEditText.getText();
+
+        if (preferences.getBoolean(SettingsFragment.KEY_PREF_AUTO_KEYBOARD, false) ||
+                searchText.length() > 0) {
+            final InputMethodManager imm =
+                    (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+            // This is a special case to show SearchEditText should have focus.
+            if (searchText.length() == 1 && searchText.charAt(0) == '\0') {
+                mSearchEditText.setText(null);
+            }
+
+            mSearchEditText.requestFocus();
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+            imm.showSoftInput(mSearchEditText, 0);
+        } else {
+            hideKeyboard();
+        }
+
+        if (preferences.getBoolean(SettingsFragment.KEY_PREF_ALLOW_ROTATION, false)) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+        }
+    }
+
+    /**
+     * Retain the state of the adapter on configuration change.
+     *
+     * @return The attached {@link LaunchableAdapter}.
+     */
+    @Override
+    public Object onRetainNonConfigurationInstance() {
+        return mAdapter.export();
+    }
+
+    @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        final String searchEdit = mSearchEditText.getText().toString();
+
+        if (!searchEdit.isEmpty()) {
+            outState.putCharSequence(SEARCH_EDIT_TEXT_KEY, searchEdit);
+        } else if (mSearchEditText.hasFocus()) {
+            // This is a special case to show that the box had focus.
+            outState.putCharSequence(SEARCH_EDIT_TEXT_KEY, '\0' + "");
+        }
+
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        //does this need to run in uiThread?
+        if (key.equals(KEY_PREF_PREFERRED_ORDER)) {
+            setPreferredOrder(sharedPreferences);
+            mAdapter.sortApps();
+        } else if (key.equals(KEY_PREF_DISABLE_ICONS)) {
+            recreate();
+        }
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        if (level == TRIM_MEMORY_COMPLETE) {
+            mAdapter.clearCaches();
+        }
+
+    }
+
+    private void setPreferredOrder(final SharedPreferences preferences) {
+        final String order = preferences.getString(KEY_PREF_PREFERRED_ORDER,
+                KEY_PREF_PREFERRED_ORDER_RECENT);
+
+        if (KEY_PREF_PREFERRED_ORDER_RECENT.equals(order)) {
+            mAdapter.enableOrderByRecent();
+        } else {
+            mAdapter.disableOrderByRecent();
+        }
+
+        if (KEY_PREF_PREFERRED_ORDER_USAGE.equals(order)) {
+            mAdapter.enableOrderByUsage();
+        } else {
+            mAdapter.disableOrderByUsage();
+        }
+    }
+
+    /**
+     * This method dynamically sets the padding for the outer boundaries of the masterLayout and
+     * appContainer.
+     *
+     * @param isNavBarTranslucent Set this to {@code true} if android.R.windowTranslucentNavigation
+     *                            is expected to be {@code true}, {@code false} otherwise.
+     */
+    private void setupPadding(final boolean isNavBarTranslucent) {
+        final Resources resources = getResources();
+        final View masterLayout = findViewById(R.id.masterLayout);
+        final View appContainer = findViewById(R.id.appsContainer);
+        final int appTop = resources.getDimensionPixelSize(R.dimen.activity_vertical_margin);
+
+        if (isNavBarTranslucent) {
+            masterLayout.setFitsSystemWindows(false);
+            final int navBarWidth = getNavigationBarWidth(resources);
+            final int searchUpperPadding = getDimensionSize(resources, "status_bar_height");
+            final int navBarHeight = getNavigationBarHeight(resources);
+
+            // If the navigation bar is on the side, don't put apps under it.
+            masterLayout.setPadding(0, searchUpperPadding, navBarWidth, 0);
+
+            // If the navigation bar is at the bottom, stop the icons above it.
+            appContainer.setPadding(0, appTop, 0, navBarHeight);
+        } else {
+            masterLayout.setFitsSystemWindows(true);
+            appContainer.setPadding(0, appTop, 0, 0);
+        }
+    }
+
+    private void setupPreferences() {
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        if (preferences.getBoolean(SettingsFragment.KEY_PREF_NOTIFICATION, false)) {
+            final String strPriority =
+                    preferences.getString(SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY,
+                            SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY_LOW);
+
+            ShortcutNotificationManager.showNotification(this, strPriority);
+        }
+
+        if (preferences.getBoolean(KEY_PREF_DISABLE_ICONS, false)) {
+            mAdapter.setIconsDisabled();
+        } else {
+            mAdapter.setIconsEnabled();
+        }
+
+        setPreferredOrder(preferences);
+        preferences.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    private EditText setupSearchEditText() {
+        final SearchEditTextListeners listeners = new SearchEditTextListeners();
+        final EditText searchEditText = findViewById(R.id.user_search_input);
+
+        searchEditText.addTextChangedListener(listeners);
+        searchEditText.setOnEditorActionListener(listeners);
+        searchEditText.setOnKeyListener(listeners);
+
+        return searchEditText;
+    }
+
+    private void setupViews() {
+        final GridView appContainer = findViewById(R.id.appsContainer);
+        mSearchEditText = setupSearchEditText();
+
+        registerForContextMenu(appContainer);
+
+        appContainer.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem,
+                    int visibleItemCount, int totalItemCount) {
+
+            }
+
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (scrollState != SCROLL_STATE_IDLE) {
+                    hideKeyboard();
+                }
+            }
+        });
+        appContainer.setAdapter(mAdapter);
+
+        appContainer.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                launchActivity(mAdapter.getItem(position));
+            }
+
+        });
+    }
+
+    public void showPopup(View v) {
+        final PopupMenu popup = new PopupMenu(this, v);
+        popup.setOnMenuItemClickListener(new PopupEventListener());
+        final MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.search_activity_menu, popup.getMenu());
+        popup.show();
+    }
+
+    private void updateFilter(final CharSequence cs) {
+        final int seqLength = cs.length();
+
+        if (seqLength != 1 || cs.charAt(0) != '\0') {
+            mAdapter.getFilter().filter(cs);
+        }
     }
 
     class PopupEventListener implements PopupMenu.OnMenuItemClickListener {
+
         @Override
         public boolean onMenuItemClick(MenuItem item) {
             return onOptionsItemSelected(item);

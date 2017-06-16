@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2015-2017 Hayai Software
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -22,7 +21,6 @@
 
     <color name="hint_grey">#757575</color>
     <color name="text_hint_grey">#9E9E9E</color>
-
 
     <color name="full_transparent">#00000000</color>
 </resources>

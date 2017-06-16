@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2015-2017 Hayai Software
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -14,12 +13,12 @@
   -->
 
 <resources>
-
     <string name="action_settings">Configurações</string>
     <string name="application_icon_desc">Ícone do Aplicativo</string>
     <string name="search_view_hint">Digite algo…</string>
-	<string name="title_activity_settings">Configurações</string>
-    <string name="settings_enable_notification_title">Exibir atalho no painel de notificações</string>
+    <string name="title_activity_settings">Configurações</string>
+    <string name="settings_enable_notification_title">Exibir atalho no painel de notificações
+    </string>
     <string name="appmenu_launch">Executar</string>
     <string name="appmenu_info">Informações do aplicativo</string>
     <string name="action_refresh_app_list">Atualizar lista de apps</string>
