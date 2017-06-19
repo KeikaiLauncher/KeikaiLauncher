@@ -239,6 +239,10 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
      *                                       this list
      */
     public void addAll(@NonNull final Collection<? extends T> collection) {
+        for (final T toAdd : collection) {
+            mPrefs.setPreferences(toAdd);
+        }
+
         synchronized (mLock) {
             if (mOriginalValues == null) {
                 mObjects.addAll(collection);
@@ -257,6 +261,10 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
      * @param items The items to add at the end of the array.
      */
     public void addAll(final T... items) {
+        for (final T toAdd : items) {
+            mPrefs.setPreferences(toAdd);
+        }
+
         synchronized (mLock) {
             if (mOriginalValues == null) {
                 Collections.addAll(mObjects, items);
