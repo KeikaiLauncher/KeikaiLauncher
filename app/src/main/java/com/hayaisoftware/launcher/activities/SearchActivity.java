@@ -187,7 +187,7 @@ public class SearchActivity extends Activity
 
         synchronized (mLock) {
             if (mAdapter.getClassNamePosition(activityName) == -1) {
-                addToAdapter(resolveInfos);
+                addToAdapter(mAdapter, resolveInfos);
                 mAdapter.sortApps();
                 updateFilter(mSearchEditText.getText());
             }
@@ -498,7 +498,8 @@ public class SearchActivity extends Activity
         return adapter;
     }
 
-    private void addToAdapter(@NonNull final Iterable<ResolveInfo> infoList) {
+    private void addToAdapter(final LaunchableAdapter<LaunchableActivity> adapter,
+            @NonNull final Iterable<ResolveInfo> infoList) {
         final PackageManager pm = getPackageManager();
         final String thisCanonicalName = getClass().getCanonicalName();
 
@@ -508,7 +509,7 @@ public class SearchActivity extends Activity
                 final LaunchableActivity launchableActivity =
                         LaunchableActivity.getLaunchable(info.activityInfo, pm);
 
-                mAdapter.add(launchableActivity);
+                adapter.add(launchableActivity);
             }
         }
     }
@@ -522,7 +523,7 @@ public class SearchActivity extends Activity
         final int cores = Runtime.getRuntime().availableProcessors();
 
         if (cores <= 1) {
-            addToAdapter(infoList);
+            addToAdapter(adapter, infoList);
         } else {
             final String thisCanonicalName = getClass().getCanonicalName();
             final SimpleTaskConsumerManager simpleTaskConsumerManager =
