@@ -380,9 +380,10 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
     public View getDropDownView(final int position, @Nullable final View convertView,
             @NonNull final ViewGroup parent) {
         final TextView text;
-        final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         if (convertView == null) {
+            final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+
             text = (TextView) inflater.inflate(mDropDownResource, parent, false);
         } else {
             text = (TextView) convertView;
@@ -478,9 +479,10 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
     public View getView(final int position, final View convertView,
             @NonNull final ViewGroup parent) {
         final View view;
-        final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         if (convertView == null) {
+            final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+
             view = inflater.inflate(R.layout.app_grid_item, parent, false);
         } else {
             view = convertView;
