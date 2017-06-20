@@ -739,7 +739,6 @@ public class SearchActivity extends Activity
 
         searchEditText.addTextChangedListener(listeners);
         searchEditText.setOnEditorActionListener(listeners);
-        searchEditText.setOnKeyListener(listeners);
 
         return searchEditText;
     }
@@ -800,7 +799,7 @@ public class SearchActivity extends Activity
     }
 
     private final class SearchEditTextListeners
-            implements TextView.OnEditorActionListener, TextWatcher, View.OnKeyListener {
+            implements TextView.OnEditorActionListener, TextWatcher {
 
         @Override
         public void afterTextChanged(final Editable s) {
@@ -816,23 +815,13 @@ public class SearchActivity extends Activity
         @Override
         public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
             final boolean actionConsumed;
+            final boolean enterPressed = event != null &&
+                    event.getAction() == KeyEvent.ACTION_DOWN &&
+                    event.getKeyCode() == KeyEvent.KEYCODE_ENTER;
 
-            if (actionId == EditorInfo.IME_ACTION_GO) {
-                Log.d("KEYBOARD", "ACTION_GO");
-                actionConsumed = openFirstActivity();
-            } else {
-                actionConsumed = false;
-            }
-
-            return actionConsumed;
-        }
-
-        @Override
-        public boolean onKey(final View v, final int keyCode, final KeyEvent event) {
-            final boolean actionConsumed;
-
-            if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                actionConsumed = openFirstActivity();
+            if (actionId == EditorInfo.IME_ACTION_GO || enterPressed && !mAdapter.isEmpty()) {
+                launchActivity(mAdapter.getItem(0));
+                actionConsumed = true;
             } else {
                 actionConsumed = false;
             }
@@ -851,19 +840,6 @@ public class SearchActivity extends Activity
             } else {
                 clearButton.setVisibility(View.GONE);
             }
-        }
-
-        private boolean openFirstActivity() {
-            final boolean actionConsumed;
-
-            if (mAdapter.isEmpty()) {
-                actionConsumed = false;
-            } else {
-                launchActivity(mAdapter.getItem(0));
-                actionConsumed = true;
-            }
-
-            return actionConsumed;
         }
     }
 }
