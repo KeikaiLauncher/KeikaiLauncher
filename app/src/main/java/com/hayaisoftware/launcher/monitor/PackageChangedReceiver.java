@@ -94,6 +94,9 @@ public class PackageChangedReceiver extends BroadcastReceiver {
             case Intent.ACTION_PACKAGE_REPLACED:
                 sendPackageName(PACKAGE_CHANGED, intent.getData().getSchemeSpecificPart());
                 break;
+            case ACTION_DELAYED:
+                // This will happen if a second intent processes the delayed intent first.
+                break;
             default:
                 Log.w(TAG, "Received action without reaction: " + action);
                 break;
