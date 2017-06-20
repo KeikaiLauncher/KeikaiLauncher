@@ -37,6 +37,7 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -87,6 +88,11 @@ public class SearchActivity extends Activity
      * threads.
      */
     private final Object mLock = new Object();
+
+    /*
+     * Hold the menu state because we need to be able to dismiss it on demand.
+     */
+    public PopupMenu mPopupMenu;
 
     private LaunchableAdapter<LaunchableActivity> mAdapter;
 
@@ -382,7 +388,12 @@ public class SearchActivity extends Activity
     }
 
     public void onClickSettingsButton(final View view) {
-        showPopup(findViewById(R.id.overflow_button_topleft));
+        if (mPopupMenu == null) {
+            final View topLeft = findViewById(R.id.overflow_button_topleft);
+            mPopupMenu = new PopupMenu(this, topLeft);
+            mPopupMenu.inflate(R.menu.search_activity_menu);
+            mPopupMenu.show();
+        }
     }
 
     @Override
@@ -429,6 +440,13 @@ public class SearchActivity extends Activity
     }
 
     @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.search_activity_menu, menu);
+
+        return true;
+    }
+
+    @Override
     protected void onDestroy() {
         if (!isChangingConfigurations()) {
             Log.d("HayaiLauncher", "Hayai is ded");
@@ -436,19 +454,6 @@ public class SearchActivity extends Activity
         modifyReceiver(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
         mAdapter.onDestroy();
         super.onDestroy();
-    }
-
-    public boolean onKeyUp(final int keyCode, final KeyEvent event) {
-        final boolean consumed;
-
-        if (keyCode == KeyEvent.KEYCODE_MENU) {
-            showPopup(findViewById(R.id.overflow_button_topleft));
-            consumed = true;
-        } else {
-            consumed = super.onKeyUp(keyCode, event);
-        }
-
-        return consumed;
     }
 
     @Override
@@ -475,6 +480,12 @@ public class SearchActivity extends Activity
         }
 
         closeContextMenu();
+        closeOptionsMenu();
+
+        if (mPopupMenu != null) {
+            mPopupMenu.dismiss();
+            mPopupMenu = null;
+        }
 
         // If the y coordinate is not at 0, let's reset it.
         final GridView view = findViewById(R.id.appsContainer);
@@ -743,14 +754,6 @@ public class SearchActivity extends Activity
                 launchActivity(view);
             }
         });
-    }
-
-    public void showPopup(final View v) {
-        final PopupMenu popup = new PopupMenu(this, v);
-        final MenuInflater inflater = popup.getMenuInflater();
-
-        inflater.inflate(R.menu.search_activity_menu, popup.getMenu());
-        popup.show();
     }
 
     public void startAppSettings(final MenuItem item) {
