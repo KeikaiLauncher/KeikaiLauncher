@@ -460,8 +460,9 @@ public class SearchActivity extends Activity
     }
 
     @Override
-    public void onMultiWindowModeChanged(final boolean isInMultiWindowMode) {
-        super.onMultiWindowModeChanged(isInMultiWindowMode);
+    public void onMultiWindowModeChanged(final boolean isInMultiWindowMode,
+            final Configuration newConfig) {
+        super.onMultiWindowModeChanged(isInMultiWindowMode, newConfig);
 
         setupPadding(!isInMultiWindowMode);
     }
