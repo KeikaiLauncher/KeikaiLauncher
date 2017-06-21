@@ -23,7 +23,6 @@
     <string name="appmenu_launch">Εκκίνηση</string>
     <string name="appmenu_info">Πληροφορίες εφαρμογής</string>
     <string name="launch">Εκκίνηση</string>
-    <string name="action_refresh_app_list">Ενημέρωση λίστας εφαρμογών</string>
     <string name="action_system_settings">Ρυθμίσεις συσκευής</string>
     <string name="activity_not_found">Δεν βρέθηκε εφαρμογή.</string>
     <string name="action_about">Σχετικά</string>

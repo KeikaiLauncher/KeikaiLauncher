@@ -28,7 +28,6 @@
     <string name="appmenu_launch">Launch</string>
     <string name="appmenu_info">App information</string>
     <string name="launch">Go</string>
-    <string name="action_refresh_app_list">Refresh app list</string>
     <string name="action_system_settings">Device settings</string>
     <string name="activity_not_found">Activity not found.</string>
     <string name="action_about">About</string>

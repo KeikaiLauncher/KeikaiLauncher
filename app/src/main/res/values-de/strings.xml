@@ -15,7 +15,6 @@
 <resources>
     <string name="action_about">Über</string>
     <string name="action_manage_apps">App-Verwaltung</string>
-    <string name="action_refresh_app_list">App-Liste aktualisieren</string>
     <string name="action_settings">Einstellungen</string>
     <string name="action_system_settings">Geräte-Einstellungen</string>
     <string name="activity_not_found">Aktivität nicht gefunden.</string>

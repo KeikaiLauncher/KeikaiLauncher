@@ -15,32 +15,31 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_settings"
+        android:onClick="startAppSettings"
         android:orderInCategory="1"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
     <item
-        android:id="@+id/action_refresh_app_list"
-        android:orderInCategory="2"
-        android:showAsAction="never"
-        android:title="@string/action_refresh_app_list"
-        android:visible="false"/>
-    <item
         android:id="@+id/action_system_settings"
-        android:orderInCategory="3"
+        android:onClick="startSystemSettings"
+        android:orderInCategory="2"
         android:showAsAction="never"
         android:title="@string/action_system_settings"/>
     <item
         android:id="@+id/action_manage_apps"
+        android:onClick="manageApplications"
         android:orderInCategory="3"
         android:showAsAction="never"
         android:title="@string/action_manage_apps"/>
     <item
         android:id="@+id/action_set_wallpaper"
+        android:onClick="setWallpaper"
         android:orderInCategory="4"
         android:showAsAction="never"
         android:title="@string/action_set_wallpaper"/>
     <item
         android:id="@+id/action_about"
+        android:onClick="launchAbout"
         android:orderInCategory="5"
         android:showAsAction="never"
         android:title="@string/action_about"/>

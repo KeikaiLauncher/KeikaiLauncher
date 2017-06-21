@@ -31,7 +31,6 @@
     <string name="pref_notification_priority">Prioridad de la notificación</string>
     <string name="pref_notification_priority_entries_high">Alta</string>
     <string name="pref_notification_priority_entries_low">Baja (sin ícono)</string>
-    <string name="action_refresh_app_list">Actualizar lista de aplicaciones</string>
     <string name="action_set_wallpaper">Cambiar fondo de pantalla</string>
     <string name="action_system_settings">Preferencias del dispositivo</string>
     <string name="activity_not_found">Actividad no encontrada</string>

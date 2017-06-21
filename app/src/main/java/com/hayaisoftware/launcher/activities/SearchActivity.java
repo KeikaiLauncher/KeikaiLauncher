@@ -239,6 +239,10 @@ public class SearchActivity extends Activity
 
     }
 
+    public void launchAbout(final MenuItem item) {
+        startActivity(new Intent(this, AboutActivity.class));
+    }
+
     public void launchActivity(final LaunchableActivity launchableActivity) {
         final LaunchableActivityPrefs prefs = new LaunchableActivityPrefs(this);
 
@@ -313,6 +317,13 @@ public class SearchActivity extends Activity
         adapter.notifyDataSetChanged();
 
         return adapter;
+    }
+
+    public void manageApplications(final MenuItem item) {
+        final Intent intentManageApps = new Intent(Settings.ACTION_APPLICATION_SETTINGS);
+
+        intentManageApps.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intentManageApps);
     }
 
     private void modifyReceiver(final int state) {
@@ -482,45 +493,6 @@ public class SearchActivity extends Activity
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        boolean consumed = true;
-
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                final Intent intentSettings = new Intent(this, SettingsActivity.class);
-                startActivity(intentSettings);
-                break;
-            case R.id.action_refresh_app_list:
-                recreate();
-                break;
-            case R.id.action_system_settings:
-                final Intent intentSystemSettings = new Intent(Settings.ACTION_SETTINGS);
-                intentSystemSettings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intentSystemSettings);
-                break;
-            case R.id.action_manage_apps:
-                final Intent intentManageApps = new Intent(Settings.ACTION_APPLICATION_SETTINGS);
-                intentManageApps.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intentManageApps);
-                break;
-            case R.id.action_set_wallpaper:
-                final Intent intentWallpaperPicker = new Intent(Intent.ACTION_SET_WALLPAPER);
-                startActivity(intentWallpaperPicker);
-                break;
-            case R.id.action_about:
-                final Intent intentAbout = new Intent(this, AboutActivity.class);
-                startActivity(intentAbout);
-                break;
-            default:
-                consumed = super.onOptionsItemSelected(item);
-                break;
-        }
-
-        return consumed;
-    }
-
     /**
      * Called when a package appears for any reason.
      *
@@ -671,6 +643,10 @@ public class SearchActivity extends Activity
         }
     }
 
+    public void setWallpaper(final MenuItem item) {
+        startActivity(new Intent(Intent.ACTION_SET_WALLPAPER));
+    }
+
     /**
      * This method dynamically sets the padding for the outer boundaries of the masterLayout and
      * appContainer.
@@ -765,10 +741,21 @@ public class SearchActivity extends Activity
 
     public void showPopup(final View v) {
         final PopupMenu popup = new PopupMenu(this, v);
-        popup.setOnMenuItemClickListener(new PopupEventListener());
         final MenuInflater inflater = popup.getMenuInflater();
+
         inflater.inflate(R.menu.search_activity_menu, popup.getMenu());
         popup.show();
+    }
+
+    public void startAppSettings(final MenuItem item) {
+        startActivity(new Intent(this, SettingsActivity.class));
+    }
+
+    public void startSystemSettings(final MenuItem item) {
+        final Intent intentSystemSettings = new Intent(Settings.ACTION_SETTINGS);
+
+        intentSystemSettings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intentSystemSettings);
     }
 
     private void updateFilter(final CharSequence cs) {
@@ -776,14 +763,6 @@ public class SearchActivity extends Activity
 
         if (seqLength != 1 || cs.charAt(0) != '\0') {
             mAdapter.getFilter().filter(cs);
-        }
-    }
-
-    class PopupEventListener implements PopupMenu.OnMenuItemClickListener {
-
-        @Override
-        public boolean onMenuItemClick(final MenuItem item) {
-            return onOptionsItemSelected(item);
         }
     }
 

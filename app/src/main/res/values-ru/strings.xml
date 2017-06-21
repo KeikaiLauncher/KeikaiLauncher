@@ -23,7 +23,6 @@
     <string name="appmenu_launch">Запуск</string>
     <string name="appmenu_info">Информация о приложении</string>
     <string name="launch">Запуск</string>
-    <string name="action_refresh_app_list">Обновить список приложений</string>
     <string name="action_system_settings">Настройки устройства</string>
     <string name="activity_not_found">Действие не найдено.</string>
     <string name="action_about">О приложении</string>
