@@ -215,23 +215,6 @@ public class SearchActivity extends Activity
         }
     }
 
-    private void disableReceiver() {
-        final ComponentName name = new ComponentName(this, PackageChangedReceiver.class);
-
-        getPackageManager().setComponentEnabledSetting(name,
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                PackageManager.DONT_KILL_APP);
-    }
-
-    private void enableReceiver() {
-        final PackageManager pm = getPackageManager();
-        final ComponentName componentName = new ComponentName(this, PackageChangedReceiver.class);
-
-        pm.setComponentEnabledSetting(componentName,
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP);
-    }
-
     private void hideKeyboard() {
         final View focus = getCurrentFocus();
 
@@ -332,6 +315,12 @@ public class SearchActivity extends Activity
         return adapter;
     }
 
+    private void modifyReceiver(final int state) {
+        final ComponentName name = new ComponentName(this, PackageChangedReceiver.class);
+
+        getPackageManager().setComponentEnabledSetting(name, state, PackageManager.DONT_KILL_APP);
+    }
+
     @Override
     public void onBackPressed() {
         if (isCurrentLauncher()) {
@@ -406,7 +395,7 @@ public class SearchActivity extends Activity
         setupPadding(transparentPossible && noMultiWindow);
 
         PackageChangedReceiver.setCallback(this);
-        enableReceiver();
+        modifyReceiver(PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
 
         setupPreferences();
         setupViews();
@@ -441,7 +430,7 @@ public class SearchActivity extends Activity
         if (!isChangingConfigurations()) {
             Log.d("HayaiLauncher", "Hayai is ded");
         }
-        disableReceiver();
+        modifyReceiver(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
         mAdapter.onDestroy();
         super.onDestroy();
     }
