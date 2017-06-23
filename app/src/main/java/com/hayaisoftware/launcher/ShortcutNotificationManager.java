@@ -81,8 +81,10 @@ public final class ShortcutNotificationManager {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1 &&
                 Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             if (SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY_LOW.equals(priority)) {
+                //noinspection deprecation
                 builder.setPriority(Notification.PRIORITY_LOW);
             } else if (SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY_HIGH.equals(priority)) {
+                //noinspection deprecation
                 builder.setPriority(Notification.PRIORITY_HIGH);
             } else {
                 throw new AssertionError("Undefined notification priority.");
@@ -92,6 +94,7 @@ public final class ShortcutNotificationManager {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
             notification = builder.build();
         } else {
+            //noinspection deprecation
             notification = builder.getNotification();
         }
 
