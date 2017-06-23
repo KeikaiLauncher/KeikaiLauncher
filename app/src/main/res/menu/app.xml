@@ -15,18 +15,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/appmenu_launch"
+        android:onClick="launchActivity"
         android:title="@string/appmenu_launch"/>
 
     <item
-        android:id="@+id/appmenu_info"
+        android:onClick="launchApplicationDetails"
         android:title="@string/appmenu_info"/>
 
     <item
         android:id="@+id/appmenu_pin_to_top"
+        android:onClick="pinToTop"
         android:title="@string/appmenu_pin_to_top"/>
 
     <item
-        android:id="@+id/appmenu_onplaystore"
+        android:onClick="launchPlayStore"
         android:title="@string/appmenu_onplaystore"/>
 </menu>

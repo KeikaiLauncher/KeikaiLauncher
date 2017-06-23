@@ -112,6 +112,18 @@ public class SearchActivity extends Activity
         return dimensionSize;
     }
 
+    public static LaunchableActivity getLaunchableActivity(final View view) {
+        return (LaunchableActivity) view.findViewById(R.id.appIcon).getTag();
+    }
+
+    private static LaunchableActivity getLaunchableActivity(final ContextMenuInfo menuInfo) {
+        return getLaunchableActivity(((AdapterContextMenuInfo) menuInfo).targetView);
+    }
+
+    private static LaunchableActivity getLaunchableActivity(final MenuItem item) {
+        return getLaunchableActivity(item.getMenuInfo());
+    }
+
     public static Collection<ResolveInfo> getLaunchableResolveInfos(final PackageManager pm,
             @Nullable final String activityName) {
         final Intent intent = new Intent();
@@ -272,6 +284,30 @@ public class SearchActivity extends Activity
         }
     }
 
+    public void launchActivity(final MenuItem item) {
+        launchActivity(getLaunchableActivity(item));
+    }
+
+    public void launchActivity(final View view) {
+        launchActivity(getLaunchableActivity(view));
+    }
+
+    public void launchApplicationDetails(final MenuItem item) {
+        final LaunchableActivity activity = getLaunchableActivity(item);
+        final Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.parse("package:" + activity.getComponent().getPackageName()));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    public void launchPlayStore(final MenuItem item) {
+        final LaunchableActivity activity = getLaunchableActivity(item);
+        final Intent intentPlayStore = new Intent(Intent.ACTION_VIEW);
+        intentPlayStore.setData(Uri.parse("market://details?id=" +
+                activity.getComponent().getPackageName()));
+        startActivity(intentPlayStore);
+    }
+
     private LaunchableAdapter<LaunchableActivity> loadLaunchableAdapter() {
         final LaunchableAdapter<LaunchableActivity> adapter;
         final Object object = getLastNonConfigurationInstance();
@@ -350,46 +386,6 @@ public class SearchActivity extends Activity
     }
 
     @Override
-    public boolean onContextItemSelected(final MenuItem item) {
-        final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-        final View itemView = info.targetView;
-        final LaunchableActivity launchableActivity =
-                (LaunchableActivity) itemView.findViewById(R.id.appIcon).getTag();
-        boolean consumed = true;
-
-        switch (item.getItemId()) {
-            case R.id.appmenu_launch:
-                launchActivity(launchableActivity);
-                break;
-            case R.id.appmenu_info:
-                final Intent intent = new Intent(
-                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                intent.setData(Uri.parse("package:"
-                        + launchableActivity.getComponent().getPackageName()));
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                break;
-            case R.id.appmenu_onplaystore:
-                final Intent intentPlayStore = new Intent(Intent.ACTION_VIEW);
-                intentPlayStore.setData(Uri.parse("market://details?id=" +
-                        launchableActivity.getComponent().getPackageName()));
-                startActivity(intentPlayStore);
-                break;
-            case R.id.appmenu_pin_to_top:
-                final LaunchableActivityPrefs prefs = new LaunchableActivityPrefs(this);
-                launchableActivity.setPriority(launchableActivity.getPriority() == 0 ? 1 : 0);
-                prefs.writePreference(launchableActivity);
-                mAdapter.sortApps();
-                break;
-            default:
-                consumed = super.onContextItemSelected(item);
-                break;
-        }
-
-        return consumed;
-    }
-
-    @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -420,19 +416,15 @@ public class SearchActivity extends Activity
         final MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.app, menu);
 
-        if (menuInfo instanceof AdapterContextMenuInfo) {
-            final AdapterContextMenuInfo adapterMenuInfo = (AdapterContextMenuInfo) menuInfo;
-            final LaunchableActivity activity = (LaunchableActivity) adapterMenuInfo.targetView
-                    .findViewById(R.id.appIcon).getTag();
-            final MenuItem item = menu.findItem(R.id.appmenu_pin_to_top);
+        final LaunchableActivity activity = getLaunchableActivity(menuInfo);
+        final MenuItem item = menu.findItem(R.id.appmenu_pin_to_top);
 
-            menu.setHeaderTitle(activity.toString());
+        menu.setHeaderTitle(activity.toString());
 
-            if (activity.getPriority() == 0) {
-                item.setTitle(R.string.appmenu_pin_to_top);
-            } else {
-                item.setTitle(R.string.appmenu_remove_pin);
-            }
+        if (activity.getPriority() == 0) {
+            item.setTitle(R.string.appmenu_pin_to_top);
+        } else {
+            item.setTitle(R.string.appmenu_remove_pin);
         }
     }
 
@@ -626,6 +618,20 @@ public class SearchActivity extends Activity
 
     }
 
+    public void pinToTop(final MenuItem item) {
+        final LaunchableActivity activity = getLaunchableActivity(item);
+        final LaunchableActivityPrefs prefs = new LaunchableActivityPrefs(this);
+
+        if (activity.getPriority() == 0) {
+            activity.setPriority(1);
+        } else {
+            activity.setPriority(0);
+        }
+
+        prefs.writePreference(activity);
+        mAdapter.sortApps();
+    }
+
     private void setPreferredOrder(final SharedPreferences preferences) {
         final String order = preferences.getString(KEY_PREF_PREFERRED_ORDER,
                 KEY_PREF_PREFERRED_ORDER_RECENT);
@@ -734,7 +740,7 @@ public class SearchActivity extends Activity
             @Override
             public void onItemClick(final AdapterView<?> parent, final View view,
                     final int position, final long id) {
-                launchActivity(mAdapter.getItem(position));
+                launchActivity(view);
             }
         });
     }
