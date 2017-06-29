@@ -22,7 +22,7 @@ import android.widget.ImageView;
 import com.hayaisoftware.launcher.threading.SimpleTaskConsumerManager;
 
 
-public final class ImageLoadingTask extends SimpleTaskConsumerManager.Task implements Runnable {
+public final class ImageLoadingTask implements Runnable, SimpleTaskConsumerManager.Task {
 
     private final Context mContext;
 

@@ -14,22 +14,23 @@
 
 package com.hayaisoftware.launcher.threading;
 
+import android.util.Log;
+
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-
 public class SimpleTaskConsumerManager {
+
+    private static final String INTERRUPTED_MSG = "Task was interrupted.";
+
+    private static final String TAG = "SimpleTaskManager";
 
     private final BlockingQueue<Task> mTasks;
 
-    private boolean mConsumersShouldDie;
+    private final Thread[] mThreads;
 
-    private volatile int mNumThreadsAlive;
-
-    private SimpleTaskConsumer[] mSimpleTaskConsumers;
-
-    private Thread[] threads;
+    private boolean mSubmissionsAccepted = true;
 
     public SimpleTaskConsumerManager(final int numConsumers, final int queueSize) {
         if (queueSize < 1) {
@@ -37,59 +38,64 @@ public class SimpleTaskConsumerManager {
         } else {
             mTasks = new ArrayBlockingQueue<>(queueSize);
         }
-        startConsumers(numConsumers);
 
+        mThreads = new Thread[numConsumers];
+        for (int i = 0; i < numConsumers; i++) {
+            mThreads[i] = new Thread(new SimpleTaskConsumer(mTasks));
+            mThreads[i].start();
+        }
     }
 
     public SimpleTaskConsumerManager(final int numConsumers) {
-        mTasks = new LinkedBlockingQueue<>();
-        startConsumers(numConsumers);
+        this(numConsumers, 0);
+    }
 
+    private static void putTask(final BlockingQueue<Task> tasks, final Task task) {
+        try {
+            tasks.put(task);
+        } catch (final InterruptedException e) {
+            Log.e(TAG, INTERRUPTED_MSG, e);
+        }
     }
 
     public void addTask(final Task task) {
-        if (!mConsumersShouldDie) {
+        if (mSubmissionsAccepted) {
+            putTask(mTasks, task);
+        }
+    }
+
+    private void blockThreadsUntilFinished() {
+        for (final Thread thread : mThreads) {
             try {
-                mTasks.put(task);
+                thread.join();
             } catch (final InterruptedException e) {
-                e.printStackTrace();
+                Log.e(TAG, INTERRUPTED_MSG, e);
+            }
+        }
+    }
+
+    public void destroyAllConsumers(final boolean finishCurrentTasks,
+            final boolean blockUntilFinished) {
+        if (mSubmissionsAccepted) {
+            mSubmissionsAccepted = false;
+
+            if (finishCurrentTasks) {
+                final Task dieTask = new DieTask();
+                for (final Thread mThread : mThreads) {
+                    putTask(mTasks, dieTask);
+                }
+
+                if (blockUntilFinished) {
+                    blockThreadsUntilFinished();
+                }
+            } else {
+                removeAllTasks();
             }
         }
     }
 
     public void destroyAllConsumers(final boolean finishCurrentTasks) {
         destroyAllConsumers(finishCurrentTasks, false);
-    }
-
-    public void destroyAllConsumers(final boolean finishCurrentTasks,
-            final boolean blockUntilFinished) {
-        if (!mConsumersShouldDie) {
-            mConsumersShouldDie = true;
-
-            if (!finishCurrentTasks) {
-                removeAllTasks();
-            }
-
-            final DieTask dieTask = new DieTask();
-            for (final Thread thread : threads) {
-                try {
-                    mTasks.put(dieTask);
-                    //Log.d("Multithread", "Added DieTask");
-                } catch (final InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            //Log.d("Multithread","Added All DieTasks");
-            if (blockUntilFinished) {
-                for (final Thread thread : threads) {
-                    try {
-                        thread.join();
-                    } catch (final InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -100,57 +106,48 @@ public class SimpleTaskConsumerManager {
         super.finalize();
     }
 
-    public void removeAllTasks() {
+    private void removeAllTasks() {
+        for (final Thread thread : mThreads) {
+            thread.interrupt();
+        }
         mTasks.clear();
     }
 
-    private void startConsumers(final int numConsumers) {
-        mSimpleTaskConsumers = new SimpleTaskConsumer[numConsumers];
-        threads = new Thread[numConsumers];
-        for (int i = 0; i < numConsumers; i++) {
-            mSimpleTaskConsumers[i] = new SimpleTaskConsumer();
-            threads[i] = new Thread(mSimpleTaskConsumers[i]);
-            threads[i].start();
-        }
+    public interface Task {
+
+        //Returns true if you want the thread that run the task to continue running.
+        boolean doTask();
     }
 
     //Dummy task, does nothing. Used to properly wake the threads to kill them.
-    public static final class DieTask extends Task {
+    private static final class DieTask implements Task {
 
+        @Override
         public boolean doTask() {
-            //Log.d("Multithread"," Run DieTask");
             return false;
         }
     }
 
-    public abstract static class Task {
+    private static final class SimpleTaskConsumer implements Runnable {
 
-        //Returns true if you want the thread that run the task to continue running.
-        public abstract boolean doTask();
-    }
+        private final BlockingQueue<Task> mTasks;
 
-    private class SimpleTaskConsumer implements Runnable {
+        private SimpleTaskConsumer(final BlockingQueue<Task> tasks) {
+            mTasks = tasks;
+        }
 
         @Override
         public void run() {
-            final int threadId = mNumThreadsAlive++;
-            //Log.d("Thread"+threadId, " is ready!");
+            Task task = null;
+
             do {
                 try {
-                    final Task task = mTasks.take();
-                    if (!task.doTask()) {
-                        break;
-                    }
-
+                    task = mTasks.take();
                 } catch (final InterruptedException e) {
-                    e.printStackTrace();
+                    // Interruption is part of the lifecycle here.
+                    Log.v(TAG, INTERRUPTED_MSG, e);
                 }
-
-            } while (true);
-
-            //Log.d("Multithread",threadId + " quit the loop!");
-            mNumThreadsAlive--;
-
+            } while (task == null || task.doTask());
         }
     }
 }

@@ -21,7 +21,7 @@ import android.content.pm.ResolveInfo;
 import com.hayaisoftware.launcher.threading.SimpleTaskConsumerManager;
 
 
-public final class LoadLaunchableActivityTask extends SimpleTaskConsumerManager.Task {
+public final class LoadLaunchableActivityTask implements SimpleTaskConsumerManager.Task {
 
     private final LaunchableAdapter<LaunchableActivity> mAdapter;
 
