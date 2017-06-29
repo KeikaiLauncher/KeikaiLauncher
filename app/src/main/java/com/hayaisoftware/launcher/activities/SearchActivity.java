@@ -728,33 +728,14 @@ public class SearchActivity extends Activity
 
     private void setupViews() {
         final GridView appContainer = findViewById(R.id.appsContainer);
+        final AppContainerListener listener = new AppContainerListener();
         mSearchEditText = setupSearchEditText();
 
         registerForContextMenu(appContainer);
 
-        appContainer.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScroll(final AbsListView view, final int firstVisibleItem,
-                    final int visibleItemCount, final int totalItemCount) {
-            }
-
-            @Override
-            public void onScrollStateChanged(final AbsListView view, final int scrollState) {
-                if (scrollState != SCROLL_STATE_IDLE) {
-                    hideKeyboard();
-                }
-            }
-        });
+        appContainer.setOnScrollListener(listener);
         appContainer.setAdapter(mAdapter);
-
-        appContainer.setOnItemClickListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(final AdapterView<?> parent, final View view,
-                    final int position, final long id) {
-                launchActivity(view);
-            }
-        });
+        appContainer.setOnItemClickListener(listener);
     }
 
     public void startAppSettings(final MenuItem item) {
@@ -773,6 +754,28 @@ public class SearchActivity extends Activity
 
         if (seqLength != 1 || cs.charAt(0) != '\0') {
             mAdapter.getFilter().filter(cs);
+        }
+    }
+
+    private final class AppContainerListener implements AbsListView.OnScrollListener,
+            OnItemClickListener {
+
+        @Override
+        public void onItemClick(final AdapterView<?> parent, final View view,
+                final int position, final long id) {
+            launchActivity(view);
+        }
+
+        @Override
+        public void onScroll(final AbsListView view, final int firstVisibleItem,
+                final int visibleItemCount, final int totalItemCount) {
+        }
+
+        @Override
+        public void onScrollStateChanged(final AbsListView view, final int scrollState) {
+            if (scrollState != SCROLL_STATE_IDLE) {
+                hideKeyboard();
+            }
         }
     }
 
