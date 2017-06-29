@@ -21,7 +21,7 @@
 
     <string-array name="pref_notification_priority_values" translatable="false">
         <item>max</item>
-        <item>min</item>
+        <item>@string/minimum</item>
     </string-array>
 
 
@@ -32,7 +32,7 @@
     </string-array>
 
     <string-array name="pref_app_preferred_order_values" translatable="false">
-        <item>recent</item>
+        <item>@string/recent</item>
         <item>alphabetical</item>
         <item>usage</item>
     </string-array>

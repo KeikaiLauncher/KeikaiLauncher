@@ -22,6 +22,7 @@
         android:label="@string/app_name"
         android:resizeableActivity="true"
         android:theme="@style/AppBaseTheme"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning"
         tools:targetApi="n">
 
         <activity
@@ -29,7 +30,7 @@
             android:alwaysRetainTaskState="true"
             android:label="@string/title_activity_search"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="stateHidden|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <action android:name="android.intent.action.ASSIST"/>

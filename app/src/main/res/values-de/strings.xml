@@ -23,7 +23,7 @@
     <string name="appmenu_launch">Starten</string>
     <string name="launch">Start</string>
     <string name="pref_notification_priority">Priorität der Benachrichtigung.</string>
-    <string name="search_view_hint">Geben Sie etwas ein...</string>
+    <string name="search_view_hint">Geben Sie etwas ein…</string>
     <string name="settings_category_notification_category">Benachrichtigungen</string>
     <string name="settings_enable_notification_title">Im Benachrichtigungsfeld Verknüpfung
         anzeigen

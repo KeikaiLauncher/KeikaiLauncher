@@ -28,11 +28,6 @@
                 android:width="0.5dip"
                 android:color="#7d7e7e7e"/>
             <corners android:radius="2dip"/>
-            <margin
-                android:bottom="0dip"
-                android:left="0dip"
-                android:right="0dip"
-                android:top="0dip"/>
             <padding
                 android:bottom="0dip"
                 android:left="0dip"

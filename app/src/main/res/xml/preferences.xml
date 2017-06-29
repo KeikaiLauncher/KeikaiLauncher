@@ -21,7 +21,7 @@
             android:key="pref_autokeyboard"
             android:title="@string/settings_autokeyboard"/>
         <ListPreference
-            android:defaultValue="recent"
+            android:defaultValue="@string/recent"
             android:dialogTitle="@string/pref_preferred_app_order_dialog"
             android:entries="@array/pref_app_preferred_order_entries"
             android:entryValues="@array/pref_app_preferred_order_values"
@@ -44,7 +44,7 @@
             android:key="pref_notification"
             android:title="@string/settings_enable_notification_title"/>
         <ListPreference
-            android:defaultValue="min"
+            android:defaultValue="@string/minimum"
             android:dependency="pref_notification"
             android:dialogTitle="@string/pref_notification_priority"
             android:entries="@array/pref_notification_priority_entries"
