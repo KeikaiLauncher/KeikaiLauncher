@@ -67,7 +67,7 @@ public final class ImageLoadingTask implements Runnable, SimpleTaskConsumerManag
             mIconSizePixels = iconSizePixels;
         }
 
-        public ImageLoadingTask create(final ImageView imageView,
+        public SimpleTaskConsumerManager.Task create(final ImageView imageView,
                 final LaunchableActivity activity) {
             return new ImageLoadingTask(imageView, activity, mIconSizePixels);
         }

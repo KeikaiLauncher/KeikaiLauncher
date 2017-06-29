@@ -58,7 +58,7 @@ public final class LoadLaunchableActivityTask implements SimpleTaskConsumerManag
             mAdapter = adapter;
         }
 
-        public LoadLaunchableActivityTask create(final ResolveInfo info) {
+        public SimpleTaskConsumerManager.Task create(final ResolveInfo info) {
             return new LoadLaunchableActivityTask(info.activityInfo, mPackageManager, mAdapter);
         }
     }
