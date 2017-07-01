@@ -21,7 +21,7 @@ So far, this fork has quite a few features not found in mainline, including:
 * Tons of cleanups.
 * Actual project wide code formatting and inspections.
 * Update all build requirements.
-* Fewer depreciations.
+* Fewer deprecations.
 * Better compartmentalization.
 * Less custom code when native code is available.
 * Fewer fields when the variable doesn't require state storage.
@@ -59,6 +59,6 @@ There are currently no prebuilt binaries.
 </table>
 
 ## Branch stuff
-* [master](https://github.com/avuton/HayaiLauncher) - This branch have commits considered finished and stable.
+* [master](https://github.com/avuton/HayaiLauncher) - This branch has commits considered finished and stable.
 * [next](https://github.com/avuton/HayaiLauncher/tree/next) - This branch has commits which are unfinished, under development and potentially unstable. This branch gets force merged all the time, so, the git commit structures will never be stable.
-* [hacks](https://github.com/avuton/HayaiLauncher/tree/hacks) - This branch is upstream of the 'next' branch, it includes commits which will never be part of master, but can be considered pretty useful.
+* [hacks](https://github.com/avuton/HayaiLauncher/tree/hacks) - This branch is upstream of the 'next' branch, it includes commits which will never be part of master, but might be considered pretty useful.
