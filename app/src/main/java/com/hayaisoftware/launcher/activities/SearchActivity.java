@@ -89,12 +89,12 @@ public class SearchActivity extends Activity
      */
     private final Object mLock = new Object();
 
+    private LaunchableAdapter<LaunchableActivity> mAdapter;
+
     /*
      * Hold the menu state because we need to be able to dismiss it on demand.
      */
-    public PopupMenu mPopupMenu;
-
-    private LaunchableAdapter<LaunchableActivity> mAdapter;
+    private PopupMenu mPopupMenu;
 
     private EditText mSearchEditText;
 
@@ -118,7 +118,7 @@ public class SearchActivity extends Activity
         return dimensionSize;
     }
 
-    public static LaunchableActivity getLaunchableActivity(final View view) {
+    private static LaunchableActivity getLaunchableActivity(final View view) {
         return (LaunchableActivity) view.findViewById(R.id.appIcon).getTag();
     }
 
@@ -130,7 +130,7 @@ public class SearchActivity extends Activity
         return getLaunchableActivity(item.getMenuInfo());
     }
 
-    public static Collection<ResolveInfo> getLaunchableResolveInfos(final PackageManager pm,
+    private static Collection<ResolveInfo> getLaunchableResolveInfos(final PackageManager pm,
             @Nullable final String activityName) {
         final Intent intent = new Intent();
 
@@ -261,7 +261,7 @@ public class SearchActivity extends Activity
         startActivity(new Intent(this, AboutActivity.class));
     }
 
-    public void launchActivity(final LaunchableActivity launchableActivity) {
+    private void launchActivity(final LaunchableActivity launchableActivity) {
         final LaunchableActivityPrefs prefs = new LaunchableActivityPrefs(this);
 
         hideKeyboard();
@@ -294,7 +294,7 @@ public class SearchActivity extends Activity
         launchActivity(getLaunchableActivity(item));
     }
 
-    public void launchActivity(final View view) {
+    private void launchActivity(final View view) {
         launchActivity(getLaunchableActivity(view));
     }
 
