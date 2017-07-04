@@ -392,8 +392,9 @@ public class SearchActivity extends Activity
             final View topLeft = findViewById(R.id.overflow_button_topleft);
             mPopupMenu = new PopupMenu(this, topLeft);
             mPopupMenu.inflate(R.menu.search_activity_menu);
-            mPopupMenu.show();
         }
+
+        mPopupMenu.show();
     }
 
     @Override
