@@ -61,7 +61,6 @@ import com.hayaisoftware.launcher.LaunchableAdapter;
 import com.hayaisoftware.launcher.LoadLaunchableActivityTask;
 import com.hayaisoftware.launcher.R;
 import com.hayaisoftware.launcher.ShortcutNotificationManager;
-import com.hayaisoftware.launcher.fragments.SettingsFragment;
 import com.hayaisoftware.launcher.monitor.PackageChangeCallback;
 import com.hayaisoftware.launcher.monitor.PackageChangedReceiver;
 import com.hayaisoftware.launcher.threading.SimpleTaskConsumerManager;
@@ -70,14 +69,6 @@ import java.util.Collection;
 
 public class SearchActivity extends Activity
         implements SharedPreferences.OnSharedPreferenceChangeListener, PackageChangeCallback {
-
-    private static final String KEY_PREF_DISABLE_ICONS = "pref_disable_icons";
-
-    private static final String KEY_PREF_PREFERRED_ORDER = "pref_app_preferred_order";
-
-    private static final String KEY_PREF_PREFERRED_ORDER_RECENT = "recent";
-
-    private static final String KEY_PREF_PREFERRED_ORDER_USAGE = "usage";
 
     private static final String SEARCH_EDIT_TEXT_KEY = "SearchEditText";
 
@@ -262,7 +253,8 @@ public class SearchActivity extends Activity
     }
 
     private void launchActivity(final LaunchableActivity launchableActivity) {
-        final LaunchableActivityPrefs prefs = new LaunchableActivityPrefs(this);
+        final LaunchableActivityPrefs launchableprefs = new LaunchableActivityPrefs(this);
+        final SharedLauncherPrefs sharedPrefs = new SharedLauncherPrefs(this);
 
         hideKeyboard();
         try {
@@ -270,11 +262,11 @@ public class SearchActivity extends Activity
             mSearchEditText.setText(null);
             launchableActivity.setLaunchTime();
             launchableActivity.addUsage();
-            prefs.writePreference(launchableActivity);
+            launchableprefs.writePreference(launchableActivity);
 
-            if (mAdapter.isOrderedByRecent()) {
+            if (sharedPrefs.isOrderedByRecent()) {
                 mAdapter.sort(LaunchableAdapter.RECENT);
-            } else if (mAdapter.isOrderedByUsage()) {
+            } else if (sharedPrefs.isOrderedByUsage()) {
                 mAdapter.sort(LaunchableAdapter.USAGE);
             }
         } catch (final ActivityNotFoundException e) {
@@ -355,7 +347,7 @@ public class SearchActivity extends Activity
             simpleTaskConsumerManager.destroyAllConsumers(true, true);
         }
 
-        adapter.sortApps();
+        adapter.sortApps(this);
         adapter.notifyDataSetChanged();
 
         return adapter;
@@ -510,7 +502,7 @@ public class SearchActivity extends Activity
         synchronized (mLock) {
             if (mAdapter.getClassNamePosition(activityName) == -1) {
                 addToAdapter(resolveInfos);
-                mAdapter.sortApps();
+                mAdapter.sortApps(this);
                 updateFilter(mSearchEditText.getText());
             }
         }
@@ -558,11 +550,10 @@ public class SearchActivity extends Activity
     @Override
     protected void onResume() {
         super.onResume();
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedLauncherPrefs prefs = new SharedLauncherPrefs(this);
         final Editable searchText = mSearchEditText.getText();
 
-        if (preferences.getBoolean(SettingsFragment.KEY_PREF_AUTO_KEYBOARD, false) ||
-                searchText.length() > 0) {
+        if (prefs.isKeyboardAutomatic() || searchText.length() > 0) {
             final InputMethodManager imm =
                     (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
@@ -578,7 +569,7 @@ public class SearchActivity extends Activity
             hideKeyboard();
         }
 
-        if (preferences.getBoolean(SettingsFragment.KEY_PREF_ALLOW_ROTATION, false)) {
+        if (prefs.isRotationAllowed()) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
@@ -613,10 +604,9 @@ public class SearchActivity extends Activity
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
             final String key) {
         //does this need to run in uiThread?
-        if (key.equals(KEY_PREF_PREFERRED_ORDER)) {
-            setPreferredOrder(sharedPreferences);
-            mAdapter.sortApps();
-        } else if (key.equals(KEY_PREF_DISABLE_ICONS)) {
+        if (getString(R.string.pref_key_preferred_order).equals(key)) {
+            mAdapter.sortApps(this);
+        } else if (getString(R.string.pref_key_disable_icons).equals(key)) {
             recreate();
         }
     }
@@ -641,24 +631,7 @@ public class SearchActivity extends Activity
         }
 
         prefs.writePreference(activity);
-        mAdapter.sortApps();
-    }
-
-    private void setPreferredOrder(final SharedPreferences preferences) {
-        final String order = preferences.getString(KEY_PREF_PREFERRED_ORDER,
-                KEY_PREF_PREFERRED_ORDER_RECENT);
-
-        if (KEY_PREF_PREFERRED_ORDER_RECENT.equals(order)) {
-            mAdapter.enableOrderByRecent();
-        } else {
-            mAdapter.disableOrderByRecent();
-        }
-
-        if (KEY_PREF_PREFERRED_ORDER_USAGE.equals(order)) {
-            mAdapter.enableOrderByUsage();
-        } else {
-            mAdapter.disableOrderByUsage();
-        }
+        mAdapter.sortApps(this);
     }
 
     public void setWallpaper(final MenuItem item) {
@@ -696,23 +669,14 @@ public class SearchActivity extends Activity
     }
 
     private void setupPreferences() {
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedLauncherPrefs prefs = new SharedLauncherPrefs(this);
+        final SharedPreferences preferences = prefs.getPreferences();
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        if (preferences.getBoolean(SettingsFragment.KEY_PREF_NOTIFICATION, false)) {
-            final String strPriority =
-                    preferences.getString(SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY,
-                            SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY_LOW);
 
-            ShortcutNotificationManager.showNotification(this, strPriority);
+        if (prefs.isNotificationEnabled()) {
+            ShortcutNotificationManager.showNotification(this);
         }
 
-        if (preferences.getBoolean(KEY_PREF_DISABLE_ICONS, false)) {
-            mAdapter.setIconsDisabled();
-        } else {
-            mAdapter.setIconsEnabled();
-        }
-
-        setPreferredOrder(preferences);
         preferences.registerOnSharedPreferenceChangeListener(this);
     }
 

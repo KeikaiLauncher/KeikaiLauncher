@@ -27,21 +27,14 @@ import android.view.ViewGroup;
 
 import com.hayaisoftware.launcher.R;
 import com.hayaisoftware.launcher.ShortcutNotificationManager;
+import com.hayaisoftware.launcher.activities.SharedLauncherPrefs;
 
 public class SettingsFragment extends PreferenceFragment implements
         SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public static final String KEY_PREF_ALLOW_ROTATION = "pref_allow_rotation";
-
-    public static final String KEY_PREF_AUTO_KEYBOARD = "pref_autokeyboard";
-
-    public static final String KEY_PREF_NOTIFICATION = "pref_notification";
-
-    public static final String KEY_PREF_NOTIFICATION_PRIORITY = "pref_notification_priority";
-
-    public static final String KEY_PREF_NOTIFICATION_PRIORITY_HIGH = "max";
-
-    public static final String KEY_PREF_NOTIFICATION_PRIORITY_LOW = "min";
+    private Preference findPreference(@StringRes final int prefKey) {
+        return findPreference(getString(prefKey));
+    }
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -59,7 +52,8 @@ public class SettingsFragment extends PreferenceFragment implements
                     (PreferenceCategory) findPreference("pref_category_notification");
             notificationCategory.removePreference(notificationCategory);
 
-            final Preference priorityPreference = findPreference(KEY_PREF_NOTIFICATION_PRIORITY);
+            final String priorityKey = getString(R.string.pref_key_notification_priority);
+            final Preference priorityPreference = findPreference(priorityKey);
             notificationCategory.removePreference(priorityPreference);
         }
 
@@ -85,24 +79,18 @@ public class SettingsFragment extends PreferenceFragment implements
     @Override
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
             final String key) {
-        if (key.equals(KEY_PREF_NOTIFICATION) || key.equals(KEY_PREF_NOTIFICATION_PRIORITY)) {
-            final boolean notificationEnabled =
-                    sharedPreferences.getBoolean(KEY_PREF_NOTIFICATION, false);
-            final Context context = getActivity();
+        final Context context = getActivity();
 
-            // Fragments suck.
-            if (context != null) {
+        // Fragments suck.
+        if (context != null) {
+            final SharedLauncherPrefs prefs = new SharedLauncherPrefs(context);
+
+            if (key.equals(getString(R.string.pref_key_notification)) ||
+                    key.equals(getString(R.string.pref_key_notification_priority))) {
                 ShortcutNotificationManager.cancelNotification(context);
-            }
 
-            if (notificationEnabled) {
-                final String strPriority =
-                        sharedPreferences.getString(KEY_PREF_NOTIFICATION_PRIORITY,
-                                KEY_PREF_NOTIFICATION_PRIORITY_LOW);
-
-                // Fragments suck.
-                if (context != null) {
-                    ShortcutNotificationManager.showNotification(context, strPriority);
+                if (prefs.isNotificationEnabled()) {
+                    ShortcutNotificationManager.showNotification(context);
                 }
             }
         }

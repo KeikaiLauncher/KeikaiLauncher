@@ -31,6 +31,7 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.hayaisoftware.launcher.activities.SharedLauncherPrefs;
 import com.hayaisoftware.launcher.comparators.AlphabeticalOrder;
 import com.hayaisoftware.launcher.comparators.PinToTop;
 import com.hayaisoftware.launcher.comparators.RecentOrder;
@@ -121,27 +122,10 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
     private int mDropDownResource;
 
     /**
-     * This field stores whether icons are enabled or disabled.
-     */
-    private boolean mIconsEnabled = false;
-
-    /**
      * Indicates whether or not {@link #notifyDataSetChanged()} must be called whenever
      * {@link #mObjects} is modified.
      */
     private boolean mNotifyOnChange = false;
-
-    /**
-     * This field stores whether to order this list by how recently used the {@link
-     * LaunchableActivity} was launched.
-     */
-    private boolean mOrderByRecent = false;
-
-    /**
-     * This field stores whether to order this list by how much the {@link LaunchableActivity} was
-     * used.
-     */
-    private boolean mOrderByUsage = false;
 
     // A copy of the original mObjects array, initialized from and then used instead as soon as
     // the mFilter ArrayFilter is used. mObjects will then only contain the filtered values.
@@ -302,34 +286,6 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
                 activity.deleteActivityIcon();
             }
         }
-    }
-
-    /**
-     * This method disables ordering by recent use of a {@link LaunchableActivity}.
-     */
-    public void disableOrderByRecent() {
-        mOrderByRecent = false;
-    }
-
-    /**
-     * This method disables ordering by total number of uses of a {@link LaunchableActivity}.
-     */
-    public void disableOrderByUsage() {
-        mOrderByUsage = false;
-    }
-
-    /**
-     * This method enables ordering by recent use of a {@link LaunchableActivity}.
-     */
-    public void enableOrderByRecent() {
-        mOrderByRecent = true;
-    }
-
-    /**
-     * This method enables ordering by total number of uses of a {@link LaunchableActivity}.
-     */
-    public void enableOrderByUsage() {
-        mOrderByUsage = true;
     }
 
     /**
@@ -505,7 +461,8 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
             appIconView.setImageDrawable(
                     launchableActivity.getActivityIcon(parent.getContext(), mIconSizePixels));
         } else {
-            if (mIconsEnabled) {
+            final SharedLauncherPrefs prefs = new SharedLauncherPrefs(parent.getContext());
+            if (prefs.areIconsEnabled()) {
                 mImageLoadingConsumersManager.addTask(mImageTasks.create(appIconView,
                         launchableActivity));
             }
@@ -539,14 +496,6 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
         if (mNotifyOnChange) {
             notifyDataSetChanged();
         }
-    }
-
-    public boolean isOrderedByRecent() {
-        return mOrderByRecent;
-    }
-
-    public boolean isOrderedByUsage() {
-        return mOrderByUsage;
     }
 
     /**
@@ -680,20 +629,6 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
     }
 
     /**
-     * This method disables loading of {@link LaunchableActivity} icons.
-     */
-    public void setIconsDisabled() {
-        mIconsEnabled = false;
-    }
-
-    /**
-     * This method disables loading of {@link LaunchableActivity} icons.
-     */
-    public void setIconsEnabled() {
-        mIconsEnabled = true;
-    }
-
-    /**
      * Control whether methods that change the list ({@link #add}, {@link #addAll(Collection)},
      * {@link #addAll(LaunchableActivity[])} (Object[])}, {@link #insert}, {@link #remove},
      * {@link #clear}, {@link #sort(Comparator)}) automatically call {@link #notifyDataSetChanged}.
@@ -732,22 +667,19 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
 
     /**
      * This method sorts all {@link LaunchableActivity} objects in this {@code Adapter}.
-     *
-     * @see #disableOrderByRecent()
-     * @see #enableOrderByRecent()
-     * @see #disableOrderByUsage()
-     * @see #enableOrderByUsage()
      */
-    public void sortApps() {
+    public void sortApps(final Context context) {
+        final SharedLauncherPrefs prefs = new SharedLauncherPrefs(context);
+
         synchronized (mLock) {
             final boolean notify = mNotifyOnChange;
             mNotifyOnChange = false;
 
             sort(ALPHABETICAL);
 
-            if (mOrderByRecent) {
+            if (prefs.isOrderedByRecent()) {
                 sort(RECENT);
-            } else if (mOrderByUsage) {
+            } else if (prefs.isOrderedByUsage()) {
                 sort(USAGE);
             }
 

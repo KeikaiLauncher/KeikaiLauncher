@@ -23,7 +23,7 @@ import android.content.Intent;
 import android.os.Build;
 
 import com.hayaisoftware.launcher.activities.SearchActivity;
-import com.hayaisoftware.launcher.fragments.SettingsFragment;
+import com.hayaisoftware.launcher.activities.SharedLauncherPrefs;
 
 public final class ShortcutNotificationManager {
 
@@ -40,7 +40,8 @@ public final class ShortcutNotificationManager {
         mNotificationManager.cancel(NOTIFICATION_ID);
     }
 
-    public static void showNotification(final Context context, final String priority) {
+    public static void showNotification(final Context context) {
+        final SharedLauncherPrefs prefs = new SharedLauncherPrefs(context);
         final Intent resultIntent = new Intent(context, SearchActivity.class);
         final PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, resultIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
@@ -56,9 +57,9 @@ public final class ShortcutNotificationManager {
             final int importance;
             final NotificationChannel channel;
 
-            if (SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY_LOW.equals(priority)) {
+            if (prefs.isNotificationPriorityLow()) {
                 importance = NotificationManager.IMPORTANCE_LOW;
-            } else if (SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY_HIGH.equals(priority)) {
+            } else if (prefs.isNotificationPriorityHigh()) {
                 importance = NotificationManager.IMPORTANCE_HIGH;
             } else {
                 throw new AssertionError("Undefined notification priority.");
@@ -80,10 +81,10 @@ public final class ShortcutNotificationManager {
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1 &&
                 Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            if (SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY_LOW.equals(priority)) {
+            if (prefs.isNotificationPriorityLow()) {
                 //noinspection deprecation
                 builder.setPriority(Notification.PRIORITY_LOW);
-            } else if (SettingsFragment.KEY_PREF_NOTIFICATION_PRIORITY_HIGH.equals(priority)) {
+            } else if (prefs.isNotificationPriorityHigh()) {
                 //noinspection deprecation
                 builder.setPriority(Notification.PRIORITY_HIGH);
             } else {
