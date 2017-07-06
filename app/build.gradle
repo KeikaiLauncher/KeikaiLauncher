@@ -25,6 +25,22 @@ android {
         versionName "1.4.5"
     }
     buildTypes {
+        all {
+            final String gitOutput = "git config --get-all remote.origin.url".execute().text.trim();
+            String[] info = getGithubInfo(gitOutput, "github.com/");
+
+            if (info == null) {
+                info = getGithubInfo(gitOutput, "github.com:");
+            }
+
+            if (info == null) {
+                buildConfigField("String", "GITHUB_USER", "\"avuton\"")
+                buildConfigField("String", "GITHUB_PROJECT", "\"HayaiLauncher\"")
+            } else {
+                buildConfigField("String", "GITHUB_USER", "\"${info[0]}\"");
+                buildConfigField("String", "GITHUB_PROJECT", "\"${info[1]}\"");
+            }
+        }
         release {
             minifyEnabled true
             shrinkResources true
@@ -41,6 +57,41 @@ android {
     }
     productFlavors {
     }
+}
+
+/**
+ * This method is a simple git URL parser to pull the username and project name if this repository
+ * was pulled from a Github remote origin URL.
+ *
+ * @param gitInput The git remote origin URL.
+ * @param lookFor This is the string to use.
+ * @return A String array, the first string being the git user the second being the git project,
+ * null if it could not be parsed from the given information.
+ */
+static def String[] getGithubInfo(final String gitInput, final String lookFor) {
+    final String[] info;
+
+    final int index = gitInput.indexOf(lookFor);
+    if (index == -1) {
+        info = null;
+    } else {
+        final int endName = gitInput.indexOf('/', index)
+
+        if (endName == -1) {
+            info = null;
+        } else {
+            info = new String[2];
+            info[0] = gitInput.substring(index + lookFor.length(), endName);
+
+            if (gitInput.endsWith(".git")) {
+                info[1] = gitInput.substring(endName + 1, gitInput.length() - 4);
+            } else {
+                info[1] = gitInput.substring(endName + 1);
+            }
+        }
+    }
+
+    return info;
 }
 
 static def gitShortHash() {

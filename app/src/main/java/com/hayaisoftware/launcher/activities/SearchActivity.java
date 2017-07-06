@@ -276,8 +276,7 @@ public class SearchActivity extends Activity
                 final String notFound = getString(R.string.activity_not_found);
 
                 Log.e(TAG, notFound, e);
-                Toast.makeText(this, getString(R.string.activity_not_found),
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, notFound, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -442,7 +441,7 @@ public class SearchActivity extends Activity
     @Override
     protected void onDestroy() {
         if (!isChangingConfigurations()) {
-            Log.d("HayaiLauncher", "Hayai is ded");
+            Log.d(BuildConfig.GITHUB_PROJECT, "Hayai is ded");
         }
         modifyReceiver(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
         mAdapter.onDestroy();

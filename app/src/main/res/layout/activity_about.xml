@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingBottom="4dp"
+        android:paddingBottom="24dp"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
         android:paddingTop="4dp">
@@ -41,7 +41,7 @@
         <TextView
             android:id="@+id/about_project_website_url"
             style="@style/BodyText"
-            android:text="@string/about_project_website_url"/>
+            android:textIsSelectable="true"/>
 
         <TextView
             style="@style/CaptionText"
@@ -54,10 +54,10 @@
 
         <TextView
             style="@style/CaptionText"
-            android:text="@string/about_contributors"/>
+            android:text="@string/about_contributors_title"/>
 
         <TextView
-            android:id="@+id/about_contributors"
+            android:id="@+id/list_of_contributors"
             style="@style/BodyText"
             android:textIsSelectable="false"/>
     </LinearLayout>

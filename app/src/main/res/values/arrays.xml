@@ -13,7 +13,6 @@
   -->
 
 <resources>
-
     <string-array name="pref_notification_priority_entries">
         <item>@string/pref_notification_priority_entries_high</item>
         <item>@string/pref_notification_priority_entries_low</item>
@@ -35,30 +34,5 @@
         <item>@string/pref_value_preferred_order_recent</item>
         <item>@string/pref_value_preferred_order_alpha</item>
         <item>@string/pref_value_preferred_order_usage</item>
-    </string-array>
-
-    <!--
-    This is an array of the contributors. This array directly coordinates with
-    {@code about_contributor_usernames}. An entry must be made there when adding a contributor.
-
-    Maintainer should always be item 0.
-    -->
-    <string-array name="about_contributor_names" translatable="false">
-        <item>Edgar Villani Peres</item>
-        <item>Dalton de Oliveira Silva</item>
-        <item>Avuton Olrich</item>
-    </string-array>
-
-    <!--
-    This is an array of contributor user names. This array directly coordinates with
-    {@code about_contributor_names}. If a contributor doesn't have a Github user name, add
-    null to the relational place in the list.
-
-    Maintainer should always be item 0.
-    -->
-    <string-array name="about_contributor_usernames" translatable="false">
-        <item>seizonsenryaku</item>
-        <item>daltonos</item>
-        <item>avuton</item>
     </string-array>
 </resources>

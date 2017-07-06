@@ -12,8 +12,7 @@
   ~ limitations under the License.
   -->
 
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-
+<resources>
     <string name="app_name" translatable="false">Hayai Launcher</string>
     <string name="title_activity_search" translatable="false">Hayai Launcher</string>
     <string name="action_settings">Settings</string>
@@ -34,15 +33,13 @@
     <string name="about_header">About Hayai Launcher</string>
     <string name="about_version_code">Version</string>
     <string name="about_project_website">Project Website</string>
-    <string name="about_project_website_url" translatable="false">
-        https://github.com/seizonsenryaku/HayaiLauncher
-    </string>
     <string name="about_license">License</string>
     <string name="about_license_type" translatable="false">Apache License Version 2.0</string>
     <string name="about_license_url" translatable="false">
         http://www.apache.org/licenses/LICENSE-2.0.txt
     </string>
-    <string name="about_contributors">Contributors</string>
+    <string name="about_contributors_title">Contributors</string>
+    <string name="about_list_of_contributors">List of contributors</string>
 
     <string name="action_manage_apps">Manage apps</string>
     <string name="appmenu_onplaystore">Open on app market</string>
