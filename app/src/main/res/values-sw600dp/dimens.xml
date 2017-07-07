@@ -18,6 +18,9 @@
     -->
     <dimen name="app_icon_size">72dp</dimen>
     <dimen name="app_icon_label_size">14sp</dimen>
+
+    <!-- This anchors the text right below the app_icon_size.  -->
+    <dimen name="app_text_upper_margin">76dp</dimen>
     <dimen name="app_row_column_width">96dp</dimen>
     <dimen name="app_row_column_height">130dp</dimen>
     <dimen name="app_pin_size">24dp</dimen>

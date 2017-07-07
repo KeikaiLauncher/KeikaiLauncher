@@ -19,6 +19,8 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <!-- This anchors the text right below the app_icon_size.  -->
+    <dimen name="app_text_upper_margin">60dp</dimen>
     <dimen name="app_row_horizontal_spacing">8dp</dimen>
     <dimen name="app_row_vertical_spacing">8dp</dimen>
     <dimen name="app_icon_size">56dp</dimen>
