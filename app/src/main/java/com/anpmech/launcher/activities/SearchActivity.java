@@ -411,7 +411,7 @@ public class SearchActivity extends Activity
 
         menu.setHeaderTitle(activity.toString());
 
-        if (activity.getPriority() == 0) {
+        if (activity.getPriority() == LaunchableActivity.PIN_PRIORITY_NONE) {
             item.setTitle(R.string.appmenu_pin_to_top);
         } else {
             item.setTitle(R.string.appmenu_remove_pin);
@@ -662,10 +662,10 @@ public class SearchActivity extends Activity
         final LaunchableActivity activity = getLaunchableActivity(item);
         final LaunchableActivityPrefs prefs = new LaunchableActivityPrefs(this);
 
-        if (activity.getPriority() == 0) {
-            activity.setPriority(1);
+        if (activity.getPriority() == LaunchableActivity.PIN_PRIORITY_NONE) {
+            activity.setPriority(LaunchableActivity.PIN_PRIORITY_MANUAL);
         } else {
-            activity.setPriority(0);
+            activity.setPriority(LaunchableActivity.PIN_PRIORITY_NONE);
         }
 
         prefs.writePreference(activity);
