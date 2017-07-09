@@ -144,7 +144,7 @@ public class LaunchableActivityPrefs extends SQLiteOpenHelper {
         final ComponentName name = launchableActivity.getComponent();
         final String className;
 
-        if (priority > 0) {
+        if (priority != LaunchableActivity.PIN_PRIORITY_NONE) {
             values.put(KEY_FAVORITE, priority);
         }
 

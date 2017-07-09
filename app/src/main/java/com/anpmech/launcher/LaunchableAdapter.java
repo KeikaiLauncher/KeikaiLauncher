@@ -573,7 +573,7 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
             }
         }
 
-        if (launchableActivity.getPriority() > 0) {
+        if (launchableActivity.getPriority() != LaunchableActivity.PIN_PRIORITY_NONE) {
             appPinToTop.setVisibility(View.VISIBLE);
         } else {
             appPinToTop.setVisibility(View.GONE);

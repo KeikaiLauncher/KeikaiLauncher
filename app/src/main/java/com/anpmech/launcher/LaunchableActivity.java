@@ -39,6 +39,12 @@ import androidx.annotation.RequiresApi;
 
 public class LaunchableActivity {
 
+    // This priority designates the user has manually raised the priority of the launchable.
+    public static final int PIN_PRIORITY_MANUAL = 1;
+
+    // This priority designates the launchable does not have raised priority.
+    public static final int PIN_PRIORITY_NONE = 0;
+
     private static final String TAG = "LaunchableActivity";
 
     private final String mActivityLabel;
