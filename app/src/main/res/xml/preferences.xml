@@ -35,6 +35,12 @@
             android:defaultValue="false"
             android:key="pref_allow_rotation"
             android:title="@string/pref_allow_rotation"/>
+        <Preference
+            android:key="modify_usage_statistics"
+            android:summary="@string/pref_modify_android_usage_summary"
+            android:title="@string/pref_modify_android_usage_title">
+            <intent android:action="android.settings.USAGE_ACCESS_SETTINGS"/>
+        </Preference>
     </PreferenceCategory>
     <PreferenceCategory
         android:key="pref_category_notification"

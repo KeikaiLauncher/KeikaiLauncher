@@ -15,6 +15,7 @@ So far, this fork has quite a few features not found in mainline, including:
 * Do fewer things and get the same or better results.
 * Installs, removes and package modifications now work (including external removable storage).
 * Better behaviour with 'home' button presses and search bar interactions.
+* Support for Android's UsageStats subsystem (API 21+)
 
 ### Development stuff
 

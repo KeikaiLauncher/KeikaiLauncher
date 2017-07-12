@@ -16,6 +16,13 @@
           xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools">
 
+    <!--
+    ~ This permission completely optional and set in the system settings menus. The following
+    ~ declares intention to use, if available and granted.
+    -->
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions"/>
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"

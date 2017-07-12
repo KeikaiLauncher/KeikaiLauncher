@@ -22,6 +22,11 @@
     <!-- This string is the key used to retrieve the value for icon preference. -->
     <string name="pref_key_disable_icons" translatable="false">pref_disable_icons</string>
 
+    <!-- This string is the key used to retrieve the intent for system usage permissions. -->
+    <string name="pref_key_modify_usage_statistics" translatable="false">
+        modify_usage_statistics
+    </string>
+
     <!-- This string is the key used to retrieve the value for notification preference. -->
     <string name="pref_key_notification" translatable="false">pref_notification</string>
 

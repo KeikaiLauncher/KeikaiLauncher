@@ -550,6 +550,7 @@ public class SearchActivity extends Activity
     protected void onResume() {
         super.onResume();
         final SharedLauncherPrefs prefs = new SharedLauncherPrefs(this);
+        mAdapter.updateUsageMap(this);
         final Editable searchText = mSearchEditText.getText();
 
         if (prefs.isKeyboardAutomatic() || searchText.length() > 0) {

@@ -16,11 +16,13 @@ package com.hayaisoftware.launcher.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
+import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +33,10 @@ import com.hayaisoftware.launcher.activities.SharedLauncherPrefs;
 
 public class SettingsFragment extends PreferenceFragment implements
         SharedPreferences.OnSharedPreferenceChangeListener {
+
+    private Preference findPreference(@StringRes final int prefKey) {
+        return findPreference(getString(prefKey));
+    }
 
     private Preference findPreference(@StringRes final int prefKey) {
         return findPreference(getString(prefKey));
@@ -57,6 +63,7 @@ public class SettingsFragment extends PreferenceFragment implements
             notificationCategory.removePreference(priorityPreference);
         }
 
+        setUsageStatisticsStatus();
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -94,5 +101,16 @@ public class SettingsFragment extends PreferenceFragment implements
                 }
             }
         }
+    }
+
+    /**
+     * This method sets the usage statistics preference status by checking the availability of the
+     * UsageStats subsystem.
+     */
+    private void setUsageStatisticsStatus() {
+        final Preference pref = findPreference(R.string.pref_key_modify_usage_statistics);
+        final PackageManager pm = pref.getContext().getPackageManager();
+
+        pref.setEnabled(pref.getIntent().resolveActivity(pm) != null);
     }
 }

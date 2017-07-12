@@ -14,10 +14,14 @@
 
 package com.hayaisoftware.launcher;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Build;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -43,7 +47,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -115,6 +121,8 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
      */
     private final LaunchableActivityPrefs mPrefs;
 
+    private final Map<String, UsageStats> mUsageMap;
+
     /**
      * The resource indicating what views to inflate to display the content of this
      * array adapter in a drop down widget.
@@ -148,6 +156,8 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
                 new SimpleTaskConsumerManager(getOptimalNumberOfThreads(res), 300);
         mImageTasks = new ImageLoadingTask.Factory(mIconSizePixels);
         mPrefs = new LaunchableActivityPrefs(context);
+        mUsageMap = new HashMap<>(0);
+        mUsageMap.putAll(getUsageStats(context));
     }
 
     /**
@@ -184,6 +194,31 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
         }
 
         return numThreads;
+    }
+
+    /**
+     * This method returns a map of UsageStats for all enabled applications, if available.
+     *
+     * @param context The context to get the {@link UsageStatsManager} system service with.
+     * @return A Map containing the PackageName as the key and the UsageStats as the value for
+     * each individual package, if available. And empty map will be returned if not available for
+     * whatever reason. To mutate this map would result in a critical error.
+     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
+    private static Map<String, UsageStats> getUsageStats(final Context context) {
+        Map<String, UsageStats> map = Collections.emptyMap();
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                final UsageStatsManager statsManager =
+                        (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+                map = statsManager.queryAndAggregateUsageStats(0L, System.currentTimeMillis());
+            } catch (final RuntimeException e) {
+                Log.v(TAG, "UsageStatsManager not supported.", e);
+            }
+        }
+
+        return map;
     }
 
     /**
@@ -297,6 +332,31 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
      */
     public Object export() {
         return new List<?>[]{mObjects, mOriginalValues};
+    }
+
+    /**
+     * This method returns the actual time an activity was used, if available.
+     *
+     * @param activity The activity to return the last usage for.
+     * @return The last time this LaunchableActivity was used according to the Android usage
+     * system, -1L if not available for whatever reason.
+     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private long getActualLastUsed(final LaunchableActivity activity) {
+        final String packageName = activity.getComponent().getPackageName();
+        final long lastUsed;
+
+        if (mUsageMap.containsKey(packageName)) {
+            lastUsed = mUsageMap.get(packageName).getLastTimeUsed();
+        } else {
+            if (mUsageMap.isEmpty()) {
+                lastUsed = -1L;
+            } else {
+                lastUsed = 0L;
+            }
+        }
+
+        return lastUsed;
     }
 
     /**
@@ -419,6 +479,30 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
         }
 
         return position;
+    }
+
+    /**
+     * This method returns the usage time as stored by Android.
+     *
+     * @param activity The LaunchableActivity to retrieve the usage time for.
+     * @return The usage time in milliseconds, -1L if not available for whatever reason.
+     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private long getUsageTime(final LaunchableActivity activity) {
+        final String packageName = activity.getComponent().getPackageName();
+        final long actualUsage;
+
+        if (mUsageMap.containsKey(packageName)) {
+            actualUsage = mUsageMap.get(packageName).getTotalTimeInForeground();
+        } else {
+            if (mUsageMap.isEmpty()) {
+                actualUsage = -1L;
+            } else {
+                actualUsage = 0L;
+            }
+        }
+
+        return actualUsage;
     }
 
     /**
@@ -670,6 +754,19 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
      */
     public void sortApps(final Context context) {
         final SharedLauncherPrefs prefs = new SharedLauncherPrefs(context);
+        final Collection<T> launchables;
+
+        if (!prefs.isOrderedByAlphabetical()) {
+            if (mOriginalValues == null) {
+                launchables = mObjects;
+            } else {
+                launchables = mOriginalValues;
+            }
+
+            for (final T launchable : launchables) {
+                updateLaunchableStats(launchable);
+            }
+        }
 
         synchronized (mLock) {
             final boolean notify = mNotifyOnChange;
@@ -707,6 +804,33 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
         }
 
         return toString;
+    }
+
+    /**
+     * This method updates a LaunchableActivity with statistics from the Android
+     * {@link UsageStatsManager} subsystem.
+     *
+     * @param launchable The launchable to update.
+     */
+    private void updateLaunchableStats(final LaunchableActivity launchable) {
+        final long usageTime = getUsageTime(launchable);
+        final long actualLastUse = getActualLastUsed(launchable);
+        final long launcherLastUse = launchable.getLaunchTime();
+
+        if (actualLastUse > launcherLastUse) {
+            launchable.setLaunchTime(actualLastUse);
+        }
+
+        launchable.setUsageTime(usageTime);
+    }
+
+    /**
+     * This method updates the Map from the {@link UsageStatsManager} subsystem.
+     *
+     * @param context The context to use to obtain the Map from the UsageStatsManager subsystem.
+     */
+    public void updateUsageMap(final Context context) {
+        mUsageMap.putAll(getUsageStats(context));
     }
 
     /**

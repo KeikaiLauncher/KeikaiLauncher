@@ -48,6 +48,8 @@ public class LaunchableActivity {
 
     private int mPriority;
 
+    private long mUsageTime;
+
     private int mUsagesQuantity;
 
     public LaunchableActivity(@NonNull final Intent intent, @NonNull final String activityLabel,
@@ -140,6 +142,18 @@ public class LaunchableActivity {
         return mUsagesQuantity;
     }
 
+    /**
+     * This method returns the usage time.
+     *
+     * The usage time will be set if it is supported by Android and the permission is
+     * granted by the user.
+     *
+     * @return The usage time, -1L if not supported for whatever reason.
+     */
+    public long getUsageTime() {
+        return mUsageTime;
+    }
+
     public boolean isIconLoaded() {
         return mActivityIcon != null;
     }
@@ -158,6 +172,15 @@ public class LaunchableActivity {
 
     public void setUsageQuantity(final int usagesQuantity) {
         mUsagesQuantity = usagesQuantity;
+    }
+
+    /**
+     * This method sets the usage time.
+     *
+     * @param usageTime The usage time, this shall be -1L if not supported for whatever reason.
+     */
+    public void setUsageTime(final long usageTime) {
+        mUsageTime = usageTime;
     }
 
     @Override
