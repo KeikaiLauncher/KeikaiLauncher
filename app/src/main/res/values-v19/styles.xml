@@ -14,20 +14,19 @@
   -->
 
 <resources>
-
     <!--
         Base application theme for API 13+. This theme completely replaces
         AppBaseTheme from BOTH res/values/styles.xml and
         res/values-v11/styles.xml on API 13+ devices.
     -->
-    <style name="AppBaseTheme" parent="@android:style/Theme.Holo.Light.NoActionBar">
+    <style name="AppBaseTheme" parent="@android:style/Theme.DeviceDefault.Light.NoActionBar">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowBackground">@color/full_transparent</item>
         <item name="android:windowShowWallpaper">true</item>
     </style>
 
-    <style name="AppSettingsTheme" parent="@android:style/Theme.Holo.Light">
+    <style name="AppSettingsTheme" parent="@android:style/Theme.DeviceDefault.Light">
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to

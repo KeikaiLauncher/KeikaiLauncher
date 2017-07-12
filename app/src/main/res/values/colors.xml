@@ -14,9 +14,6 @@
   -->
 
 <resources>
-    <color name="indigo_500">#3f51b5</color>
-    <color name="indigo_700">#303f9f</color>
-
     <color name="gray_500">#9e9e9e</color>
     <color name="gray_700">#616161</color>
 
