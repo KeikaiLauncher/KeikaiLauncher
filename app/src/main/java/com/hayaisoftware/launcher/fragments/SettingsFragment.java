@@ -20,7 +20,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
@@ -53,14 +52,7 @@ public class SettingsFragment extends PreferenceFragment implements
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-            //remove priority preference (not supported)
-            final PreferenceCategory notificationCategory =
-                    (PreferenceCategory) findPreference("pref_category_notification");
-            notificationCategory.removePreference(notificationCategory);
-
-            final String priorityKey = getString(R.string.pref_key_notification_priority);
-            final Preference priorityPreference = findPreference(priorityKey);
-            notificationCategory.removePreference(priorityPreference);
+            findPreference(R.string.pref_key_notification_priority).setEnabled(false);
         }
 
         setUsageStatisticsStatus();
