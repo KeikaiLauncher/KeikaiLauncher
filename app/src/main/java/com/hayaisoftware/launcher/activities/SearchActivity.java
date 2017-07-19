@@ -764,7 +764,7 @@ public class SearchActivity extends Activity
                     event.getAction() == KeyEvent.ACTION_DOWN &&
                     event.getKeyCode() == KeyEvent.KEYCODE_ENTER;
 
-            if (actionId == EditorInfo.IME_ACTION_GO || enterPressed && !mAdapter.isEmpty()) {
+            if (actionId == EditorInfo.IME_ACTION_GO || (enterPressed && !mAdapter.isEmpty())) {
                 launchActivity(mAdapter.getItem(0));
                 actionConsumed = true;
             } else {
