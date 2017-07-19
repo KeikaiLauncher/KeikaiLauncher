@@ -37,10 +37,6 @@ public class SettingsFragment extends PreferenceFragment implements
         return findPreference(getString(prefKey));
     }
 
-    private Preference findPreference(@StringRes final int prefKey) {
-        return findPreference(getString(prefKey));
-    }
-
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
