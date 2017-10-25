@@ -15,12 +15,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.1'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.0'
     defaultConfig {
         applicationId 'com.hayaisoftware.launcher'
         minSdkVersion 15
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 10405
         versionName "1.4.5"
     }
@@ -53,9 +53,7 @@ android {
     }
     dependencies {
         //noinspection GradleDependency
-        compile 'com.android.support:support-annotations:25.3.1'
-    }
-    productFlavors {
+        implementation 'com.android.support:support-annotations:25.4.0'
     }
 }
 
