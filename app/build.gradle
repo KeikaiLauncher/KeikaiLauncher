@@ -16,7 +16,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '27.0.0'
+    buildToolsVersion '27.0.2'
     defaultConfig {
         applicationId 'com.hayaisoftware.launcher'
         minSdkVersion 15
@@ -52,8 +52,7 @@ android {
         }
     }
     dependencies {
-        //noinspection GradleDependency
-        implementation 'com.android.support:support-annotations:25.4.0'
+        implementation 'com.android.support:support-annotations:27.0.2'
     }
 }
 
@@ -106,7 +105,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.11"
+        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.13"
     }
 }
 
@@ -119,5 +118,5 @@ tasks.withType(JavaCompile) {
 }
 
 configurations.errorprone {
-    resolutionStrategy.force 'com.google.errorprone:error_prone_core:2.0.21'
+    resolutionStrategy.force 'com.google.errorprone:error_prone_core:2.1.3'
 }
