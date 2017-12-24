@@ -36,4 +36,10 @@
         <item>@string/pref_value_preferred_order_alpha</item>
         <item>@string/pref_value_preferred_order_usage</item>
     </string-array>
+
+    <string-array name="pref_landscape_entries">
+        <item>@string/pref_value_landscape_left</item>
+        <item>@string/pref_value_landscape_right</item>
+        <item>@string/pref_value_landscape_invisible</item>
+    </string-array>
 </resources>

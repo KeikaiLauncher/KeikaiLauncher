@@ -47,6 +47,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -540,10 +541,10 @@ public class SearchActivity extends Activity
             hideKeyboard();
         }
 
+        setupPadding();
         if (prefs.isRotationAllowed()) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 
-            setupPadding();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 registerDisplayListener();
             }
@@ -670,9 +671,27 @@ public class SearchActivity extends Activity
             final int navBarWidth = getNavigationBarWidth(resources);
             final int searchUpperPadding = getDimensionSize(resources, "status_bar_height");
             final int navBarHeight = getNavigationBarHeight(resources);
+            final SharedLauncherPrefs prefs = new SharedLauncherPrefs(this);
+            final int orientation = getWindowManager().getDefaultDisplay().getRotation();
+            int leftPadding = 0;
+            int rightPadding = 0;
+
+            if (orientation == Surface.ROTATION_90) {
+                if ("right".equals(prefs.get90NavBarPosition())) {
+                    rightPadding = navBarWidth;
+                } else if ("left".equals(prefs.get90NavBarPosition())) {
+                    leftPadding = navBarWidth;
+                }
+            } else if (orientation == Surface.ROTATION_270) {
+                if ("right".equals(prefs.get270NavBarPosition())) {
+                    rightPadding = navBarWidth;
+                } else if ("left".equals(prefs.get270NavBarPosition())) {
+                    leftPadding = navBarWidth;
+                }
+            }
 
             // If the navigation bar is on the side, don't put apps under it.
-            masterLayout.setPadding(0, searchUpperPadding, navBarWidth, 0);
+            masterLayout.setPadding(leftPadding, searchUpperPadding, rightPadding, 0);
 
             // If the navigation bar is at the bottom, stop the icons above it.
             appContainer.setPadding(0, appTop, 0, navBarHeight);

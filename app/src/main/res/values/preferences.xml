@@ -23,6 +23,22 @@
     <!-- This string is the key used to retrieve the value for icon preference. -->
     <string name="pref_key_disable_icons" translatable="false">pref_disable_icons</string>
 
+    <!--
+         This string is the key used to retrieve the value for the 270 degree orientation with the
+         navigation bar.
+    -->
+    <string name="pref_key_landscape_270" translatable="false">
+        settings_landscape_270
+    </string>
+
+    <!--
+     This string is the key used to retrieve the value for the 90 degree orientation with the
+     navigation bar.
+    -->
+    <string name="pref_key_landscape_90" translatable="false">
+        settings_landscape_90
+    </string>
+
     <!-- This string is the key used to retrieve the intent for system usage permissions. -->
     <string name="pref_key_modify_usage_statistics" translatable="false">
         modify_usage_statistics

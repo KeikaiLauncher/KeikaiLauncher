@@ -25,6 +25,11 @@
     <string name="title_activity_settings">Settings</string>
     <string name="settings_category_notification_category">Notifications</string>
     <string name="settings_enable_notification_title">Show shortcut in notification panel</string>
+    <string name="settings_landscape_90">90° orientation navigation bar position</string>
+    <string name="settings_landscape_270">270° orientation navigation bar position</string>
+    <string name="pref_value_landscape_left">left</string>
+    <string name="pref_value_landscape_right">right</string>
+    <string name="pref_value_landscape_invisible">invisible</string>
     <string name="appmenu_launch">Launch</string>
     <string name="appmenu_info">App information</string>
     <string name="launch">Go</string>

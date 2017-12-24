@@ -76,6 +76,31 @@ public class SharedLauncherPrefs {
     }
 
     /**
+     * This method returns position of the navigation bar when the phone is rotated 270 degrees.
+     * Stock android the value, and the default value, is the right side of the screen.
+     *
+     * @return "right" if the navigation bar is on the right hand side of the screen when the phone
+     * is rotated to 270 degrees. "left" if the navigation bar is on the left side of the screen
+     * when the phone is rotated 270 degrees. "invisible" if the navigation bar has been turned
+     * off.
+     */
+    public String get270NavBarPosition() {
+        return getValue(R.string.pref_key_landscape_270, R.string.pref_value_landscape_right);
+    }
+
+    /**
+     * This method returns position of the navigation bar when the phone is rotated 90 degrees.
+     * Stock android the value, and the default value, is the right side of the screen.
+     *
+     * @return "right" if the navigation bar is on the right hand side of the screen when the phone
+     * is rotated to 90 degrees. "left" if the navigation bar is on the left side of the screen
+     * when the phone is rotated 90 degrees. "invisible" if the navigation bar has been turned off.
+     */
+    public String get90NavBarPosition() {
+        return getValue(R.string.pref_key_landscape_90, R.string.pref_value_landscape_right);
+    }
+
+    /**
      * This method returns the order launchables should be ordered in.
      *
      * @return The value of {@link R.string#pref_app_preferred_order_entries_alphabetical},
