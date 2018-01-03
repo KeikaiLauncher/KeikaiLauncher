@@ -17,6 +17,7 @@ package com.hayaisoftware.launcher.activities;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -24,13 +25,17 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.hardware.display.DisplayManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -73,6 +78,9 @@ public class SearchActivity extends Activity
     private static final String SEARCH_EDIT_TEXT_KEY = "SearchEditText";
 
     private static final String TAG = "SearchActivity";
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    private final DisplayManager.DisplayListener mDisplayListener = new DisplayChangeListener();
 
     /**
      * Synchronize to this lock when the Adapter is visible and might be called by multiple
@@ -398,12 +406,6 @@ public class SearchActivity extends Activity
         mSearchEditText = findViewById(R.id.user_search_input);
         mAdapter = loadLaunchableAdapter();
 
-        final boolean noMultiWindow = Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
-                !isInMultiWindowMode();
-        final boolean transparentPossible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-
-        setupPadding(transparentPossible && noMultiWindow);
-
         PackageChangedReceiver.setCallback(this);
         modifyReceiver(PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
 
@@ -446,14 +448,6 @@ public class SearchActivity extends Activity
         modifyReceiver(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
         mAdapter.onDestroy();
         super.onDestroy();
-    }
-
-    @Override
-    public void onMultiWindowModeChanged(final boolean isInMultiWindowMode,
-            final Configuration newConfig) {
-        super.onMultiWindowModeChanged(isInMultiWindowMode, newConfig);
-
-        setupPadding(!isInMultiWindowMode);
     }
 
     /**
@@ -534,6 +528,17 @@ public class SearchActivity extends Activity
     }
 
     @Override
+    protected void onPause() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            final DisplayManager manager =
+                    (DisplayManager) getSystemService(Context.DISPLAY_SERVICE);
+            manager.unregisterDisplayListener(mDisplayListener);
+        }
+
+        super.onPause();
+    }
+
+    @Override
     protected void onRestoreInstanceState(final Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
@@ -571,6 +576,11 @@ public class SearchActivity extends Activity
 
         if (prefs.isRotationAllowed()) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+
+            setupPadding();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                registerDisplayListener();
+            }
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         }
@@ -634,6 +644,20 @@ public class SearchActivity extends Activity
         mAdapter.sortApps(this);
     }
 
+    /**
+     * This method registers a display listener for JB MR1 and higher to workaround a Android
+     * deficiency with regard to 180 degree landscape rotation. See {@link DisplayChangeListener}
+     * documentation for more information.
+     */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    private void registerDisplayListener() {
+        final DisplayManager displayManager =
+                (DisplayManager) getSystemService(Context.DISPLAY_SERVICE);
+        final Handler handler = new Handler(Looper.getMainLooper());
+
+        displayManager.registerDisplayListener(mDisplayListener, handler);
+    }
+
     public void setWallpaper(final MenuItem item) {
         startActivity(new Intent(Intent.ACTION_SET_WALLPAPER));
     }
@@ -641,17 +665,17 @@ public class SearchActivity extends Activity
     /**
      * This method dynamically sets the padding for the outer boundaries of the masterLayout and
      * appContainer.
-     *
-     * @param isNavBarTranslucent Set this to {@code true} if android.R.windowTranslucentNavigation
-     *                            is expected to be {@code true}, {@code false} otherwise.
      */
-    private void setupPadding(final boolean isNavBarTranslucent) {
+    private void setupPadding() {
         final Resources resources = getResources();
         final View masterLayout = findViewById(R.id.masterLayout);
         final View appContainer = findViewById(R.id.appsContainer);
         final int appTop = resources.getDimensionPixelSize(R.dimen.activity_vertical_margin);
+        final boolean noMultiWindow = Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
+                !isInMultiWindowMode();
+        final boolean transparentPossible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
-        if (isNavBarTranslucent) {
+        if (transparentPossible && noMultiWindow) {
             masterLayout.setFitsSystemWindows(false);
             final int navBarWidth = getNavigationBarWidth(resources);
             final int searchUpperPadding = getDimensionSize(resources, "status_bar_height");
@@ -740,6 +764,30 @@ public class SearchActivity extends Activity
             if (scrollState != SCROLL_STATE_IDLE) {
                 hideKeyboard();
             }
+        }
+    }
+
+    /**
+     * This class is a workaround for cases where {@link Activity} does not call any lifecycle
+     * methods after 180 degree landscape orientation change.
+     *
+     * In this case, OrientationEventListener would not be suitable due to magnitude restrictions
+     * in the SensorEventListener implementation.
+     */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    private final class DisplayChangeListener implements DisplayManager.DisplayListener {
+
+        @Override
+        public void onDisplayAdded(final int displayId) {
+        }
+
+        @Override
+        public void onDisplayChanged(final int displayId) {
+            setupPadding();
+        }
+
+        @Override
+        public void onDisplayRemoved(final int displayId) {
         }
     }
 
