@@ -36,7 +36,7 @@ public class LaunchableActivityPrefs extends SQLiteOpenHelper {
 
     private static final String KEY_LASTLAUNCHTIMESTAMP = "LastLaunchTimestamp";
 
-    private static final String KEY_USAGEQUANTIY = "UsageQuantity";
+    private static final String KEY_USAGE_QUANTITY = "UsageQuantity";
 
     private static final String TABLE_NAME = "ActivityLaunchNumbers";
 
@@ -72,7 +72,7 @@ public class LaunchableActivityPrefs extends SQLiteOpenHelper {
         final String tableCreate = String.format("CREATE TABLE %s (%S INTEGER PRIMARY KEY, " +
                         "%s TEXT UNIQUE, %s INTEGER, %s INTEGER, %s INTEGER);",
                 TABLE_NAME, KEY_ID, KEY_CLASSNAME, KEY_LASTLAUNCHTIMESTAMP,
-                KEY_FAVORITE, KEY_USAGEQUANTIY);
+                KEY_FAVORITE, KEY_USAGE_QUANTITY);
 
         db.execSQL(tableCreate);
     }
@@ -94,7 +94,7 @@ public class LaunchableActivityPrefs extends SQLiteOpenHelper {
         final SQLiteDatabase db = getReadableDatabase();
 
         final String[] whereArgs = {launchableActivity.getComponent().getClassName()};
-        final String[] columns = {KEY_LASTLAUNCHTIMESTAMP, KEY_USAGEQUANTIY, KEY_FAVORITE};
+        final String[] columns = {KEY_LASTLAUNCHTIMESTAMP, KEY_USAGE_QUANTITY, KEY_FAVORITE};
         final Cursor cursor = db.query(TABLE_NAME, columns, KEY_CLASSNAME + "=?", whereArgs, null,
                 null, null);
 
@@ -111,7 +111,7 @@ public class LaunchableActivityPrefs extends SQLiteOpenHelper {
                 launchableActivity.setPriority(cursor.getInt(column));
             }
 
-            column = cursor.getColumnIndex(KEY_USAGEQUANTIY);
+            column = cursor.getColumnIndex(KEY_USAGE_QUANTITY);
 
             if (column != -1) {
                 launchableActivity.setUsageQuantity(cursor.getInt(column));
@@ -139,7 +139,7 @@ public class LaunchableActivityPrefs extends SQLiteOpenHelper {
 
         if (usageQuantity > 0) {
             values.put(KEY_LASTLAUNCHTIMESTAMP, launchableActivity.getLaunchTime());
-            values.put(KEY_USAGEQUANTIY, usageQuantity);
+            values.put(KEY_USAGE_QUANTITY, usageQuantity);
         }
 
         if (values.size() == 0) {
