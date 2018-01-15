@@ -18,11 +18,11 @@
         android:key="pref_category_general"
         android:title="@string/settings_category_general_category">
         <CheckBoxPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="pref_autokeyboard"
             android:title="@string/settings_autokeyboard"/>
         <ListPreference
-            android:defaultValue="@string/pref_value_preferred_order_recent"
+            android:defaultValue="@string/pref_app_preferred_order_entries_alphabetical"
             android:dialogTitle="@string/pref_preferred_app_order_dialog"
             android:entries="@array/pref_app_preferred_order_entries"
             android:entryValues="@array/pref_app_preferred_order_values"
@@ -33,7 +33,7 @@
             android:key="pref_disable_icons"
             android:title="@string/settings_disable_icon_loading"/>
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="pref_allow_rotation"
             android:title="@string/pref_allow_rotation"/>
         <Preference

@@ -54,7 +54,7 @@ public class SharedLauncherPrefs {
      */
     @StringRes
     private static int getDefaultLauncherOrder() {
-        return R.string.pref_value_preferred_order_recent;
+        return R.string.pref_app_preferred_order_entries_alphabetical;
     }
 
     /**
@@ -140,7 +140,7 @@ public class SharedLauncherPrefs {
      * {@code false} otherwise.
      */
     public boolean isKeyboardAutomatic() {
-        return isPrefEnabled(R.string.pref_key_auto_keyboard, true);
+        return isPrefEnabled(R.string.pref_key_auto_keyboard, false);
     }
 
     /**
@@ -224,6 +224,6 @@ public class SharedLauncherPrefs {
      * @return {@code true} if screen rotation should be permitted, {@code false} otherwise.
      */
     public boolean isRotationAllowed() {
-        return isPrefEnabled(R.string.pref_key_allow_rotation, false);
+        return isPrefEnabled(R.string.pref_key_allow_rotation, true);
     }
 }
