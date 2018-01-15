@@ -380,8 +380,21 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
 
         final int currentSize = current.size();
         for (int i = 0; i < currentSize && position == -1; i++) {
-            if (current.get(i).getComponent().getClassName().equals(className)) {
-                position = i;
+            final String componentName = current.get(i).getComponent().getClassName();
+            final int firstIndex = componentName.indexOf('.');
+            final int lastIndex = componentName.lastIndexOf('.');
+
+            // The component classname is actually the ActivityName which will likely be longer
+            // than the classname. Make sure the activity name is somewhat valid before attempting
+            // to match with the beginning.
+            if (firstIndex == -1 || lastIndex == -1 || firstIndex == lastIndex) {
+                if (componentName.equals(className)) {
+                    position = i;
+                }
+            } else {
+                if (componentName.startsWith(className)) {
+                    position = i;
+                }
             }
         }
 
