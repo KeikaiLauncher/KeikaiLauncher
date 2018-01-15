@@ -17,7 +17,7 @@ package com.anpmech.launcher.activities;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
-import android.content.ComponentName;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -88,6 +88,8 @@ public class SearchActivity extends Activity
      * threads.
      */
     private final Object mLock = new Object();
+
+    private final BroadcastReceiver mPackageChangeReceiver = new PackageChangedReceiver();
 
     private LaunchableAdapter<LaunchableActivity> mAdapter;
 
@@ -368,12 +370,6 @@ public class SearchActivity extends Activity
         startActivity(intentManageApps);
     }
 
-    private void modifyReceiver(final int state) {
-        final ComponentName name = new ComponentName(this, PackageChangedReceiver.class);
-
-        getPackageManager().setComponentEnabledSetting(name, state, PackageManager.DONT_KILL_APP);
-    }
-
     @Override
     public void onBackPressed() {
         if (isCurrentLauncher()) {
@@ -403,15 +399,6 @@ public class SearchActivity extends Activity
 
         setContentView(R.layout.activity_search);
 
-        //fields:
-        mSearchEditText = findViewById(R.id.user_search_input);
-        mAdapter = loadLaunchableAdapter();
-
-        PackageChangedReceiver.setCallback(this);
-        modifyReceiver(PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
-
-        setupPreferences();
-        setupViews();
     }
 
     @Override
@@ -439,16 +426,6 @@ public class SearchActivity extends Activity
         getMenuInflater().inflate(R.menu.search_activity_menu, menu);
 
         return true;
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (!isChangingConfigurations()) {
-            Log.d(BuildConfig.GITHUB_PROJECT, "Hayai is ded");
-        }
-        modifyReceiver(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
-        mAdapter.onDestroy();
-        super.onDestroy();
     }
 
     /**
@@ -620,6 +597,30 @@ public class SearchActivity extends Activity
         } else if (getString(R.string.pref_key_disable_icons).equals(key)) {
             recreate();
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // In a perfect world, this all could happen in onCreate(), but there are problems
+        // with BroadcastReceiver registration and unregistration with that scenario.
+        mSearchEditText = findViewById(R.id.user_search_input);
+        mAdapter = loadLaunchableAdapter();
+
+        registerReceiver(mPackageChangeReceiver, PackageChangedReceiver.getFilter());
+        PackageChangedReceiver.setCallback(this);
+
+        setupPreferences();
+        setupViews();
+    }
+
+    @Override
+    protected void onStop() {
+        mAdapter.onStop();
+        unregisterReceiver(mPackageChangeReceiver);
+
+        super.onStop();
     }
 
     @Override

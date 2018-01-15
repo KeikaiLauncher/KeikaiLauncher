@@ -597,7 +597,7 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
     /**
      * This method should be called before the parent context is destroyed.
      */
-    public void onDestroy() {
+    public void onStop() {
         mPrefs.close();
 
         if (mImageLoadingConsumersManager != null) {

@@ -20,6 +20,8 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -102,6 +104,26 @@ public class PackageChangedReceiver extends BroadcastReceiver {
                 Log.w(TAG, "Received action without reaction: " + action);
                 break;
         }
+    }
+
+    public static IntentFilter getFilter() {
+        final IntentFilter filter = new IntentFilter();
+
+        filter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        filter.addAction(Intent.ACTION_PACKAGE_CHANGED);
+        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        filter.addAction(Intent.ACTION_PACKAGE_REPLACED);
+        filter.addDataScheme("package");
+
+        filter.addAction(Intent.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE);
+        filter.addAction(Intent.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            filter.addAction(Intent.ACTION_PACKAGES_SUSPENDED);
+            filter.addAction(Intent.ACTION_PACKAGES_UNSUSPENDED);
+        }
+
+        return filter;
     }
 
     /**
