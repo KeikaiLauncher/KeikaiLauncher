@@ -64,12 +64,10 @@ import com.anpmech.launcher.BuildConfig;
 import com.anpmech.launcher.LaunchableActivity;
 import com.anpmech.launcher.LaunchableActivityPrefs;
 import com.anpmech.launcher.LaunchableAdapter;
-import com.anpmech.launcher.LoadLaunchableActivityTask;
 import com.anpmech.launcher.R;
 import com.anpmech.launcher.ShortcutNotificationManager;
 import com.anpmech.launcher.monitor.PackageChangeCallback;
 import com.anpmech.launcher.monitor.PackageChangedReceiver;
-import com.anpmech.launcher.threading.SimpleTaskConsumerManager;
 
 import java.util.Collection;
 
@@ -220,17 +218,32 @@ public class SearchActivity extends Activity
         return hasNavBar;
     }
 
-    private void addToAdapter(@NonNull final Iterable<ResolveInfo> infoList) {
-        final PackageManager pm = getPackageManager();
+    private void addToAdapter(@NonNull final LaunchableAdapter<LaunchableActivity> adapter,
+            @NonNull final Iterable<ResolveInfo> infoList,
+            final boolean useReadCache) {
+        final SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
         final String thisCanonicalName = getClass().getCanonicalName();
 
         for (final ResolveInfo info : infoList) {
-            // Don't include activities from this package.
             if (!thisCanonicalName.startsWith(info.activityInfo.packageName)) {
-                final LaunchableActivity launchableActivity =
-                        LaunchableActivity.getLaunchable(info.activityInfo, pm);
+                final ActivityInfo activityInfo = info.activityInfo;
+                final ComponentName name =
+                        new ComponentName(activityInfo.packageName, activityInfo.name);
+                final Intent launchIntent = Intent.makeMainActivity(name);
+                final int iconResource = info.getIconResource();
+                final String label;
 
-                mAdapter.add(launchableActivity);
+                launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                        Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+
+                if (prefs.contains(activityInfo.packageName) && useReadCache) {
+                    label = prefs.getString(activityInfo.packageName, null);
+                } else {
+                    label = info.loadLabel(getPackageManager()).toString();
+                    prefs.edit().putString(activityInfo.packageName, label).apply();
+                }
+
+                adapter.add(new LaunchableActivity(launchIntent, label, iconResource));
             }
         }
     }
@@ -321,44 +334,19 @@ public class SearchActivity extends Activity
         final Object object = getLastNonConfigurationInstance();
 
         if (object == null) {
-            adapter = loadLaunchableApps();
+            final PackageManager pm = getPackageManager();
+            final Collection<ResolveInfo> infoList = getLaunchableResolveInfos(pm, null);
+            final int infoListSize = infoList.size();
+            adapter = new LaunchableAdapter<>(this, R.layout.app_grid_item, infoListSize);
+
+            addToAdapter(adapter, infoList, true);
+
+            adapter.sortApps(this);
+            adapter.notifyDataSetChanged();
         } else {
             adapter = new LaunchableAdapter<>(object, this, R.layout.app_grid_item);
             adapter.setNotifyOnChange(true);
         }
-
-        return adapter;
-    }
-
-    private LaunchableAdapter<LaunchableActivity> loadLaunchableApps() {
-        final PackageManager pm = getPackageManager();
-        final Collection<ResolveInfo> infoList = getLaunchableResolveInfos(pm, null);
-        final int infoListSize = infoList.size();
-        final LaunchableAdapter<LaunchableActivity> adapter
-                = new LaunchableAdapter<>(this, R.layout.app_grid_item, infoListSize);
-        final int cores = Runtime.getRuntime().availableProcessors();
-
-        if (cores <= 1) {
-            addToAdapter(infoList);
-        } else {
-            final String thisCanonicalName = getClass().getCanonicalName();
-            final SimpleTaskConsumerManager simpleTaskConsumerManager =
-                    new SimpleTaskConsumerManager(cores, infoListSize);
-            final LoadLaunchableActivityTask.Factory launchableTask =
-                    new LoadLaunchableActivityTask.Factory(pm, adapter);
-
-            for (final ResolveInfo info : infoList) {
-                // Don't include activities from this package.
-                if (!thisCanonicalName.startsWith(info.activityInfo.packageName)) {
-                    simpleTaskConsumerManager.addTask(launchableTask.create(info));
-                }
-            }
-
-            simpleTaskConsumerManager.destroyAllConsumers(true, true);
-        }
-
-        adapter.sortApps(this);
-        adapter.notifyDataSetChanged();
 
         return adapter;
     }
@@ -472,7 +460,7 @@ public class SearchActivity extends Activity
 
         synchronized (mLock) {
             if (mAdapter.getClassNamePosition(activityName) == -1) {
-                addToAdapter(resolveInfos);
+                addToAdapter(mAdapter, resolveInfos, false);
                 mAdapter.sortApps(this);
                 updateFilter(mSearchEditText.getText());
             }
