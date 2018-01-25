@@ -12,7 +12,7 @@
   ~ limitations under the License.
   -->
 
-<manifest package="com.hayaisoftware.launcher"
+<manifest package="com.anpmech.launcher"
           xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools">
 
@@ -33,7 +33,7 @@
         tools:targetApi="n">
 
         <activity
-            android:name="com.hayaisoftware.launcher.activities.SearchActivity"
+            android:name="com.anpmech.launcher.activities.SearchActivity"
             android:alwaysRetainTaskState="true"
             android:label="@string/title_activity_search"
             android:launchMode="singleTask"
@@ -49,7 +49,7 @@
         </activity>
 
         <activity
-            android:name="com.hayaisoftware.launcher.activities.SettingsActivity"
+            android:name="com.anpmech.launcher.activities.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppSettingsTheme"/>
 

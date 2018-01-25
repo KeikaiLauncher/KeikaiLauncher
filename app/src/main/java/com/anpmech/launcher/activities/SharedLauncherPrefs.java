@@ -12,14 +12,14 @@
  * limitations under the License.
  */
 
-package com.hayaisoftware.launcher.activities;
+package com.anpmech.launcher.activities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.StringRes;
 
-import com.hayaisoftware.launcher.R;
+import com.anpmech.launcher.R;
 
 /**
  * This class is used to retrieve shared preferences used by this package.
@@ -175,7 +175,7 @@ public class SharedLauncherPrefs {
 
     /**
      * This method returns if the launchables should be ordered with
-     * {@link com.hayaisoftware.launcher.comparators.AlphabeticalOrder}.
+     * {@link com.anpmech.launcher.comparators.AlphabeticalOrder}.
      *
      * @return {@code true} if launchables should be in alphabetical order, false otherwise.
      */
@@ -185,7 +185,7 @@ public class SharedLauncherPrefs {
 
     /**
      * This method returns if the launchables should be ordered with
-     * {@link com.hayaisoftware.launcher.comparators.RecentOrder}.
+     * {@link com.anpmech.launcher.comparators.RecentOrder}.
      *
      * @return {@code true} if launchables should be in ordered by recent usage, {@code false}
      * otherwise.
@@ -196,7 +196,7 @@ public class SharedLauncherPrefs {
 
     /**
      * This method returns if the launchables should be ordered with
-     * {@link com.hayaisoftware.launcher.comparators.UsageOrder}.
+     * {@link com.anpmech.launcher.comparators.UsageOrder}.
      *
      * @return {@code true} if launchables should be ordered by frequency of usage, {@code false}
      * otherwise.

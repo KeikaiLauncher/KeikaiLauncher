@@ -12,13 +12,13 @@
  * limitations under the License.
  */
 
-package com.hayaisoftware.launcher;
+package com.anpmech.launcher;
 
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 
-import com.hayaisoftware.launcher.threading.SimpleTaskConsumerManager;
+import com.anpmech.launcher.threading.SimpleTaskConsumerManager;
 
 
 public final class LoadLaunchableActivityTask implements SimpleTaskConsumerManager.Task {

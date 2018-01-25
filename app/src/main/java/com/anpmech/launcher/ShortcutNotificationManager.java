@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.hayaisoftware.launcher;
+package com.anpmech.launcher;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -22,8 +22,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import com.hayaisoftware.launcher.activities.SearchActivity;
-import com.hayaisoftware.launcher.activities.SharedLauncherPrefs;
+import com.anpmech.launcher.activities.SearchActivity;
+import com.anpmech.launcher.activities.SharedLauncherPrefs;
 
 public final class ShortcutNotificationManager {
 

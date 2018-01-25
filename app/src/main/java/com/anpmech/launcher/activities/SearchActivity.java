@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.hayaisoftware.launcher.activities;
+package com.anpmech.launcher.activities;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -59,16 +59,16 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.hayaisoftware.launcher.BuildConfig;
-import com.hayaisoftware.launcher.LaunchableActivity;
-import com.hayaisoftware.launcher.LaunchableActivityPrefs;
-import com.hayaisoftware.launcher.LaunchableAdapter;
-import com.hayaisoftware.launcher.LoadLaunchableActivityTask;
-import com.hayaisoftware.launcher.R;
-import com.hayaisoftware.launcher.ShortcutNotificationManager;
-import com.hayaisoftware.launcher.monitor.PackageChangeCallback;
-import com.hayaisoftware.launcher.monitor.PackageChangedReceiver;
-import com.hayaisoftware.launcher.threading.SimpleTaskConsumerManager;
+import com.anpmech.launcher.BuildConfig;
+import com.anpmech.launcher.LaunchableActivity;
+import com.anpmech.launcher.LaunchableActivityPrefs;
+import com.anpmech.launcher.LaunchableAdapter;
+import com.anpmech.launcher.LoadLaunchableActivityTask;
+import com.anpmech.launcher.R;
+import com.anpmech.launcher.ShortcutNotificationManager;
+import com.anpmech.launcher.monitor.PackageChangeCallback;
+import com.anpmech.launcher.monitor.PackageChangedReceiver;
+import com.anpmech.launcher.threading.SimpleTaskConsumerManager;
 
 import java.util.Collection;
 

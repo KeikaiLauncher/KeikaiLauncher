@@ -12,14 +12,14 @@
  * limitations under the License.
  */
 
-package com.hayaisoftware.launcher;
+package com.anpmech.launcher;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.widget.ImageView;
 
-import com.hayaisoftware.launcher.threading.SimpleTaskConsumerManager;
+import com.anpmech.launcher.threading.SimpleTaskConsumerManager;
 
 
 public final class ImageLoadingTask implements Runnable, SimpleTaskConsumerManager.Task {

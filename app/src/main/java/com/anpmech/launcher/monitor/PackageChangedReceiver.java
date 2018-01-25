@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.hayaisoftware.launcher.monitor;
+package com.anpmech.launcher.monitor;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;

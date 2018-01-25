@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.hayaisoftware.launcher.fragments;
+package com.anpmech.launcher.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -26,9 +26,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.hayaisoftware.launcher.R;
-import com.hayaisoftware.launcher.ShortcutNotificationManager;
-import com.hayaisoftware.launcher.activities.SharedLauncherPrefs;
+import com.anpmech.launcher.R;
+import com.anpmech.launcher.ShortcutNotificationManager;
+import com.anpmech.launcher.activities.SharedLauncherPrefs;
 
 public class SettingsFragment extends PreferenceFragment implements
         SharedPreferences.OnSharedPreferenceChangeListener {

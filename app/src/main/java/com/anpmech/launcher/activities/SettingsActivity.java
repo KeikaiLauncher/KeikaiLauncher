@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.hayaisoftware.launcher.activities;
+package com.anpmech.launcher.activities;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
@@ -20,7 +20,7 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.widget.ListView;
 
-import com.hayaisoftware.launcher.fragments.SettingsFragment;
+import com.anpmech.launcher.fragments.SettingsFragment;
 
 public class SettingsActivity extends PreferenceActivity {
 

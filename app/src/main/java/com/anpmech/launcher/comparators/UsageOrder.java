@@ -12,17 +12,35 @@
  * limitations under the License.
  */
 
-package com.hayaisoftware.launcher.comparators;
+package com.anpmech.launcher.comparators;
 
-import com.hayaisoftware.launcher.LaunchableActivity;
+import com.anpmech.launcher.LaunchableActivity;
 
 import java.util.Comparator;
 
 
-public class AlphabeticalOrder implements Comparator<LaunchableActivity> {
+public class UsageOrder implements Comparator<LaunchableActivity> {
 
     @Override
     public int compare(final LaunchableActivity lhs, final LaunchableActivity rhs) {
-        return lhs.toString().compareToIgnoreCase(rhs.toString());
+        final int compare;
+        long lhsResult = lhs.getUsageTime();
+        long rhsResult = rhs.getUsageTime();
+
+        // Prefer the more accurate usage time. If one is -1L, all will be.
+        if (lhsResult == -1L) {
+            lhsResult = (long) lhs.getUsageQuantity();
+            rhsResult = (long) rhs.getUsageQuantity();
+        }
+
+        if (lhsResult > rhsResult) {
+            compare = -1;
+        } else if (lhsResult < rhsResult) {
+            compare = 1;
+        } else {
+            compare = 0;
+        }
+
+        return compare;
     }
 }

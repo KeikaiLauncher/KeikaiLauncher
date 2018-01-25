@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.hayaisoftware.launcher;
+package com.anpmech.launcher;
 
 import android.content.ContentValues;
 import android.content.Context;

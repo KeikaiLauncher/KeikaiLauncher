@@ -1,4 +1,6 @@
-# A fork of HayaiLauncher (name change pending)
+# KeikaiLauncher
+
+*A fork of HayaiLauncher*
 
 It is a fast, [free](https://en.wikipedia.org/wiki/Free_software), minimalist Android Launcher. Even though this fork is heavily modified this launcher is a tribute to the ideas and concepts of HayaiLauncher.
 

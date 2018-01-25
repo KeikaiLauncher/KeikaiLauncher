@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.hayaisoftware.launcher;
+package com.anpmech.launcher;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -35,12 +35,12 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.hayaisoftware.launcher.activities.SharedLauncherPrefs;
-import com.hayaisoftware.launcher.comparators.AlphabeticalOrder;
-import com.hayaisoftware.launcher.comparators.PinToTop;
-import com.hayaisoftware.launcher.comparators.RecentOrder;
-import com.hayaisoftware.launcher.comparators.UsageOrder;
-import com.hayaisoftware.launcher.threading.SimpleTaskConsumerManager;
+import com.anpmech.launcher.activities.SharedLauncherPrefs;
+import com.anpmech.launcher.comparators.AlphabeticalOrder;
+import com.anpmech.launcher.comparators.PinToTop;
+import com.anpmech.launcher.comparators.RecentOrder;
+import com.anpmech.launcher.comparators.UsageOrder;
+import com.anpmech.launcher.threading.SimpleTaskConsumerManager;
 
 import java.text.Normalizer;
 import java.util.ArrayList;

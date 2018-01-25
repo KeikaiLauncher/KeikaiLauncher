@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.hayaisoftware.launcher.activities;
+package com.anpmech.launcher.activities;
 
 import android.app.Activity;
 import android.os.Build;
@@ -21,8 +21,8 @@ import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.widget.TextView;
 
-import com.hayaisoftware.launcher.BuildConfig;
-import com.hayaisoftware.launcher.R;
+import com.anpmech.launcher.BuildConfig;
+import com.anpmech.launcher.R;
 
 /**
  * This class is a user interface to provide simple information about the current build.
