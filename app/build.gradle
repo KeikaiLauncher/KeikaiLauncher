@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2015-2018 Hayai Software
+ * Copyright 2015-2017 Hayai Software
+ * Copyright 2018 The KeikaiLauncher Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -21,8 +22,8 @@ android {
         applicationId 'com.anpmech.launcher'
         minSdkVersion 15
         targetSdkVersion 27
-        versionCode 10405
-        versionName "1.4.5"
+        versionCode 11000
+        versionName "2.0.0"
     }
     buildTypes {
         all {
@@ -35,7 +36,7 @@ android {
 
             if (info == null) {
                 buildConfigField("String", "GITHUB_USER", "\"avuton\"")
-                buildConfigField("String", "GITHUB_PROJECT", "\"HayaiLauncher\"")
+                buildConfigField("String", "GITHUB_PROJECT", "\"KeikaiLauncher\"")
             } else {
                 buildConfigField("String", "GITHUB_USER", "\"${info[0]}\"");
                 buildConfigField("String", "GITHUB_PROJECT", "\"${info[1]}\"");
@@ -65,7 +66,7 @@ android {
  * @return A String array, the first string being the git user the second being the git project,
  * null if it could not be parsed from the given information.
  */
-static def String[] getGithubInfo(final String gitInput, final String lookFor) {
+static String[] getGithubInfo(final String gitInput, final String lookFor) {
     final String[] info;
 
     final int index = gitInput.indexOf(lookFor);

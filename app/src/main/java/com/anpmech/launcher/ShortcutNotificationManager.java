@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2015-2018 Hayai Software
+ * Copyright 2015-2017 Hayai Software
+ * Copyright 2018 The KeikaiLauncher Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -65,8 +66,8 @@ public final class ShortcutNotificationManager {
                 throw new AssertionError("Undefined notification priority.");
             }
 
-            channel = new NotificationChannel(BuildConfig.APPLICATION_ID, "Hayai Launcher",
-                    importance);
+            channel = new NotificationChannel(BuildConfig.APPLICATION_ID,
+                    BuildConfig.GITHUB_PROJECT, importance);
             notificationManager.createNotificationChannel(channel);
             builder = new Notification.Builder(context, BuildConfig.APPLICATION_ID);
         } else {

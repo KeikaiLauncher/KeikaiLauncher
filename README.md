@@ -6,7 +6,7 @@ It is a fast, [free](https://en.wikipedia.org/wiki/Free_software), minimalist An
 
 
 ## Changes from mainline
-So far, this fork has quite a few features not found in mainline, including:
+So far, this fork has quite a few features not found in HayaiLauncher, including:
 
 ### User interfacing
 
@@ -17,11 +17,11 @@ So far, this fork has quite a few features not found in mainline, including:
 * Do fewer things and get the same or better results.
 * Installs, removes and package modifications now work (including external removable storage).
 * Better behaviour with 'home' button presses and search bar interactions.
-* Support for Android's UsageStats subsystem (API 21+)
+* Support for Android's UsageStats subsystem (API 21+).
 
 ### Development stuff
 
-* Tons of cleanups.
+* Tons of cleanups, hopefully it's a bit easier to read.
 * Actual project wide code formatting and inspections.
 * Update all build requirements.
 * Fewer deprecations.
@@ -29,6 +29,7 @@ So far, this fork has quite a few features not found in mainline, including:
 * Less custom code when native code is available.
 * Fewer fields when the variable doesn't require state storage.
 * More static loading.
+* Updates and targets latest APIs.
 
 The app has a very small APK size and currently requires no permissions.
 
@@ -62,6 +63,6 @@ There are currently no prebuilt binaries.
 </table>
 
 ## Branch stuff
-* [master](https://github.com/avuton/HayaiLauncher) - This branch has commits considered finished and stable.
-* [next](https://github.com/avuton/HayaiLauncher/tree/next) - This branch has commits which are unfinished, under development and potentially unstable. This branch gets force merged all the time, so, the git commit structures will never be stable.
-* [hacks](https://github.com/avuton/HayaiLauncher/tree/hacks) - This branch is upstream of the 'next' branch, it includes commits which will never be part of master, but might be considered pretty useful.
+* [master](https://github.com/avuton/KeikaiLauncher) - This branch has commits considered finished and stable.
+* [next](https://github.com/avuton/KeikaiLauncher/tree/next) - This branch has commits which are unfinished, under development and potentially unstable. This branch gets force merged all the time, so, the git commit structures will never be stable.
+* [hacks](https://github.com/avuton/KeikaiLauncher/tree/hacks) - This branch is upstream of the 'next' branch, it includes commits which will never be part of master, but might be considered pretty useful.
