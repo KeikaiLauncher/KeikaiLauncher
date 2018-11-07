@@ -12,8 +12,34 @@
  * either express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
+plugins {
+    id 'com.android.application'
+    id 'pl.allegro.tech.build.axion-release' version '1.8.1'
+}
 
-apply plugin: 'com.android.application'
+scmVersion {
+    tag {
+        prefix = ''
+    }
+}
+
+/**
+ * Takes version {@code major.minor.patch[-suffix]} and returns numeric versionCode based on it
+ * Example: {@code 1.2.3-SNAPSHOT} will return {@code 1002003}
+ */
+static int versionCode(String versionName) {
+    def matcher = (versionName =~ /(\d+)\.(\d+)\.(\d+).*/)
+    return matcher.matches() ?
+            matcher.collect { version, major, minor, patch ->
+                major.toInteger() * 10000 + minor.toInteger() * 100 + patch.toInteger()
+            }.head() :
+            -1
+}
+
+def androidVersion = [
+    name: scmVersion.version,
+    code: versionCode(scmVersion.version),
+]
 
 android {
     compileSdkVersion 28
@@ -21,8 +47,11 @@ android {
         applicationId 'com.anpmech.launcher'
         minSdkVersion 15
         targetSdkVersion 28
-        versionCode 11000
-        versionName "2.0.0"
+        versionName androidVersion.name
+        versionCode androidVersion.code
+    }
+    lintOptions {
+        abortOnError false
     }
     buildTypes {
         all {
@@ -32,11 +61,10 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
-                    'proguard-rules.txt'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.txt'
         }
         debug {
-            versionNameSuffix "-SNAPSHOT"
+            versionNameSuffix "-debug"
         }
     }
     dependencies {
@@ -45,21 +73,4 @@ android {
 }
 
 dependencies {
-}
-
-buildscript {
-    repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.6"
-    }
-}
-
-apply plugin: "net.ltgt.errorprone"
-
-configurations.errorprone {
-    resolutionStrategy.force 'com.google.errorprone:error_prone_core:2.3.2'
 }
