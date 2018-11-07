@@ -25,9 +25,9 @@ scmVersion {
 
 /**
  * Takes version {@code major.minor.patch[-suffix]} and returns numeric versionCode based on it
- * Example: {@code 1.2.3-SNAPSHOT} will return {@code 1002003}
+ * Example: {@code 1.2.3-SNAPSHOT} will return {@code 10203}
  */
-static int versionCode(String versionName) {
+static int getVersionCode(String versionName) {
     def matcher = (versionName =~ /(\d+)\.(\d+)\.(\d+).*/)
     return matcher.matches() ?
             matcher.collect { version, major, minor, patch ->
@@ -38,7 +38,7 @@ static int versionCode(String versionName) {
 
 def androidVersion = [
     name: scmVersion.version,
-    code: versionCode(scmVersion.version),
+    code: getVersionCode(scmVersion.version),
 ]
 
 android {
