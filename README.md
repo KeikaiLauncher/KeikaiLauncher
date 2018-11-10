@@ -1,5 +1,9 @@
 # KeikaiLauncher
 
+[<img src="https://f-droid.org/badge/get-it-on.png"
+      alt="Get it on F-Droid"
+      height="80">](https://f-droid.org/app/com.anpmech.launcher)
+
 *A fork of HayaiLauncher*
 
 It is a fast, [free](https://en.wikipedia.org/wiki/Free_software), minimalist Android Launcher. Even though this fork is heavily modified this launcher is a tribute to the ideas and concepts of HayaiLauncher.
@@ -34,7 +38,7 @@ The app has a very small APK size and currently requires no permissions.
 
 ## Download
 
-There are currently no prebuilt binaries.
+Install it from [f-droid repository](https://f-droid.org/app/com.anpmech.launcher).
 
 ## Screenshots
 
