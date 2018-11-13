@@ -9,32 +9,8 @@
 It is a fast, [free](https://en.wikipedia.org/wiki/Free_software), minimalist Android Launcher. Even though this fork is heavily modified this launcher is a tribute to the ideas and concepts of HayaiLauncher.
 
 ## Changes from mainline
-So far, this fork has quite a few features not found in HayaiLauncher, including:
 
-### User interfacing
-
-* All images have been replaced with native vectors.
-* Dynamic layouts which allow orientation change and better scaling for larger devices.
-* Removes tons of unused resources, and cleans up existing code to be leaner.
-* Less crappy about screen.
-* Do fewer things and get the same or better results.
-* Installs, removes and package modifications now work (including external removable storage).
-* Better behaviour with 'home' button presses and search bar interactions.
-* Support for Android's UsageStats subsystem (API 21+).
-
-### Development stuff
-
-* Tons of cleanups, hopefully it's a bit easier to read.
-* Actual project wide code formatting and inspections.
-* Update all build requirements.
-* Fewer deprecations.
-* Better compartmentalization.
-* Less custom code when native code is available.
-* Fewer fields when the variable doesn't require state storage.
-* More static loading.
-* Updates and targets latest APIs.
-
-The app has a very small APK size and currently requires no permissions.
+See [CHANGELOG](CHANGELOG.md).
 
 ## Download
 
