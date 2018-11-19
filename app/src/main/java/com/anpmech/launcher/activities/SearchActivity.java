@@ -60,7 +60,6 @@ import android.widget.GridView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.anpmech.launcher.BuildConfig;
 import com.anpmech.launcher.LaunchableActivity;
 import com.anpmech.launcher.LaunchableActivityPrefs;
@@ -761,7 +760,7 @@ public class SearchActivity extends Activity
     /**
      * This class is a workaround for cases where {@link Activity} does not call any lifecycle
      * methods after 180 degree landscape orientation change.
-     *
+     * <p>
      * In this case, OrientationEventListener would not be suitable due to magnitude restrictions
      * in the SensorEventListener implementation.
      */

@@ -14,9 +14,9 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="@dimen/app_row_column_height"
-             android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/app_row_column_height"
+    android:orientation="vertical">
 
     <ImageView
         android:id="@+id/appIcon"
@@ -24,7 +24,7 @@
         android:layout_height="@dimen/app_icon_size"
         android:layout_gravity="center_horizontal"
         android:contentDescription="@string/application_icon_desc"
-        android:src="@android:mipmap/sym_def_app_icon"/>
+        android:src="@android:mipmap/sym_def_app_icon" />
 
     <ImageView
         android:id="@+id/appPinToTop"
@@ -32,7 +32,7 @@
         android:layout_height="@dimen/app_pin_size"
         android:contentDescription="@string/appmenu_pin_to_top"
         android:src="@drawable/ic_star_yellow_18dp"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/appLabel"
@@ -50,5 +50,5 @@
         android:shadowRadius="1.2"
         android:textColor="#FFFFFF"
         android:textIsSelectable="false"
-        android:textSize="@dimen/app_icon_label_size"/>
+        android:textSize="@dimen/app_icon_label_size" />
 </FrameLayout>

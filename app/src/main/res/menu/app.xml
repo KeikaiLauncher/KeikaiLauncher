@@ -17,18 +17,18 @@
 
     <item
         android:onClick="launchActivity"
-        android:title="@string/appmenu_launch"/>
+        android:title="@string/appmenu_launch" />
 
     <item
         android:onClick="launchApplicationDetails"
-        android:title="@string/appmenu_info"/>
+        android:title="@string/appmenu_info" />
 
     <item
         android:id="@+id/appmenu_pin_to_top"
         android:onClick="pinToTop"
-        android:title="@string/appmenu_pin_to_top"/>
+        android:title="@string/appmenu_pin_to_top" />
 
     <item
         android:onClick="launchPlayStore"
-        android:title="@string/appmenu_onplaystore"/>
+        android:title="@string/appmenu_onplaystore" />
 </menu>

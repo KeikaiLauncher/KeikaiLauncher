@@ -32,7 +32,7 @@ import java.util.ListIterator;
 /**
  * This {@link BroadcastReceiver} receives messages from the base system about package changes
  * and stores it in SharedPreferences to be acted upon later.
- *
+ * <p>
  * This class is not thread-safe and is expected to only be called by one thread at a time, in
  * sequence per the Android documentation.
  */
@@ -171,7 +171,7 @@ public class PackageChangedReceiver extends BroadcastReceiver {
     /**
      * This method will be called by the system when a package addition, modification or removal
      * has been performed.
-     *
+     * <p>
      * Intents received when there is no callback will be stored in {@link #DELAYED_INTENTS}.
      * The window that Intents are delayed should be minimal.
      *

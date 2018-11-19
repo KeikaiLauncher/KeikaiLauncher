@@ -26,7 +26,6 @@ import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.anpmech.launcher.R;
 import com.anpmech.launcher.ShortcutNotificationManager;
 import com.anpmech.launcher.activities.SharedLauncherPrefs;

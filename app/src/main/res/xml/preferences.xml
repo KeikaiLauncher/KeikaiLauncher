@@ -20,27 +20,27 @@
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="pref_autokeyboard"
-            android:title="@string/settings_autokeyboard"/>
+            android:title="@string/settings_autokeyboard" />
         <ListPreference
             android:defaultValue="@string/pref_app_preferred_order_entries_alphabetical"
             android:dialogTitle="@string/pref_preferred_app_order_dialog"
             android:entries="@array/pref_app_preferred_order_entries"
             android:entryValues="@array/pref_app_preferred_order_values"
             android:key="pref_app_preferred_order"
-            android:title="@string/pref_preferred_app_order_dialog"/>
+            android:title="@string/pref_preferred_app_order_dialog" />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="pref_disable_icons"
-            android:title="@string/settings_disable_icon_loading"/>
+            android:title="@string/settings_disable_icon_loading" />
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="pref_allow_rotation"
-            android:title="@string/pref_allow_rotation"/>
+            android:title="@string/pref_allow_rotation" />
         <Preference
             android:key="modify_usage_statistics"
             android:summary="@string/pref_modify_android_usage_summary"
             android:title="@string/pref_modify_android_usage_title">
-            <intent android:action="android.settings.USAGE_ACCESS_SETTINGS"/>
+            <intent android:action="android.settings.USAGE_ACCESS_SETTINGS" />
         </Preference>
     </PreferenceCategory>
     <PreferenceCategory
@@ -49,7 +49,7 @@
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="pref_notification"
-            android:title="@string/settings_enable_notification_title"/>
+            android:title="@string/settings_enable_notification_title" />
         <ListPreference
             android:defaultValue="@string/pref_value_notification_priority_min"
             android:dependency="pref_notification"
@@ -57,6 +57,6 @@
             android:entries="@array/pref_notification_priority_entries"
             android:entryValues="@array/pref_notification_priority_values"
             android:key="pref_notification_priority"
-            android:title="@string/pref_notification_priority"/>
+            android:title="@string/pref_notification_priority" />
     </PreferenceCategory>
 </PreferenceScreen>

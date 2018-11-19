@@ -145,7 +145,7 @@ public class LaunchableActivity {
 
     /**
      * This method returns the usage time.
-     *
+     * <p>
      * The usage time will be set if it is supported by Android and the permission is
      * granted by the user.
      *

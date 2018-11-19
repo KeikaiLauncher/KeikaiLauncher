@@ -55,7 +55,7 @@
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
-    <style name="CaptionText" parent="CaptionTextBase"/>
+    <style name="CaptionText" parent="CaptionTextBase" />
 
     <!-- use this style for a text views that is a paragraph of text -->
     <style name="BodyTextBase">
@@ -64,5 +64,5 @@
         <item name="android:textAppearance">@android:style/TextAppearance.DeviceDefault.Small</item>
     </style>
 
-    <style name="BodyText" parent="BodyTextBase"/>
+    <style name="BodyText" parent="BodyTextBase" />
 </resources>

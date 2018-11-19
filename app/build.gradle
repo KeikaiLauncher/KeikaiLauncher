@@ -37,8 +37,8 @@ static int getVersionCode(String versionName) {
 }
 
 def androidVersion = [
-    name: scmVersion.version,
-    code: getVersionCode(scmVersion.version),
+        name: scmVersion.version,
+        code: getVersionCode(scmVersion.version),
 ]
 
 android {

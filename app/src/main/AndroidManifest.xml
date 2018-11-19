@@ -13,9 +13,9 @@
   ~ limitations under the License.
   -->
 
-<manifest package="com.anpmech.launcher"
-          xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.anpmech.launcher">
 
     <!--
     ~ This permission completely optional and set in the system settings menus. The following
@@ -23,7 +23,7 @@
     -->
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
-        tools:ignore="ProtectedPermissions"/>
+        tools:ignore="ProtectedPermissions" />
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -40,27 +40,27 @@
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden|adjustResize">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <action android:name="android.intent.action.ASSIST"/>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.ASSIST" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
-                <category android:name="android.intent.category.HOME"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
         <activity
             android:name="com.anpmech.launcher.activities.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:theme="@style/AppSettingsTheme"/>
+            android:theme="@style/AppSettingsTheme" />
 
         <activity
             android:name=".activities.AboutActivity"
             android:label="@string/about_header"
-            android:theme="@android:style/Theme.DeviceDefault.Light.Dialog"/>
+            android:theme="@android:style/Theme.DeviceDefault.Light.Dialog" />
 
         <receiver
             android:name=".monitor.PackageChangedReceiver"
-            android:enabled="false"/>
+            android:enabled="false" />
     </application>
 </manifest>

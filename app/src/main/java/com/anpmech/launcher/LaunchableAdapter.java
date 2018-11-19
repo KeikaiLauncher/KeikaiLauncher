@@ -35,7 +35,6 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.anpmech.launcher.activities.SharedLauncherPrefs;
 import com.anpmech.launcher.comparators.AlphabeticalOrder;
 import com.anpmech.launcher.comparators.PinToTop;
@@ -660,20 +659,20 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
 
     /**
      * This method removes all items by name.
-     *
+     * <p>
      * This method removes all items by name. This method has been made very specifically to meet
      * the need of this Adapter.
-     *
+     * <p>
      * This method will remove a package name if it has an equal {@code name} in this Adapter.
-     *
+     * <p>
      * This method will remove a class name if it has a classname that starts with {@code name} in
      * this adapter.
-     *
+     * <p>
      * This complexity is required because some packages install multiple activities (see "A Photo
      * Manager"
-     *
+     * <p>
      * Some packages install activities with duplicate names (see Google Drive/Google Sheets).
-     *
+     * <p>
      * This method should not be part of this class, but we rely on locking the collections during
      * this critical method.
      *

@@ -19,7 +19,6 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.widget.ImageView;
-
 import com.anpmech.launcher.threading.SimpleTaskConsumerManager;
 
 
