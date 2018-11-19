@@ -27,6 +27,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.hardware.display.DisplayManager;
 import android.net.Uri;
 import android.os.Build;
@@ -89,6 +90,17 @@ public class SearchActivity extends Activity
     private final Object mLock = new Object();
 
     private final BroadcastReceiver mPackageChangeReceiver = new PackageChangedReceiver();
+
+    /**
+     * This ContentObserver is used by the ContentResolver to register a callback to set rotation in case it changes
+     * in the system settings.
+     */
+    private final ContentObserver mAccSettingObserver = new ContentObserver(new Handler()) {
+        @Override
+        public void onChange(boolean selfChange) {
+            setRotation(new SharedLauncherPrefs(SearchActivity.this));
+        }
+    };
 
     private LaunchableAdapter<LaunchableActivity> mAdapter;
 
@@ -502,6 +514,8 @@ public class SearchActivity extends Activity
             manager.unregisterDisplayListener(mDisplayListener);
         }
 
+
+        getContentResolver().unregisterContentObserver(mAccSettingObserver);
         super.onPause();
     }
 
@@ -541,15 +555,40 @@ public class SearchActivity extends Activity
             hideKeyboard();
         }
 
+        setRotation(prefs);
         setupPadding();
-        if (prefs.isRotationAllowed()) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+        final Uri accUri = Settings.System.getUriFor(Settings.System.ACCELEROMETER_ROTATION);
+        getContentResolver().registerContentObserver(accUri, false, mAccSettingObserver);
+    }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                registerDisplayListener();
+    /**
+     * This method checks whether rotation should be allowed and sets the launcher to
+     * <p>
+     * The current rules:
+     * <p><ul>
+     * <li> Rotate if allowed by both system and local settings.
+     * <li> If rotation is not allowed by system settings disable rotation.
+     * <li> If rotation is not allowed by local settings set orientation as portrait.
+     * </ul><p>
+     *
+     * @param prefs The SharedLauncherPrefs object for this.
+     */
+    private void setRotation(final SharedLauncherPrefs prefs) {
+        boolean systemRotationAllowed =
+                Settings.System.getInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0) == 1;
+
+        if (systemRotationAllowed) {
+            if (prefs.isRotationAllowed()) {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    registerDisplayListener();
+                }
+            } else {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
         } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         }
     }
 
@@ -585,6 +624,8 @@ public class SearchActivity extends Activity
             mAdapter.sortApps(this);
         } else if (getString(R.string.pref_key_disable_icons).equals(key)) {
             recreate();
+        } else if (getString(R.string.pref_key_allow_rotation).equals(key)) {
+            setRotation(new SharedLauncherPrefs(this));
         }
     }
 

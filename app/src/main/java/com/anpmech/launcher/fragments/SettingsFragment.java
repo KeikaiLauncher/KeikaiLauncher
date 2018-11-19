@@ -18,10 +18,15 @@ package com.anpmech.launcher.fragments;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.ContentObserver;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
+import android.provider.Settings;
 import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +37,31 @@ import com.anpmech.launcher.activities.SharedLauncherPrefs;
 
 public class SettingsFragment extends PreferenceFragment implements
         SharedPreferences.OnSharedPreferenceChangeListener {
+
+    /**
+     * This field generates a ContentObserver to enable or disable the orientation locked setting depending if
+     * rotation is locked or unlocked.
+     */
+    private final ContentObserver mAccSettingObserver = new ContentObserver(new Handler()) {
+        @Override
+        public void onChange(boolean selfChange) {
+            final Preference orientationPreference = findPreference(R.string.pref_key_allow_rotation);
+
+            orientationPreference.setEnabled(isOrientationLocked());
+
+            super.onChange(selfChange);
+        }
+    };
+
+    /**
+     * This method returns whether the system orientation is locked.
+     *
+     * @return True if orientation is locked, false otherwise.
+     */
+    private boolean isOrientationLocked() {
+        return Settings.System.getInt(getPreferenceScreen().getContext().getContentResolver(),
+                Settings.System.ACCELEROMETER_ROTATION, 0) == 1;
+    }
 
     private Preference findPreference(@StringRes final int prefKey) {
         return findPreference(getString(prefKey));
@@ -57,8 +87,10 @@ public class SettingsFragment extends PreferenceFragment implements
 
     @Override
     public void onPause() {
-        getPreferenceScreen().getSharedPreferences()
-                .unregisterOnSharedPreferenceChangeListener(this);
+        final PreferenceScreen prefs = getPreferenceScreen();
+
+        prefs.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        prefs.getContext().getContentResolver().unregisterContentObserver(mAccSettingObserver);
 
         super.onPause();
     }
@@ -67,14 +99,19 @@ public class SettingsFragment extends PreferenceFragment implements
     public void onResume() {
         super.onResume();
 
-        getPreferenceScreen().getSharedPreferences()
-                .registerOnSharedPreferenceChangeListener(this);
+        final Preference orientationPreference = findPreference(R.string.pref_key_allow_rotation);
+        final Context context = orientationPreference.getContext();
+        final Uri accUri = Settings.System.getUriFor(Settings.System.ACCELEROMETER_ROTATION);
+
+        context.getContentResolver().registerContentObserver(accUri, false, mAccSettingObserver);
+        orientationPreference.setEnabled(isOrientationLocked());
+        orientationPreference.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
             final String key) {
-        final Context context = getActivity();
+        final Context context = getPreferenceScreen().getContext();
 
         // Fragments suck.
         if (context != null) {
