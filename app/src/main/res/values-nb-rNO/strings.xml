@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2015-2017 Hayai Software
+  ~ Copyright 2018 The KeikaiLauncher Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License. You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed under the
+  ~ License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND
+  ~ either express or implied. See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="app_name" translatable="false">Keikai Launcher</string>
+    <string name="title_activity_search" translatable="false">Keikai Launcher</string>
+    <string name="action_settings">Innstillinger</string>
+    <string name="application_icon_desc">Programikon</string>
+    <string name="search_icon">Søkeikon</string>
+    <string name="clear_button">Knapp for teksttømming</string>
+    <string name="overflow_menu_button">Overflytsmenyknapp</string>
+    <string name="search_view_hint">Skriv noe…</string>
+    <string name="title_activity_settings">Innstillinger</string>
+    <string name="settings_category_notification_category">Merknader</string>
+    <string name="settings_enable_notification_title">Vis snarvei i merknadsfelt</string>
+    <string name="settings_landscape_90">90° orientasjon for navigasjonslinjeposisjon</string>
+    <string name="settings_landscape_270">270° orientasjon for navigasjonslinjeposisjon</string>
+    <string name="pref_value_landscape_left">venstre</string>
+    <string name="pref_value_landscape_right">høyre</string>
+    <string name="pref_value_landscape_invisible">usynlig</string>
+    <string name="appmenu_launch">Kjør</string>
+    <string name="appmenu_info">Programinfo</string>
+    <string name="launch">Kjør</string>
+    <string name="action_system_settings">Enhetsinnstillinger</string>
+    <string name="activity_not_found">Fant ikke aktivitet.</string>
+    <string name="action_about">Om</string>
+    <string name="about_header">Om Keikai Launcher</string>
+    <string name="about_version_code">Versjon</string>
+    <string name="about_project_website">Prosjektnettside</string>
+    <string name="about_license">Lisens</string>
+    <string name="about_license_type" translatable="false">Apache License Version 2.0</string>
+    <string name="about_license_url" translatable="false">
+        http://www.apache.org/licenses/LICENSE-2.0.txt
+    </string>
+    <string name="about_contributors_title">Bidragsytere</string>
+    <string name="about_list_of_contributors">Liste over bidragsytere</string>
+
+    <string name="action_manage_apps">Behandle programmer</string>
+    <string name="appmenu_onplaystore">Åpne i programmarked</string>
+    <string name="pref_notification_priority">Merknadsprioritet</string>
+    <string name="settings_autokeyboard">Åpne tastatur automatisk</string>
+    <string name="settings_category_general_category">Generelt</string>
+    <string name="pref_preferred_app_order_dialog">Programrang</string>
+    <string name="settings_disable_icon_loading">Skru av ikonlasting</string>
+    <string name="appmenu_pin_to_top">Fest til toppen</string>
+    <string name="appmenu_remove_pin">Løsne</string>
+    <string name="pref_notification_priority_entries_high">Høy</string>
+    <string name="pref_notification_priority_entries_low">Lav (inget ikon)</string>
+    <string name="pref_app_preferred_order_entries_recent">Nyligst brukte først</string>
+    <string name="pref_app_preferred_order_entries_alphabetical">Alfabetisk orden</string>
+    <string name="pref_app_preferred_order_entries_usages">Mest brukte først</string>
+    <string name="action_set_wallpaper">Sett skjermbilde</string>
+    <string name="pref_allow_rotation">Tillat endring av sideretning</string>
+
+    <string name="pref_modify_android_usage_title">Innvilg bruksstøttestatistikk</string>
+    <string name="pref_modify_android_usage_summary">
+        Skru på bruksstøtte for mer nøyaktig rangering.
+    </string>
+</resources>
