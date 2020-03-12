@@ -17,19 +17,54 @@
   ~ Warning: Padding for the masterLayout and the appContainer are set dynamically and will be
   ~ overwritten. See SearchActivity.java#setupPadding().
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/masterLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginLeft="@dimen/activity_horizontal_margin"
     android:layout_marginTop="@dimen/activity_vertical_margin"
-    android:layout_marginRight="@dimen/activity_horizontal_margin"
-    android:orientation="vertical">
+    android:layout_marginRight="@dimen/activity_horizontal_margin">
+
+    <GridView
+        android:id="@+id/appsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:choiceMode="singleChoice"
+        android:clipToPadding="false"
+        android:columnWidth="@dimen/app_row_column_width"
+        android:fadingEdge="none"
+        android:horizontalSpacing="@dimen/app_row_horizontal_spacing"
+        android:numColumns="auto_fit"
+        android:overScrollMode="never"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:scrollbars="none"
+        android:stackFromBottom="true"
+        android:stretchMode="spacingWidth"
+        android:verticalSpacing="@dimen/app_row_vertical_spacing" >
+
+    </GridView>
+
+    <!--
+      ~ Bug:
+      ~
+      ~ If enabled, overscroll mode fails on the bottom, if a navigation bar exists. This bug
+      ~ exists due to the following:
+      ~
+      ~ * The application container has focus and won't scroll to another view.
+      ~
+      ~ * If a ScrollView is added outside the GridView, it then takes the focus, and the
+      ~ overscroll.
+      ~
+      ~ This could also be fixed by not allowing scrolling under the navigation bar; I
+      ~ consider disabling overscroll to be the better compromise.
+    -->
 
     <LinearLayout
         android:id="@+id/customActionBar"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="@dimen/actionbar_height"
+        android:layout_gravity="top"
         android:background="@drawable/search_box_bg">
 
         <ImageButton
@@ -49,7 +84,6 @@
             android:background="@null"
             android:ellipsize="end"
             android:hint="@string/search_view_hint"
-            android:imeActionId="@+id/actionGo"
             android:imeActionLabel="@string/launch"
             android:imeOptions="actionGo"
             android:inputType="text"
@@ -58,11 +92,6 @@
             android:textColor="@android:color/black"
             android:textColorHint="@color/text_hint_grey"
             android:textSize="18sp" />
-
-        <View
-            android:id="@+id/overflow_button_topleft"
-            android:layout_width="0dp"
-            android:layout_height="0dp" />
 
         <ImageButton
             android:id="@+id/clear_button"
@@ -88,35 +117,11 @@
             android:padding="@dimen/actionbar_icon_padding"
             android:src="@drawable/ic_more_vert_white_24dp"
             android:tint="@color/hint_grey" />
+
+        <View
+            android:id="@+id/overflow_button_topleft"
+            android:layout_width="0dp"
+            android:layout_height="0dp" />
     </LinearLayout>
 
-    <!--
-      ~ Bug:
-      ~
-      ~ If enabled, overscroll mode fails on the bottom, if a navigation bar exists. This bug
-      ~ exists due to the following:
-      ~
-      ~ * The application container has focus and won't scroll to another view.
-      ~
-      ~ * If a ScrollView is added outside the GridView, it then takes the focus, and the
-      ~ overscroll.
-      ~
-      ~ This could also be fixed by not allowing scrolling under the navigation bar; I
-      ~ consider disabling overscroll to be the better compromise.
-    -->
-    <GridView
-        android:id="@+id/appsContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:choiceMode="singleChoice"
-        android:clipToPadding="false"
-        android:columnWidth="@dimen/app_row_column_width"
-        android:fadingEdge="none"
-        android:horizontalSpacing="@dimen/app_row_horizontal_spacing"
-        android:numColumns="auto_fit"
-        android:overScrollMode="never"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:scrollbars="none"
-        android:stretchMode="spacingWidth"
-        android:verticalSpacing="@dimen/app_row_vertical_spacing" />
-</LinearLayout>
+</FrameLayout>

@@ -69,4 +69,7 @@
 
     <!-- This string is a possible value for ordering launchables by frequency of usage. -->
     <string name="pref_value_preferred_order_usage" translatable="false">usage</string>
+
+    <!-- This string indicates if the search bar should be on the bottom of the screen. -->
+    <string name="pref_searchbar_on_bottom" translatable="false">searchbar_on_bottom</string>
 </resources>

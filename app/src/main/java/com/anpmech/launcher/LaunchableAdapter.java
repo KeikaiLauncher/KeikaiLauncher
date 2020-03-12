@@ -794,7 +794,9 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
             }
 
             sort(PIN_TO_TOP);
-
+            if (prefs.isSearchBarOnBottom()) {
+                Collections.reverse(mObjects);
+            }
             if (notify) {
                 notifyDataSetChanged();
             }

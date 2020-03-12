@@ -13,7 +13,8 @@
   ~ limitations under the License.
   -->
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
         android:key="pref_category_general"
         android:title="@string/settings_category_general_category">
@@ -36,6 +37,13 @@
             android:defaultValue="true"
             android:key="pref_allow_rotation"
             android:title="@string/pref_allow_rotation" />
+        <CheckBoxPreference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:defaultValue="false"
+            android:key="@string/pref_searchbar_on_bottom"
+            android:title="@string/settings_searchbar_on_bottom"
+            tools:text="@string/settings_searchbar_on_bottom" />
         <Preference
             android:key="modify_usage_statistics"
             android:summary="@string/pref_modify_android_usage_summary"

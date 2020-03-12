@@ -250,4 +250,8 @@ public class SharedLauncherPrefs {
     public boolean isRotationAllowed() {
         return isPrefEnabled(R.string.pref_key_allow_rotation, true);
     }
+
+    public boolean isSearchBarOnBottom() {
+        return isPrefEnabled(R.string.pref_searchbar_on_bottom, false);
+    }
 }

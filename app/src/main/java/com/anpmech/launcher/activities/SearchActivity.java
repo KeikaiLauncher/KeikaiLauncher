@@ -44,12 +44,14 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -58,7 +60,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -450,9 +454,13 @@ public class SearchActivity extends Activity
 
         // If the y coordinate is not at 0, let's reset it.
         final GridView view = findViewById(R.id.appsContainer);
-        final int[] loc = {0, 0};
-        view.getLocationInWindow(loc);
-        if (loc[1] != 0) {
+
+        final SharedLauncherPrefs prefs = new SharedLauncherPrefs(this);
+        final boolean on_bottom = prefs.isSearchBarOnBottom();
+
+        if (on_bottom) {
+            view.smoothScrollToPosition(view.getHeight());
+        } else {
             view.smoothScrollToPosition(0);
         }
     }
@@ -695,47 +703,83 @@ public class SearchActivity extends Activity
      * appContainer.
      */
     private void setupPadding() {
+        final SharedLauncherPrefs prefs = new SharedLauncherPrefs(this);
         final Resources resources = getResources();
         final View masterLayout = findViewById(R.id.masterLayout);
-        final View appContainer = findViewById(R.id.appsContainer);
-        final int appTop = resources.getDimensionPixelSize(R.dimen.activity_vertical_margin);
+        final LinearLayout actionBar = findViewById(R.id.customActionBar);
+        final GridView appContainer = findViewById(R.id.appsContainer);
+
         final boolean noMultiWindow = Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
                 !isInMultiWindowMode();
         final boolean transparentPossible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
-        if (transparentPossible && noMultiWindow) {
-            masterLayout.setFitsSystemWindows(false);
-            final int navBarWidth = getNavigationBarWidth(resources);
-            final int searchUpperPadding = getDimensionSize(resources, "status_bar_height");
-            final int navBarHeight = getNavigationBarHeight(resources);
-            final SharedLauncherPrefs prefs = new SharedLauncherPrefs(this);
-            final int orientation = getWindowManager().getDefaultDisplay().getRotation();
-            int leftPadding = 0;
-            int rightPadding = 0;
+        final int actionbar_margin = (int) getResources().getDimension(R.dimen.actionbar_top_margin);
+        final int actionbar_height = (int) getResources().getDimension(R.dimen.actionbar_height);
+        int status_bar_height = getDimensionSize(resources, "status_bar_height");
+        int navBarHeight = getNavigationBarHeight(resources);
 
-            if (orientation == Surface.ROTATION_90) {
-                if ("right".equals(prefs.get90NavBarPosition())) {
-                    rightPadding = navBarWidth;
-                } else if ("left".equals(prefs.get90NavBarPosition())) {
-                    leftPadding = navBarWidth;
-                }
-            } else if (orientation == Surface.ROTATION_270) {
-                if ("right".equals(prefs.get270NavBarPosition())) {
-                    rightPadding = navBarWidth;
-                } else if ("left".equals(prefs.get270NavBarPosition())) {
-                    leftPadding = navBarWidth;
-                }
-            }
+        final boolean on_bottom = prefs.isSearchBarOnBottom();
+        appContainer.setStackFromBottom(on_bottom);
 
-            // If the navigation bar is on the side, don't put apps under it.
-            masterLayout.setPadding(leftPadding, searchUpperPadding, rightPadding, 0);
+        FrameLayout.LayoutParams actionBarParams = (FrameLayout.LayoutParams) actionBar.getLayoutParams();
 
-            // If the navigation bar is at the bottom, stop the icons above it.
-            appContainer.setPadding(0, appTop, 0, navBarHeight);
+        // push the action bar onto the top or bottom
+        if (on_bottom) {
+            actionBarParams.gravity = Gravity.BOTTOM;
         } else {
-            masterLayout.setFitsSystemWindows(true);
-            appContainer.setPadding(0, appTop, 0, 0);
+            actionBarParams.gravity = Gravity.TOP;
         }
+
+        // e.g. split screen
+        if (!(transparentPossible && noMultiWindow)) {
+            masterLayout.setFitsSystemWindows(true);
+        }
+
+        final int navBarWidth = getNavigationBarWidth(resources);
+        final int orientation = getWindowManager().getDefaultDisplay().getRotation();
+
+        int leftPadding = 0;
+        int rightPadding = 0;
+        if (orientation == Surface.ROTATION_90) {
+            if ("right".equals(prefs.get90NavBarPosition())) {
+                rightPadding = navBarWidth;
+            } else if ("left".equals(prefs.get90NavBarPosition())) {
+                leftPadding = navBarWidth;
+            }
+        } else if (orientation == Surface.ROTATION_270) {
+            if ("right".equals(prefs.get270NavBarPosition())) {
+                rightPadding = navBarWidth;
+            } else if ("left".equals(prefs.get270NavBarPosition())) {
+                leftPadding = navBarWidth;
+            }
+        }
+
+        // when the actionBar is on the bottom and the keyboard comes up and moves the input
+        // field up, the input field needs extra padding on the bottom so that the keyboards
+        // does not overlay with the actionBar
+        final TextView userSearchInput = findViewById(R.id.user_search_input);
+        final float padding = (actionbar_height-userSearchInput.getTextSize());
+        userSearchInput.setPadding(0,(int)(padding*0.55),0,(int)(padding*0.45));
+
+        // If the navigation bar is on the side, don't put apps under it.
+        // If the navigation bar is at the bottom, stop the icons above it.
+        masterLayout.setPadding(leftPadding, 0, rightPadding, 0);
+
+        // Top and bottom margin is set. Only one will be needed, depending on the searchbar
+        // being on top or bottom. But the other one does no harm.
+        int actionbar_top_margin = status_bar_height + actionbar_margin;
+        int actionbar_bottom_margin = navBarHeight+actionbar_margin;
+        actionBarParams.setMargins(0,actionbar_top_margin, 0,actionbar_bottom_margin);
+
+        // setting the padding on the apps view so that the apps are not under the status bars,
+        // the navigation bar or the search bar.
+        int app_top = actionbar_top_margin + actionbar_height + actionbar_margin*3;
+        int app_bottom = navBarHeight;
+        if (on_bottom) {
+            app_top = actionbar_top_margin;
+            app_bottom =  actionbar_bottom_margin + actionbar_height + actionbar_margin;
+        }
+        appContainer.setPadding(0, app_top, 0, app_bottom);
     }
 
     private void setupPreferences() {
