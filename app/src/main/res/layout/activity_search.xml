@@ -52,6 +52,7 @@
             android:imeActionId="@+id/actionGo"
             android:imeActionLabel="@string/launch"
             android:imeOptions="actionGo"
+            android:importantForAutofill="noExcludeDescendants"
             android:inputType="text"
             android:maxLines="1"
             android:selectAllOnFocus="true"
