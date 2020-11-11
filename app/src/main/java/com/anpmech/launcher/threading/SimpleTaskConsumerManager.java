@@ -80,17 +80,17 @@ public class SimpleTaskConsumerManager {
         if (mSubmissionsAccepted) {
             mSubmissionsAccepted = false;
 
-            if (finishCurrentTasks) {
-                final Task dieTask = new DieTask();
-                for (final Thread mThread : mThreads) {
-                    putTask(mTasks, dieTask);
-                }
+            if (!finishCurrentTasks) {
+                mTasks.clear();
+            }
 
-                if (blockUntilFinished) {
-                    blockThreadsUntilFinished();
-                }
-            } else {
-                removeAllTasks();
+            final Task dieTask = new DieTask();
+            for (final Thread mThread : mThreads) {
+                putTask(mTasks, dieTask);
+            }
+
+            if (blockUntilFinished) {
+                blockThreadsUntilFinished();
             }
         }
     }
@@ -105,13 +105,6 @@ public class SimpleTaskConsumerManager {
         destroyAllConsumers(false);
 
         super.finalize();
-    }
-
-    private void removeAllTasks() {
-        for (final Thread thread : mThreads) {
-            thread.interrupt();
-        }
-        mTasks.clear();
     }
 
     public interface Task {
