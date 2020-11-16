@@ -14,7 +14,7 @@
  */
 plugins {
     id 'com.android.application'
-    id 'pl.allegro.tech.build.axion-release' version '1.11.0'
+    id 'pl.allegro.tech.build.axion-release' version '1.12.1'
 }
 
 scmVersion {
@@ -42,11 +42,11 @@ def androidVersion = [
 ]
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId 'com.anpmech.launcher'
         minSdkVersion 15
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionName androidVersion.name
         versionCode androidVersion.code
     }
