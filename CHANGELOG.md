@@ -1,9 +1,19 @@
 # Changelog
 
-## Unreleased
+## 1.1.0 - 2020-11-21
 
 ### Added
+
 * This changelog document
+* Norwegian Bokmål translation
+* Configuration options to make _KeikaiLauncher_ to expect Android Navigation Bar to be either on the left, on the
+  right, or be hidden when device is rotated 90° or 270°
+
+### Fixed
+
+* Launcher rotation not respecting system rotation settings #9
+* A bug with sorting by recent and by usage when apps are closed immediately after launching
+* Resources leak causing _KeikaiLauncher_ to fail to display applications sometimes #19
 
 
 ## 1.0.0 - 2018-11-06
@@ -12,7 +22,8 @@ First official release under a new name after forking [Hayai Launcher](https://g
 
 This release wouldn't happen without @avuton who did all the heavy lifting and coding!
 
-Also thanks to @edio, @gaul, @wbrawner for bringing the day of this release closer and to all the contributors of _Hayai Launcher_.
+Also thanks to @edio, @gaul, @wbrawner for bringing the day of this release closer and to all the contributors of _Hayai
+Launcher_.
 
 ### Added
 * Support for orientation change
