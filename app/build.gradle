@@ -21,6 +21,9 @@ scmVersion {
     tag {
         prefix = ''
     }
+    monorepos {
+        projectDirs = project.subprojects.collect({p -> p.name})
+    }
 }
 
 /**

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1 - 2020-11-22
+
+### Fixed
+
+* Version detection logic in the build script to fix builds on f-droid
+
 ## 1.1.0 - 2020-11-21
 
 ### Added
