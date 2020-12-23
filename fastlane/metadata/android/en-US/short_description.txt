@@ -1,0 +1,1 @@
+A fast, minimalistic and lightweight search-based launcher
