@@ -17,6 +17,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.anpmech.launcher">
 
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
     <!--
     ~ This permission completely optional and set in the system settings menus. The following
     ~ declares intention to use, if available and granted.
