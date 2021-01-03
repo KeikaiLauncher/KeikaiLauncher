@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2015-2017 Hayai Software
+  ~ Copyright 2018-2020 The KeikaiLauncher Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License. You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed under the
+  ~ License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND
+  ~ either express or implied. See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="app_name" translatable="false">Keikai Launcher</string>
+    <string name="title_activity_search" translatable="false">Keikai Launcher</string>
+    <string name="action_settings">设置</string>
+    <string name="application_icon_desc">应用程序图标</string>
+    <string name="search_icon">搜索图标</string>
+    <string name="clear_button">“清除文本”按钮</string>
+    <string name="overflow_menu_button">“溢出菜单” 按钮</string>
+    <string name="search_view_hint">输入一些东西......</string>
+    <string name="title_activity_settings">设置</string>
+    <string name="settings_category_notification_category">通知</string>
+    <string name="settings_enable_notification_title">在通知面板显示快捷方式</string>
+    <string name="settings_landscape_90">90°方向导航栏位置</string>
+    <string name="settings_landscape_270">270° 方向导航栏位置</string>
+    <string name="pref_value_landscape_left">左</string>
+    <string name="pref_value_landscape_right">右</string>
+    <string name="pref_value_landscape_invisible">不可见</string>
+    <string name="appmenu_launch">启动</string>
+    <string name="appmenu_info">应用信息</string>
+    <string name="launch">去</string>
+    <string name="action_system_settings">设备设置</string>
+    <string name="activity_not_found">未找到活动</string>
+    <string name="action_about">关于</string>
+    <string name="about_header">关于 Keikai Launcher</string>
+    <string name="about_version_code">版本</string>
+    <string name="about_project_website">项目网站</string>
+    <string name="about_license">许可证</string>
+    <string name="about_license_type" translatable="false">Apache License Version 2.0</string>
+    <string name="about_license_url" translatable="false">
+        http://www.apache.org/licenses/LICENSE-2.0.txt
+    </string>
+    <string name="about_contributors_title">贡献者</string>
+    <string name="about_list_of_contributors">贡献者名单</string>
+
+    <string name="action_manage_apps">管理应用</string>
+    <string name="appmenu_onplaystore">在应用市场中打开</string>
+    <string name="pref_notification_priority">通知优先级</string>
+    <string name="settings_autokeyboard">自动打开键盘</string>
+    <string name="settings_category_general_category">一般</string>
+    <string name="pref_preferred_app_order_dialog">应用排列顺序</string>
+    <string name="settings_disable_icon_loading">禁用图标加载</string>
+    <string name="appmenu_pin_to_top">固定在顶部</string>
+    <string name="appmenu_remove_pin">移除固定</string>
+    <string name="pref_notification_priority_entries_high">高</string>
+    <string name="pref_notification_priority_entries_low">低 （无图标）</string>
+    <string name="pref_app_preferred_order_entries_recent">最近使用的优先</string>
+    <string name="pref_app_preferred_order_entries_alphabetical">字母顺序</string>
+    <string name="pref_app_preferred_order_entries_usages">用得最多的优先</string>
+    <string name="action_set_wallpaper">设置壁纸</string>
+    <string name="pref_allow_rotation">允许方向更改</string>
+
+    <string name="pref_modify_android_usage_title">设置 Android 使用统计数据支持</string>
+    <string name="pref_modify_android_usage_summary">
+        启用 Android 应用使用情况权限提高应用排序准确度
+    </string>
+</resources>
