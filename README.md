@@ -42,6 +42,6 @@ Install it from [f-droid repository](https://f-droid.org/app/com.anpmech.launche
 </table>
 
 ## Branch stuff
-* [master](https://github.com/avuton/KeikaiLauncher) - This branch has commits considered finished and stable.
-* [next](https://github.com/avuton/KeikaiLauncher/tree/next) - This branch has commits which are unfinished, under development and potentially unstable. This branch gets force merged all the time, so, the git commit structures will never be stable.
-* [hacks](https://github.com/avuton/KeikaiLauncher/tree/hacks) - This branch is upstream of the 'next' branch, it includes commits which will never be part of master, but might be considered pretty useful.
+* [main](https://github.com/KeikaiLauncher/KeikaiLauncher) - This branch has commits considered finished and stable.
+* [next](https://github.com/KeikaiLauncher/KeikaiLauncher/tree/next) - This branch has commits which are unfinished, under development and potentially unstable. This branch gets force merged all the time, so, the git commit structures will never be stable.
+* [hacks](https://github.com/KeikaiLauncher/KeikaiLauncher/tree/hacks) - This branch is upstream of the 'next' branch, it includes commits which will never be part of master, but might be considered pretty useful.
