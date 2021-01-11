@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0 - 2021-01-11
+
+### Fixed
+
+* Support for Android 11. Permission `QUERY_ALL_PACKAGES` is now required
+
 ## 1.1.1 - 2020-11-22
 
 ### Fixed
