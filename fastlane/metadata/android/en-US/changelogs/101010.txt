@@ -1,0 +1,3 @@
+Fixed
+
+-   Version detection logic in the build script to fix builds on f-droid
