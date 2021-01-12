@@ -1,0 +1,11 @@
+Added
+
+-   This changelog document
+-   Norwegian Bokmål translation
+-   Configuration options to make KeikaiLauncher to expect Android Navigation Bar to be either on the left, on the right, or be hidden when device is rotated 90° or 270°
+
+Fixed
+
+-   Launcher rotation not respecting system rotation settings #9
+-   A bug with sorting by recent and by usage when apps are closed immediately after launching
+-   Resources leak causing KeikaiLauncher to fail to display applications sometimes #19
