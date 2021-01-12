@@ -1,1 +1,1 @@
-schneller, minimalistischer und leichtgewichtiger Such-basierter Launcher
+Schnelles, minimalistisches  und schlankes Startprogramm
