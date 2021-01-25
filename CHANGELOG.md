@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1 - 2021-01-25
+
+### Fixed
+
+* Building process for better compatibility with F-Droid
+
 ## 1.2.0 - 2021-01-11
 
 ### Fixed
