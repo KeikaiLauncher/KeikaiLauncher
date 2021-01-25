@@ -59,6 +59,16 @@ Install it from [f-droid repository](https://f-droid.org/app/com.anpmech.launche
    versioning scheme, f.ex. `release/1.2.3`
 2. In the release branch:
    * update the release version in the _app/build.gradle_ (do not forget to omit the `-SNAPSHOT` suffix)
+     ```
+     version "1.2.2"  // <- here
+     android {
+         defaultConfig {
+             ...
+             versionName "1.2.2" // <- and here
+         }
+         ...
+     }
+     ```
    * update `CHANGELOG.md`. Follow [keepachangelog](https://keepachangelog.com/en/1.0.0/) guidelines
    * create a changelog file under `fastlane/metadata/android/en-US/changelogs/` for the f-droid store
    * commit and push
