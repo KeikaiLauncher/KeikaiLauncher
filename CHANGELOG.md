@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.2 - 2021-01-25
+
+### Fixed
+
+* Finally proper F-Droid integration
+
 ## 1.2.1 - 2021-01-25
 
 ### Fixed
