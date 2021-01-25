@@ -16,15 +16,15 @@ plugins {
     id 'com.android.application'
 }
 
-version "1.2.2"
+version "1.2.3-SNAPSHOT"
 android {
     compileSdkVersion 30
     defaultConfig {
         applicationId 'com.anpmech.launcher'
         minSdkVersion 15
         targetSdkVersion 30
-        versionName "1.2.2"
-        versionCode 10202
+        versionName "1.2.3-SNAPSHOT"
+        versionCode 10203
     }
     lintOptions {
         abortOnError false
