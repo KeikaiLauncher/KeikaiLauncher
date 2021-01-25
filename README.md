@@ -60,6 +60,7 @@ Install it from [f-droid repository](https://f-droid.org/app/com.anpmech.launche
 2. In the release branch:
    * update the release version in the _app/build.gradle_ (do not forget to omit the `-SNAPSHOT` suffix)
    * update `CHANGELOG.md`. Follow [keepachangelog](https://keepachangelog.com/en/1.0.0/) guidelines
+   * create a changelog file under `fastlane/metadata/android/en-US/changelogs/` for the f-droid store
    * commit and push
 3. Open a pull-request
 4. Once the PR is merged, create an annotated tag on the merge commit with the version of the release

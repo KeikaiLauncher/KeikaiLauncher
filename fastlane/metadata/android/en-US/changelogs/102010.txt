@@ -1,0 +1,3 @@
+Fixed
+
+-   Building process for better compatibility with F-Droid
