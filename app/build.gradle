@@ -16,20 +16,6 @@ plugins {
     id 'com.android.application'
 }
 
-
-/**
- * Takes version {@code major.minor.patch[-suffix]} and returns numeric versionCode based on it
- * Example: {@code 1.2.3-SNAPSHOT} will return {@code 10203}
- */
-static int getVersionCode(String versionName) {
-    def matcher = (versionName =~ /(\d+)\.(\d+)\.(\d+).*/)
-    return matcher.matches() ?
-            matcher.collect { version, major, minor, patch ->
-                major.toInteger() * 10000 + minor.toInteger() * 100 + patch.toInteger()
-            }.head() :
-            -1
-}
-
 version "1.2.2"
 android {
     compileSdkVersion 30
@@ -38,7 +24,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 30
         versionName "1.2.2"
-        versionCode getVersionCode(project.version)
+        versionCode 10202
     }
     lintOptions {
         abortOnError false
