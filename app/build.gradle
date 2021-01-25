@@ -14,17 +14,8 @@
  */
 plugins {
     id 'com.android.application'
-    id 'pl.allegro.tech.build.axion-release' version '1.12.1'
 }
 
-scmVersion {
-    tag {
-        prefix = ''
-    }
-    monorepos {
-        projectDirs = project.subprojects.collect({p -> p.name})
-    }
-}
 
 /**
  * Takes version {@code major.minor.patch[-suffix]} and returns numeric versionCode based on it
@@ -39,9 +30,10 @@ static int getVersionCode(String versionName) {
             -1
 }
 
+version "1.2.1-SNAPSHOT"
 def androidVersion = [
-        name: scmVersion.version,
-        code: getVersionCode(scmVersion.version),
+        name: project.version,
+        code: getVersionCode(project.version),
 ]
 
 android {
