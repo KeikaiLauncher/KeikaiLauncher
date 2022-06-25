@@ -14,20 +14,18 @@
  */
 plugins {
     id 'com.android.application'
+    id 'pl.allegro.tech.build.axion-release' version '1.14.2'
 }
 
 version "1.2.3-SNAPSHOT"
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
     defaultConfig {
         applicationId 'com.anpmech.launcher'
         minSdkVersion 15
-        targetSdkVersion 30
+        targetSdkVersion 33
         versionName "1.2.3-SNAPSHOT"
         versionCode 10203
-    }
-    lintOptions {
-        abortOnError false
     }
     buildTypes {
         all {
@@ -46,6 +44,10 @@ android {
     dependencies {
         implementation 'com.android.support:support-annotations:28.0.0'
     }
+    lint {
+        abortOnError false
+    }
+    namespace 'com.anpmech.launcher'
 }
 
 dependencies {

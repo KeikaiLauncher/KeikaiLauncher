@@ -14,8 +14,7 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.anpmech.launcher">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission
         android:name="android.permission.QUERY_ALL_PACKAGES"
@@ -41,7 +40,8 @@
             android:alwaysRetainTaskState="true"
             android:label="@string/title_activity_search"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:windowSoftInputMode="stateHidden|adjustResize"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.ASSIST" />
