@@ -14,17 +14,6 @@
   -->
 
 <resources>
-    <string-array name="pref_notification_priority_entries">
-        <item>@string/pref_notification_priority_entries_high</item>
-        <item>@string/pref_notification_priority_entries_low</item>
-    </string-array>
-
-    <string-array name="pref_notification_priority_values" translatable="false">
-        <item>@string/pref_value_notification_priority_max</item>
-        <item>@string/pref_value_notification_priority_min</item>
-    </string-array>
-
-
     <string-array name="pref_app_preferred_order_entries">
         <item>@string/pref_app_preferred_order_entries_recent</item>
         <item>@string/pref_app_preferred_order_entries_alphabetical</item>

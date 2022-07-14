@@ -58,16 +58,6 @@ public class SharedLauncherPrefs {
     }
 
     /**
-     * This is the string resource of the default notification priority.
-     *
-     * @return The string resource of the default notification priority.
-     */
-    @StringRes
-    private static int getDefaultNotificationPriority() {
-        return R.string.pref_value_notification_priority_min;
-    }
-
-    /**
      * This returns whether icons should be enabled.
      *
      * @return {@code true} if icons should be enabled, {@code false} otherwise.
@@ -114,18 +104,6 @@ public class SharedLauncherPrefs {
     }
 
     /**
-     * This method returns the notification priority.
-     *
-     * @return The value of {@link R.string#pref_notification_priority_entries_low} or
-     * {@link R.string#pref_notification_priority_entries_high}.
-     * @see #getDefaultNotificationPriority()
-     */
-    private String getNotificationPriority() {
-        return getValue(R.string.pref_key_notification_priority,
-                getDefaultNotificationPriority());
-    }
-
-    /**
      * The used {@link SharedPreferences} object.
      *
      * @return The used SharedPreferences object.
@@ -166,37 +144,6 @@ public class SharedLauncherPrefs {
      */
     public boolean isKeyboardAutomatic() {
         return isPrefEnabled(R.string.pref_key_auto_keyboard, false);
-    }
-
-    /**
-     * This method returns the result of whether the notification should be enabled.
-     *
-     * @return {@code true} if the notification should be enabled, {@code false} otherwise.
-     */
-    public boolean isNotificationEnabled() {
-        return isPrefEnabled(R.string.pref_key_notification, false);
-    }
-
-    /**
-     * This method returns the result of if the notification priority is high.
-     *
-     * @return {@code true} if the notification should have a high priority, {@code false}
-     * otherwise.
-     */
-    public boolean isNotificationPriorityHigh() {
-        return getNotificationPriority().equals(
-                getString(R.string.pref_value_notification_priority_max));
-    }
-
-    /**
-     * This method returns the result of if the notification priority is low.
-     *
-     * @return {@code true} if the notification should have a low priority, {@code false}
-     * otherwise.
-     */
-    public boolean isNotificationPriorityLow() {
-        return getNotificationPriority().equals(
-                getString(R.string.pref_value_notification_priority_min));
     }
 
     /**

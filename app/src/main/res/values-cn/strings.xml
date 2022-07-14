@@ -23,8 +23,6 @@
     <string name="overflow_menu_button">“溢出菜单” 按钮</string>
     <string name="search_view_hint">输入一些东西......</string>
     <string name="title_activity_settings">设置</string>
-    <string name="settings_category_notification_category">通知</string>
-    <string name="settings_enable_notification_title">在通知面板显示快捷方式</string>
     <string name="settings_landscape_90">90°方向导航栏位置</string>
     <string name="settings_landscape_270">270° 方向导航栏位置</string>
     <string name="pref_value_landscape_left">左</string>
@@ -49,15 +47,12 @@
 
     <string name="action_manage_apps">管理应用</string>
     <string name="appmenu_onplaystore">在应用市场中打开</string>
-    <string name="pref_notification_priority">通知优先级</string>
     <string name="settings_autokeyboard">自动打开键盘</string>
     <string name="settings_category_general_category">一般</string>
     <string name="pref_preferred_app_order_dialog">应用排列顺序</string>
     <string name="settings_disable_icon_loading">禁用图标加载</string>
     <string name="appmenu_pin_to_top">固定在顶部</string>
     <string name="appmenu_remove_pin">移除固定</string>
-    <string name="pref_notification_priority_entries_high">高</string>
-    <string name="pref_notification_priority_entries_low">低 （无图标）</string>
     <string name="pref_app_preferred_order_entries_recent">最近使用的优先</string>
     <string name="pref_app_preferred_order_entries_alphabetical">字母顺序</string>
     <string name="pref_app_preferred_order_entries_usages">用得最多的优先</string>

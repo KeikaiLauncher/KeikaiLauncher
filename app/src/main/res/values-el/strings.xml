@@ -18,9 +18,6 @@
     <string name="application_icon_desc">Εικονίδιο Εφαρμογής</string>
     <string name="search_view_hint">Πληκτρολογήστε κάτι…</string>
     <string name="title_activity_settings">Ρυθμίσεις</string>
-    <string name="settings_category_notification_category">Ειδοποιήσεις</string>
-    <string name="settings_enable_notification_title">Εμφάνιση ειδοποίησης στην μπάρα ειδοποιήσεων
-    </string>
     <string name="appmenu_launch">Εκκίνηση</string>
     <string name="appmenu_info">Πληροφορίες εφαρμογής</string>
     <string name="launch">Εκκίνηση</string>
@@ -29,7 +26,6 @@
     <string name="action_about">Σχετικά</string>
     <string name="action_manage_apps">Διαχείριση εφαρμογών</string>
     <string name="appmenu_onplaystore">Δες στο Google Play Store</string>
-    <string name="pref_notification_priority">Προτεραιότητα ειδοποίησης</string>
     <string name="settings_autokeyboard">Άνοιγμα πληκτρολογίου αυτόματα</string>
     <string name="settings_category_general_category">Γενικά</string>
     <string name="pref_preferred_app_order_dialog">Σειρά εφαρμογών</string>

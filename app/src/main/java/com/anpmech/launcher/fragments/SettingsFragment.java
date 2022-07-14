@@ -16,11 +16,9 @@
 package com.anpmech.launcher.fragments;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.Preference;
@@ -33,11 +31,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.anpmech.launcher.R;
-import com.anpmech.launcher.ShortcutNotificationManager;
-import com.anpmech.launcher.activities.SharedLauncherPrefs;
 
-public class SettingsFragment extends PreferenceFragment implements
-        SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsFragment extends PreferenceFragment {
 
     /**
      * This field generates a ContentObserver to enable or disable the orientation locked setting depending if
@@ -78,10 +73,6 @@ public class SettingsFragment extends PreferenceFragment implements
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-            findPreference(R.string.pref_key_notification_priority).setEnabled(false);
-        }
-
         setUsageStatisticsStatus();
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -90,7 +81,6 @@ public class SettingsFragment extends PreferenceFragment implements
     public void onPause() {
         final PreferenceScreen prefs = getPreferenceScreen();
 
-        prefs.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
         prefs.getContext().getContentResolver().unregisterContentObserver(mAccSettingObserver);
 
         super.onPause();
@@ -106,27 +96,6 @@ public class SettingsFragment extends PreferenceFragment implements
 
         context.getContentResolver().registerContentObserver(accUri, false, mAccSettingObserver);
         orientationPreference.setEnabled(isOrientationLocked());
-        orientationPreference.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
-                                          final String key) {
-        final Context context = getPreferenceScreen().getContext();
-
-        // Fragments suck.
-        if (context != null) {
-            final SharedLauncherPrefs prefs = new SharedLauncherPrefs(context);
-
-            if (key.equals(getString(R.string.pref_key_notification)) ||
-                    key.equals(getString(R.string.pref_key_notification_priority))) {
-                ShortcutNotificationManager.cancelNotification(context);
-
-                if (prefs.isNotificationEnabled()) {
-                    ShortcutNotificationManager.showNotification(context);
-                }
-            }
-        }
     }
 
     /**

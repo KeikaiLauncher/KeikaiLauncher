@@ -23,8 +23,6 @@
     <string name="overflow_menu_button">Overflow Menu Button</string>
     <string name="search_view_hint">Type something…</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="settings_category_notification_category">Notifications</string>
-    <string name="settings_enable_notification_title">Show shortcut in notification panel</string>
     <string name="settings_landscape_90">90° orientation navigation bar position</string>
     <string name="settings_landscape_270">270° orientation navigation bar position</string>
     <string name="pref_value_landscape_left">left</string>
@@ -49,15 +47,12 @@
 
     <string name="action_manage_apps">Manage apps</string>
     <string name="appmenu_onplaystore">Open on app market</string>
-    <string name="pref_notification_priority">Notification priority</string>
     <string name="settings_autokeyboard">Open keyboard automatically</string>
     <string name="settings_category_general_category">General</string>
     <string name="pref_preferred_app_order_dialog">App order</string>
     <string name="settings_disable_icon_loading">Disable icon loading</string>
     <string name="appmenu_pin_to_top">Pin To Top</string>
     <string name="appmenu_remove_pin">Remove Pin</string>
-    <string name="pref_notification_priority_entries_high">High</string>
-    <string name="pref_notification_priority_entries_low">Low (no icon)</string>
     <string name="pref_app_preferred_order_entries_recent">Most recently used first</string>
     <string name="pref_app_preferred_order_entries_alphabetical">Alphabetical order</string>
     <string name="pref_app_preferred_order_entries_usages">Most used first</string>

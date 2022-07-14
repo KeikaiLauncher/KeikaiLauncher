@@ -18,8 +18,6 @@
     <string name="application_icon_desc">Ícone do Aplicativo</string>
     <string name="search_view_hint">Digite algo…</string>
     <string name="title_activity_settings">Configurações</string>
-    <string name="settings_enable_notification_title">Exibir atalho no painel de notificações
-    </string>
     <string name="appmenu_launch">Executar</string>
     <string name="appmenu_info">Informações do aplicativo</string>
     <string name="action_about">Sobre</string>
@@ -28,13 +26,9 @@
     <string name="action_manage_apps">Gerenciar apps</string>
     <string name="appmenu_onplaystore">Abrir na loja de aplicativos</string>
     <string name="launch">Abrir</string>
-    <string name="pref_notification_priority">Prioridade da notificação</string>
-    <string name="settings_category_notification_category">Notificações</string>
     <string name="settings_autokeyboard">Abrir teclado automaticamente</string>
     <string name="settings_category_general_category">Geral</string>
     <string name="appmenu_pin_to_top">Manter no topo</string>
-    <string name="pref_notification_priority_entries_high">Alta</string>
-    <string name="pref_notification_priority_entries_low">Baixa (sem ícone)</string>
     <string name="settings_disable_icon_loading">Desabilitar carregamento de icones</string>
     <string name="pref_preferred_app_order_dialog">Ordem dos aplicativos</string>
     <string name="action_set_wallpaper">Trocar papel de parede</string>

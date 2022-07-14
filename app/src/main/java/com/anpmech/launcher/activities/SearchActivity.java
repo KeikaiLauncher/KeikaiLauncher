@@ -68,7 +68,6 @@ import com.anpmech.launcher.LaunchableActivity;
 import com.anpmech.launcher.LaunchableActivityPrefs;
 import com.anpmech.launcher.LaunchableAdapter;
 import com.anpmech.launcher.R;
-import com.anpmech.launcher.ShortcutNotificationManager;
 import com.anpmech.launcher.monitor.PackageChangeCallback;
 import com.anpmech.launcher.monitor.PackageChangedReceiver;
 
@@ -743,10 +742,6 @@ public class SearchActivity extends Activity
         final SharedLauncherPrefs prefs = new SharedLauncherPrefs(this);
         final SharedPreferences preferences = prefs.getPreferences();
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-
-        if (prefs.isNotificationEnabled()) {
-            ShortcutNotificationManager.showNotification(this);
-        }
 
         preferences.registerOnSharedPreferenceChangeListener(this);
     }
