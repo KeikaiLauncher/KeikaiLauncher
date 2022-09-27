@@ -91,6 +91,10 @@ public class LaunchableActivity {
         }
     }
 
+    public void setActivityIcon(final Drawable activityIcon) {
+        mActivityIcon = activityIcon;
+    }
+
     @Nullable
     public Drawable getActivityIcon(final Context context, final int iconSizePixels) {
         if (!isIconLoaded()) {

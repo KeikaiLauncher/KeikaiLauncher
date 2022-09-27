@@ -338,6 +338,19 @@ public class SearchActivity extends Activity
         startActivity(intentPlayStore);
     }
 
+    /**
+     * Returns a web search {@link LaunchableActivity}.
+     *
+     * @return A web search {@link LaunchableActivity}.
+     */
+    private LaunchableActivity getWebLaunchable() {
+        final Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+        final LaunchableActivity launchable = new LaunchableActivity(intent, getString(R.string.web_search), 0);
+        launchable.setActivityIcon(getResources().getDrawable(R.drawable.ic_baseline_search_24));
+
+        return launchable;
+    }
+
     private LaunchableAdapter<LaunchableActivity> loadLaunchableAdapter() {
         final LaunchableAdapter<LaunchableActivity> adapter;
         final Object object = getLastNonConfigurationInstance();
@@ -346,14 +359,15 @@ public class SearchActivity extends Activity
             final PackageManager pm = getPackageManager();
             final Collection<ResolveInfo> infoList = getLaunchableResolveInfos(pm, null);
             final int infoListSize = infoList.size();
-            adapter = new LaunchableAdapter<>(this, R.layout.app_grid_item, infoListSize);
+
+            adapter = new LaunchableAdapter<>(getWebLaunchable(), this, R.layout.app_grid_item, infoListSize);
 
             addToAdapter(adapter, infoList, true);
 
             adapter.sortApps(this);
             adapter.notifyDataSetChanged();
         } else {
-            adapter = new LaunchableAdapter<>(object, this, R.layout.app_grid_item);
+            adapter = new LaunchableAdapter<>(getWebLaunchable(), object, this, R.layout.app_grid_item);
             adapter.setNotifyOnChange(true);
         }
 

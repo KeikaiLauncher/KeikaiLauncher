@@ -38,10 +38,10 @@
         <activity
             android:name="com.anpmech.launcher.activities.SearchActivity"
             android:alwaysRetainTaskState="true"
+            android:exported="true"
             android:label="@string/title_activity_search"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="stateHidden|adjustResize"
-            android:exported="true">
+            android:windowSoftInputMode="stateHidden|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.ASSIST" />

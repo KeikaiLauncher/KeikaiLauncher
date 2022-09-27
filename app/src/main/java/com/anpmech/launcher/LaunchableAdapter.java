@@ -17,6 +17,7 @@ package com.anpmech.launcher;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.SearchManager;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.ComponentName;
@@ -122,6 +123,8 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
      */
     private final LaunchableActivityPrefs mPrefs;
 
+    private final T mSearch;
+
     private final Map<String, UsageStats> mUsageMap;
 
     /**
@@ -147,7 +150,8 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
      * @param resource The resource ID for a layout file containing a TextView to use when
      *                 instantiating views.
      */
-    public LaunchableAdapter(@NonNull final Context context, @LayoutRes final int resource,
+    public LaunchableAdapter(@NonNull final T webSearch,
+                             @NonNull final Context context, @LayoutRes final int resource,
                              final int initialSize) {
         final Resources res = context.getResources();
         mDropDownResource = resource;
@@ -157,6 +161,7 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
                 new SimpleTaskConsumerManager(getOptimalNumberOfThreads(res), 300);
         mImageTasks = new ImageLoadingTask.Factory(mIconSizePixels);
         mPrefs = new LaunchableActivityPrefs(context);
+        mSearch = webSearch;
         mUsageMap = new HashMap<>(0);
         mUsageMap.putAll(getUsageStats(context));
     }
@@ -170,9 +175,10 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
      *                 instantiating views.
      */
     @SuppressWarnings("unchecked")
-    public LaunchableAdapter(final Object object, @NonNull final Context context,
+    public LaunchableAdapter(final T webSearchLaunchable,
+                             final Object object, @NonNull final Context context,
                              @LayoutRes final int resource) {
-        this(context, resource, ((List<? extends T>[]) object)[0].size());
+        this(webSearchLaunchable, context, resource, ((List<? extends T>[]) object)[0].size());
 
         final List<? extends T>[] lists = (List<? extends T>[]) object;
         mObjects.addAll(lists[0]);
@@ -880,6 +886,11 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
                 } else {
                     final String prefixString = stripAccents(constraint).toLowerCase();
                     final Collection<T> newValues = new ArrayList<>();
+
+                    if (!prefixString.isEmpty()) {
+                        mSearch.getLaunchIntent().putExtra(SearchManager.QUERY, prefixString);
+                        newValues.add(mSearch);
+                    }
 
                     for (int i = 0; i < count; i++) {
                         final T value = values.get(i);

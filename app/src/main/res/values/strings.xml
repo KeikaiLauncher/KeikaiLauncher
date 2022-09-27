@@ -63,4 +63,5 @@
     <string name="pref_modify_android_usage_summary">
         Enable Android usage for more accurate ordering.
     </string>
+    <string name="web_search">Web Search</string>
 </resources>

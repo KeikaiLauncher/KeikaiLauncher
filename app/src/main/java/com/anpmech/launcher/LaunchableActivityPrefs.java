@@ -15,6 +15,7 @@
 
 package com.anpmech.launcher;
 
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -93,10 +94,18 @@ public class LaunchableActivityPrefs extends SQLiteOpenHelper {
      */
     public void setPreferences(final LaunchableActivity launchableActivity) {
         final SQLiteDatabase db = getReadableDatabase();
-
-        final String[] whereArgs = {launchableActivity.getComponent().getClassName()};
+        final ComponentName name = launchableActivity.getComponent();
+        final String[] whereArgs;
         final String[] columns = {KEY_LASTLAUNCHTIMESTAMP, KEY_USAGE_QUANTITY, KEY_FAVORITE};
-        final Cursor cursor = db.query(TABLE_NAME, columns, KEY_CLASSNAME + "=?", whereArgs, null,
+        final Cursor cursor;
+
+        if (name == null) {
+            whereArgs = new String[]{launchableActivity.toString()};
+        } else {
+            whereArgs = new String[]{name.getClassName()};
+        }
+
+        cursor = db.query(TABLE_NAME, columns, KEY_CLASSNAME + "=?", whereArgs, null,
                 null, null);
 
         if (cursor.moveToFirst()) {
@@ -132,7 +141,8 @@ public class LaunchableActivityPrefs extends SQLiteOpenHelper {
         final ContentValues values = new ContentValues();
         final int priority = launchableActivity.getPriority();
         final int usageQuantity = launchableActivity.getUsageQuantity();
-        final String className = launchableActivity.getComponent().getClassName();
+        final ComponentName name = launchableActivity.getComponent();
+        final String className;
 
         if (priority > 0) {
             values.put(KEY_FAVORITE, priority);
@@ -141,6 +151,12 @@ public class LaunchableActivityPrefs extends SQLiteOpenHelper {
         if (usageQuantity > 0) {
             values.put(KEY_LASTLAUNCHTIMESTAMP, launchableActivity.getLaunchTime());
             values.put(KEY_USAGE_QUANTITY, usageQuantity);
+        }
+
+        if (name == null) {
+            className = launchableActivity.toString();
+        } else {
+            className = name.getClassName();
         }
 
         if (values.size() == 0) {
