@@ -99,7 +99,11 @@ public class LaunchableActivity {
                     final PackageManager pm = context.getPackageManager();
                     final Resources resources = pm.getResourcesForActivity(getComponent());
 
-                    //noinspection deprecation
+                    /*
+                      This is NOT pm.getActivityIcon() because that fails when a application
+                      contains more than one activity. There may be a more structural reason that
+                      I'm not aware of.
+                     */
                     mActivityIcon = resources.getDrawable(mIconResource);
 
                 } catch (PackageManager.NameNotFoundException | Resources.NotFoundException e) {
