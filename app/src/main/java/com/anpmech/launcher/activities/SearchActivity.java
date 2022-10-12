@@ -15,25 +15,30 @@
 
 package com.anpmech.launcher.activities;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.LauncherActivityInfo;
+import android.content.pm.LauncherApps;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.ContentObserver;
+import android.graphics.drawable.Drawable;
 import android.hardware.display.DisplayManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.UserHandle;
+import android.os.UserManager;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.text.Editable;
@@ -60,6 +65,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.DeprecatedSinceApi;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -73,6 +79,7 @@ import com.anpmech.launcher.monitor.PackageChangeCallback;
 import com.anpmech.launcher.monitor.PackageChangedReceiver;
 
 import java.util.Collection;
+import java.util.ListIterator;
 
 public class SearchActivity extends Activity
         implements SharedPreferences.OnSharedPreferenceChangeListener, PackageChangeCallback {
@@ -228,32 +235,51 @@ public class SearchActivity extends Activity
         return hasNavBar;
     }
 
-    private void addToAdapter(@NonNull final LaunchableAdapter<LaunchableActivity> adapter,
-                              @NonNull final Iterable<ResolveInfo> infoList,
-                              final boolean useReadCache) {
+    /**
+     * This method adds LauncherActivityInfo objects to an adapter in API 24+.
+     *
+     * @param adapter  The adapter to add to.
+     * @param infoList The objects to add to the adapter.
+     */
+    @TargetApi(Build.VERSION_CODES.N)
+    private void addToAdapter24(@NonNull final LaunchableAdapter<LaunchableActivity> adapter,
+                                @NonNull final Iterable<LauncherActivityInfo> infoList) {
+        final String thisCanonicalName = getClass().getCanonicalName();
+        final UserManager manager = (UserManager) getSystemService(Context.USER_SERVICE);
+        final boolean shouldLoadIcons = new SharedLauncherPrefs(this).areIconsEnabled();
+
+        for (final LauncherActivityInfo info : infoList) {
+            if (!thisCanonicalName.startsWith(info.getName())) {
+                adapter.add(new LaunchableActivity(info, manager, shouldLoadIcons));
+            }
+        }
+    }
+
+    /**
+     * This method adds ResolveInfo objects to an adapter in SDK 15-24, optionally using a
+     * readCache.
+     *
+     * @param adapter      The adapter to add ResolveInfo object to.
+     * @param infoList     The ResolveInfo object to add to the adapter.
+     * @param useReadCache Whether to use a read cache.
+     */
+    @DeprecatedSinceApi(api = Build.VERSION_CODES.N, message = "Later APIs use addToAdapter24()")
+    private void addToAdapter15(@NonNull final LaunchableAdapter<LaunchableActivity> adapter,
+                                @NonNull final Iterable<ResolveInfo> infoList,
+                                final boolean useReadCache) {
         final SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
         final String thisCanonicalName = getClass().getCanonicalName();
+        final PackageManager manager;
+
+        if (useReadCache) {
+            manager = getPackageManager();
+        } else {
+            manager = null;
+        }
 
         for (final ResolveInfo info : infoList) {
             if (!thisCanonicalName.startsWith(info.activityInfo.packageName)) {
-                final ActivityInfo activityInfo = info.activityInfo;
-                final ComponentName name =
-                        new ComponentName(activityInfo.packageName, activityInfo.name);
-                final Intent launchIntent = Intent.makeMainActivity(name);
-                final int iconResource = info.getIconResource();
-                final String label;
-
-                launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                        Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-
-                if (prefs.contains(activityInfo.packageName) && useReadCache) {
-                    label = prefs.getString(activityInfo.packageName, null);
-                } else {
-                    label = info.loadLabel(getPackageManager()).toString();
-                    prefs.edit().putString(activityInfo.packageName, label).apply();
-                }
-
-                adapter.add(new LaunchableActivity(launchIntent, label, iconResource));
+                adapter.add(new LaunchableActivity(info, prefs, manager));
             }
         }
     }
@@ -290,23 +316,35 @@ public class SearchActivity extends Activity
         final LaunchableActivityPrefs launchableprefs = new LaunchableActivityPrefs(this);
 
         hideKeyboard();
-        try {
-            // this is where an APP is actually started
-            startActivity(launchableActivity.getLaunchIntent());
-            mSearchEditText.setText(null);
-            launchableActivity.setLaunchTime();
-            launchableActivity.addUsage();
-            launchableprefs.writePreference(launchableActivity);
+        // Second conditional is always true, but this shuts up warnings.
+        if (launchableActivity.isUserKnown() &&
+                Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            final UserManager userManager = (UserManager) getSystemService(Context.USER_SERVICE);
+            final LauncherApps launcher =
+                    (LauncherApps) getSystemService(Context.LAUNCHER_APPS_SERVICE);
+            final long userSerial = launchableActivity.getUserSerial();
+            final UserHandle userHandle = userManager.getUserForSerialNumber(userSerial);
 
-            mAdapter.sortApps(this);
-        } catch (final ActivityNotFoundException e) {
-            if (BuildConfig.DEBUG) {
-                throw e;
-            } else {
-                final String notFound = getString(R.string.activity_not_found);
+            launcher.startMainActivity(launchableActivity.getComponent(), userHandle,
+                    null, Bundle.EMPTY);
+        } else {
+            try {
+                startActivity(launchableActivity.getLaunchIntent());
+                mSearchEditText.setText(null);
+                launchableActivity.setLaunchTime();
+                launchableActivity.addUsage();
+                launchableprefs.writePreference(launchableActivity);
 
-                Log.e(TAG, notFound, e);
-                Toast.makeText(this, notFound, Toast.LENGTH_SHORT).show();
+                mAdapter.sortApps(this);
+            } catch (final ActivityNotFoundException e) {
+                if (BuildConfig.DEBUG) {
+                    throw e;
+                } else {
+                    final String notFound = getString(R.string.activity_not_found);
+
+                    Log.e(TAG, notFound, e);
+                    Toast.makeText(this, notFound, Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
@@ -342,10 +380,16 @@ public class SearchActivity extends Activity
      */
     private LaunchableActivity getWebLaunchable() {
         final Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-        final LaunchableActivity launchable = new LaunchableActivity(intent, getString(R.string.web_search), 0);
-        launchable.setActivityIcon(getResources().getDrawable(R.drawable.ic_baseline_search_24));
+        final boolean shouldLoadIcons = new SharedLauncherPrefs(this).areIconsEnabled();
+        final Drawable icon;
 
-        return launchable;
+        if (shouldLoadIcons) {
+            icon = getResources().getDrawable(R.drawable.ic_baseline_search_24);
+        } else {
+            icon = null;
+        }
+
+        return new LaunchableActivity(intent, getString(R.string.web_search), icon);
     }
 
     private LaunchableAdapter<LaunchableActivity> loadLaunchableAdapter() {
@@ -354,13 +398,29 @@ public class SearchActivity extends Activity
 
         if (object == null) {
             final PackageManager pm = getPackageManager();
-            final Collection<ResolveInfo> infoList = getLaunchableResolveInfos(pm, null);
-            final int infoListSize = infoList.size();
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                final UserManager manager = (UserManager) getSystemService(Context.USER_SERVICE);
+                final LauncherApps launcherApps = (LauncherApps) getSystemService(Context.LAUNCHER_APPS_SERVICE);
+                final ListIterator<UserHandle> iter = manager.getUserProfiles().listIterator();
+                int count = 1; // Add the web launchable to the count
 
-            adapter = new LaunchableAdapter<>(getWebLaunchable(), this, R.layout.app_grid_item, infoListSize);
+                while (iter.hasNext()) {
+                    count += launcherApps.getActivityList(null, iter.next()).size();
+                }
 
-            addToAdapter(adapter, infoList, true);
+                adapter = new LaunchableAdapter<>(getWebLaunchable(), this, R.layout.app_grid_item, count);
 
+                while (iter.hasPrevious()) {
+                    addToAdapter24(adapter, launcherApps.getActivityList(null, iter.previous()));
+                }
+            } else {
+                final Collection<ResolveInfo> infoList = getLaunchableResolveInfos(pm, null);
+                final int infoListSize = infoList.size();
+
+                adapter = new LaunchableAdapter<>(getWebLaunchable(), this, R.layout.app_grid_item, infoListSize + 1);
+
+                addToAdapter15(adapter, infoList, true);
+            }
             adapter.sortApps(this);
             adapter.notifyDataSetChanged();
         } else {
@@ -474,13 +534,26 @@ public class SearchActivity extends Activity
      * @param activityName The name of the {@link Activity} of the package which appeared.
      */
     @Override
-    public void onPackageAppeared(final String activityName) {
+    public void onPackageAppeared(final String activityName, int[] uids) {
         final PackageManager pm = getPackageManager();
-        final Iterable<ResolveInfo> resolveInfos = getLaunchableResolveInfos(pm, activityName);
 
         synchronized (mLock) {
             if (mAdapter.getClassNamePosition(activityName) == -1) {
-                addToAdapter(mAdapter, resolveInfos, false);
+
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    final LauncherApps launcherApps =
+                            (LauncherApps) getSystemService(Context.LAUNCHER_APPS_SERVICE);
+
+                    for (int uid : uids) {
+                        addToAdapter24(mAdapter, launcherApps.getActivityList(activityName,
+                                UserHandle.getUserHandleForUid(uid)));
+                    }
+                } else {
+                    final Iterable<ResolveInfo> resolveInfos =
+                            getLaunchableResolveInfos(pm, activityName);
+
+                    addToAdapter15(mAdapter, resolveInfos, false);
+                }
                 mAdapter.sortApps(this);
                 updateFilter(mSearchEditText.getText());
             }
@@ -493,7 +566,7 @@ public class SearchActivity extends Activity
      * @param activityName The name of the {@link Activity} of the package which disappeared.
      */
     @Override
-    public void onPackageDisappeared(final String activityName) {
+    public void onPackageDisappeared(final String activityName, int[] uids) {
         synchronized (mLock) {
             mAdapter.removeAllByName(activityName);
             updateFilter(mSearchEditText.getText());
@@ -506,10 +579,10 @@ public class SearchActivity extends Activity
      * @param activityName The name of the {@link Activity} of the package which was modified.
      */
     @Override
-    public void onPackageModified(final String activityName) {
+    public void onPackageModified(final String activityName, int uid) {
         synchronized (mLock) {
-            onPackageDisappeared(activityName);
-            onPackageAppeared(activityName);
+            onPackageDisappeared(activityName, new int[]{uid});
+            onPackageAppeared(activityName, new int[]{uid});
         }
     }
 

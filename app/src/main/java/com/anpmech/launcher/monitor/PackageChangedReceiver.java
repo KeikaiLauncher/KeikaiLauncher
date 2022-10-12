@@ -73,29 +73,56 @@ public class PackageChangedReceiver extends BroadcastReceiver {
      */
     private static PackageChangeCallback sCallback;
 
+    /**
+     * This method retrieves the Unix-type UIDs from an {@link Intent} and returns them.
+     *
+     * @param intent The {@link Intent} to retrieve the Unix-type UIDs from, not to be confused
+     *               with user serials.
+     * @return The retrieved UIDs.
+     */
+    private static int[] getUids(final Intent intent) {
+        int[] uids;
+
+        if (intent.hasExtra(Intent.EXTRA_UID)) {
+            uids = new int[]{intent.getIntExtra(Intent.EXTRA_UID, -1)};
+        } else if (intent.hasExtra(Intent.EXTRA_CHANGED_PACKAGE_LIST)) {
+            uids = intent.getIntArrayExtra(Intent.EXTRA_CHANGED_PACKAGE_LIST);
+        } else {
+            uids = new int[]{-1};
+        }
+
+        return uids;
+    }
+
     private static void actOnIntent(final Intent intent) {
         final String action = intent.getAction();
 
         switch (intent.getAction()) {
             case Intent.ACTION_PACKAGE_ADDED:
-                sendPackageName(PACKAGE_APPEARED, intent.getData().getSchemeSpecificPart());
+                sendPackageName(PACKAGE_APPEARED,
+                        getUids(intent),
+                        intent.getData().getSchemeSpecificPart());
                 break;
             case Intent.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE:
             case Intent.ACTION_PACKAGES_UNSUSPENDED:
                 sendPackageName(PACKAGE_APPEARED,
+                        getUids(intent),
                         intent.getStringArrayExtra(Intent.EXTRA_CHANGED_PACKAGE_LIST));
                 break;
             case Intent.ACTION_PACKAGE_REMOVED:
-                sendPackageName(PACKAGE_DISAPPEARED, intent.getData().getSchemeSpecificPart());
+                sendPackageName(PACKAGE_DISAPPEARED,
+                        getUids(intent),
+                        intent.getData().getSchemeSpecificPart());
                 break;
             case Intent.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE:
             case Intent.ACTION_PACKAGES_SUSPENDED:
-                sendPackageName(PACKAGE_DISAPPEARED,
+                sendPackageName(PACKAGE_DISAPPEARED, getUids(intent),
                         intent.getStringArrayExtra(Intent.EXTRA_CHANGED_PACKAGE_LIST));
                 break;
             case Intent.ACTION_PACKAGE_CHANGED:
             case Intent.ACTION_PACKAGE_REPLACED:
-                sendPackageName(PACKAGE_CHANGED, intent.getData().getSchemeSpecificPart());
+                sendPackageName(PACKAGE_CHANGED, getUids(intent),
+                        intent.getData().getSchemeSpecificPart());
                 break;
             case ACTION_DELAYED:
                 // This will happen if a second intent processes the delayed intent first.
@@ -130,9 +157,11 @@ public class PackageChangedReceiver extends BroadcastReceiver {
      * This method is used to implement the callbacks.
      *
      * @param action   The action which took place.
+     * @param users    The user(s) assigned to the packages
      * @param packages The package which appeared, changed or disappeared.
      */
-    private static void sendPackageName(final int action, final String... packages) {
+    private static void sendPackageName(final int action, final int[] users,
+                                        final String... packages) {
         if (packages != null) {
             for (String newPackage : packages) {
                 if ((int) newPackage.charAt(newPackage.length() - 1) == (int) ' ') {
@@ -142,15 +171,15 @@ public class PackageChangedReceiver extends BroadcastReceiver {
                 switch (action) {
                     case PACKAGE_APPEARED:
                         Log.d(TAG, "Package appeared: " + newPackage);
-                        sCallback.onPackageAppeared(newPackage);
+                        sCallback.onPackageAppeared(newPackage, users);
                         break;
                     case PACKAGE_CHANGED:
                         Log.d(TAG, "Package changed: " + newPackage);
-                        sCallback.onPackageModified(newPackage);
+                        sCallback.onPackageModified(newPackage, users[0]);
                         break;
                     case PACKAGE_DISAPPEARED:
                         Log.d(TAG, "Package disappeared: " + newPackage);
-                        sCallback.onPackageDisappeared(newPackage);
+                        sCallback.onPackageDisappeared(newPackage, users);
                         break;
                     default:
                         break;

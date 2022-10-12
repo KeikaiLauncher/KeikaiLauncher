@@ -18,17 +18,23 @@ package com.anpmech.launcher;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.LauncherActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.os.UserManager;
 import android.util.Log;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 
 public class LaunchableActivity {
@@ -44,6 +50,12 @@ public class LaunchableActivity {
 
     private final Object mLock = new Object();
 
+    /**
+     * The user serial, to be used to retrieve a {@link android.os.UserHandle} as necessary.
+     * Defined as {@code Long.MIN_VALUE} if there is no user serial assigned to this object.
+     */
+    private final long mUserSerial;
+
     private Drawable mActivityIcon;
 
     private long mLastLaunchTime;
@@ -54,32 +66,88 @@ public class LaunchableActivity {
 
     private int mUsagesQuantity;
 
-    public LaunchableActivity(@NonNull final Intent intent, @NonNull final String activityLabel,
-                              @DrawableRes final int iconResource) {
-        mLaunchIntent = intent;
-        mActivityLabel = activityLabel;
-        mIconResource = iconResource;
+    /**
+     * This is the constructor for LaunchableActivities, used in a {@link LaunchableAdapter}, for
+     * API 21+.
+     *
+     * @param info           Information to derive the LaunchableActivity from.
+     * @param manager        The service to retrieve user information about the activity from.
+     * @param shouldLoadIcon Whether the icon should be loaded from the {@code info}.
+     */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public LaunchableActivity(@NonNull final LauncherActivityInfo info, final UserManager manager,
+                              final boolean shouldLoadIcon) {
+        mLaunchIntent = getLaunchableIntent(info.getComponentName());
+        mActivityLabel = info.getLabel().toString();
+        mIconResource = Integer.MIN_VALUE;
+        mUserSerial = manager.getSerialNumberForUser(info.getUser());
+
+        if (shouldLoadIcon) {
+            mActivityIcon = info.getBadgedIcon(R.dimen.app_icon_size);
+        } else {
+            mActivityIcon = null;
+        }
     }
 
     /**
-     * This is a convenience method to create a LaunchableActivity.
+     * This is a constructor used for manual {@code LaunchableActivity} creation.
      *
-     * @param info The {@link ActivityInfo} to extract information from.
-     * @param pm   The PackageManager to use to extract information from.
-     * @return A LaunchableActivity based off the ActivityInfo given.
+     * @param intent The {@link Intent} to create this from.
+     * @param label  The label to construct this object with.
+     * @param icon   The icon to use for this object. If null, the Android icon will be loaded.
      */
-    public static LaunchableActivity getLaunchable(@NonNull final ActivityInfo info,
-                                                   @NonNull final PackageManager pm) {
-        final Intent launchIntent = new Intent(Intent.ACTION_MAIN);
-        final String label = info.loadLabel(pm).toString();
-        final int iconResource = info.getIconResource();
+    public LaunchableActivity(@NonNull final Intent intent, @NonNull final String label,
+                              @Nullable final Drawable icon) {
+        mLaunchIntent = intent;
+        mActivityLabel = label;
+        mActivityIcon = icon;
+        mIconResource = Integer.MIN_VALUE;
+        mUserSerial = Long.MIN_VALUE;
+    }
 
-        launchIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+    /**
+     * This is the constructor for LaunchableActivities, used in a {@link LaunchableAdapter}, for
+     * APIs 15-20. If this constructor is used, {@code LaunchableActivity.getActivityIcon()} will
+     * need to be called to load the icon from the icon resource.
+     *
+     * @param info    Information to derive the LaunchableActivity from.
+     * @param prefs   The {@link SharedPreferences} to load the label for this from.
+     * @param manager The {@link PackageManager} to load the label for this from. If null, the
+     *                local store will not cache the label.
+     */
+    public LaunchableActivity(@NonNull final ResolveInfo info,
+                              @NonNull final SharedPreferences prefs,
+                              @Nullable final PackageManager manager) {
+        final ActivityInfo activityInfo = info.activityInfo;
+        final ComponentName name =
+                new ComponentName(activityInfo.packageName, activityInfo.name);
+        mLaunchIntent = getLaunchableIntent(name);
+        mIconResource = info.getIconResource();
+
+        /**
+         * Returns the actual label from the info and stores it locally, or retrieve it locally.
+         */
+        if (prefs.contains(activityInfo.packageName) && manager != null) {
+            mActivityLabel = prefs.getString(activityInfo.packageName, null);
+        } else {
+            mActivityLabel = info.loadLabel(manager).toString();
+            prefs.edit().putString(activityInfo.packageName, mActivityLabel).apply();
+        }
+
+        mUserSerial = Long.MIN_VALUE;
+    }
+
+    private static Intent getLaunchableIntent(final ComponentName componentName) {
+        final Intent launchIntent = Intent.makeMainActivity(componentName);
+
         launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                 Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-        launchIntent.setComponent(new ComponentName(info.packageName, info.name));
 
-        return new LaunchableActivity(launchIntent, label, iconResource);
+        return launchIntent;
+    }
+
+    public boolean isUserKnown() {
+        return mUserSerial != Long.MIN_VALUE;
     }
 
     public void addUsage() {
@@ -90,10 +158,6 @@ public class LaunchableActivity {
         synchronized (mLock) {
             mActivityIcon = null;
         }
-    }
-
-    public void setActivityIcon(final Drawable activityIcon) {
-        mActivityIcon = activityIcon;
     }
 
     @Nullable
@@ -130,6 +194,17 @@ public class LaunchableActivity {
             }
         }
         return mActivityIcon;
+    }
+
+    /**
+     * The user serial, to be used to retrieve a {@link android.os.UserHandle} as necessary.
+     *
+     * @return A user serial, {@code Long.MIN_VALUE} if there is no user serial assigned to this
+     * object.
+     */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public long getUserSerial() {
+        return mUserSerial;
     }
 
     public ComponentName getComponent() {

@@ -23,20 +23,23 @@ public interface PackageChangeCallback {
      * Called when a package appears for any reason.
      *
      * @param activityName The name of the {@link Activity} of the package which appeared.
+     * @param uids         Unix-type UIDs which use this activity, not to be confused with user serials.
      */
-    void onPackageAppeared(String activityName);
+    void onPackageAppeared(String activityName, int[] uids);
 
     /**
      * Called when a package disappears for any reason.
      *
      * @param activityName The name of the {@link Activity} of the package which disappeared.
+     * @param uids         Unix-type UIDs which use this activity, not to be confused with user serials.
      */
-    void onPackageDisappeared(String activityName);
+    void onPackageDisappeared(String activityName, int[] uids);
 
     /**
      * Called when an existing package is updated or its disabled state changes.
      *
      * @param activityName The name of the {@link Activity} of the package which was modified.
+     * @param uid          Unix-type UID which use this activity, not to be confused with a user serial.
      */
-    void onPackageModified(String activityName);
+    void onPackageModified(String activityName, int uid);
 }
