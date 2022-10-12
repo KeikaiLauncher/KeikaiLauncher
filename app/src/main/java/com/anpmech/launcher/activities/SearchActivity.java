@@ -79,18 +79,14 @@ public class SearchActivity extends Activity
     private static final String SEARCH_EDIT_TEXT_KEY = "SearchEditText";
 
     private static final String TAG = "SearchActivity";
-
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
-    private final DisplayManager.DisplayListener mDisplayListener = new DisplayChangeListener();
-
     /**
      * Synchronize to this lock when the Adapter is visible and might be called by multiple
      * threads.
      */
     private final Object mLock = new Object();
-
     private final BroadcastReceiver mPackageChangeReceiver = new PackageChangedReceiver();
-
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    private DisplayManager.DisplayListener mDisplayListener = null;
     /**
      * This ContentObserver is used by the ContentResolver to register a callback to set rotation in case it changes
      * in the system settings.
@@ -647,6 +643,10 @@ public class SearchActivity extends Activity
         // with BroadcastReceiver registration and unregistration with that scenario.
         mSearchEditText = findViewById(R.id.user_search_input);
         mAdapter = loadLaunchableAdapter();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            mDisplayListener = new DisplayChangeListener();
+        }
 
         registerReceiver(mPackageChangeReceiver, PackageChangedReceiver.getFilter());
         PackageChangedReceiver.setCallback(this);
