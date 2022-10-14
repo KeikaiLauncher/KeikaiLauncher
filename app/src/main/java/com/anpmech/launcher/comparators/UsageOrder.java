@@ -24,24 +24,15 @@ public class UsageOrder implements Comparator<LaunchableActivity> {
 
     @Override
     public int compare(final LaunchableActivity lhs, final LaunchableActivity rhs) {
-        final int compare;
         long lhsResult = lhs.getUsageTime();
         long rhsResult = rhs.getUsageTime();
 
         // Prefer the more accurate usage time. If one is -1L, all will be.
         if (lhsResult == -1L) {
-            lhsResult = (long) lhs.getUsageQuantity();
-            rhsResult = (long) rhs.getUsageQuantity();
+            lhsResult = lhs.getUsageQuantity();
+            rhsResult = rhs.getUsageQuantity();
         }
 
-        if (lhsResult > rhsResult) {
-            compare = -1;
-        } else if (lhsResult < rhsResult) {
-            compare = 1;
-        } else {
-            compare = 0;
-        }
-
-        return compare;
+        return Long.compare(rhsResult, lhsResult);
     }
 }

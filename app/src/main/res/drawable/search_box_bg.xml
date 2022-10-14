@@ -23,7 +23,7 @@
     </item>
 
     <item android:bottom="3px">
-        <shape xmlns:android="http://schemas.android.com/apk/res/android">
+        <shape>
             <solid android:color="#ffffff" />
             <stroke
                 android:width="0.5dip"

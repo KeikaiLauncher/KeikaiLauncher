@@ -44,7 +44,6 @@ public class AboutActivity extends Activity {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             result = Html.fromHtml(sb, Html.FROM_HTML_MODE_LEGACY);
         } else {
-            //noinspection deprecation
             result = Html.fromHtml(sb);
         }
 

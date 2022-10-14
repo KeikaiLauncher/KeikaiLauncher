@@ -24,18 +24,6 @@ public class RecentOrder implements Comparator<LaunchableActivity> {
 
     @Override
     public int compare(final LaunchableActivity lhs, final LaunchableActivity rhs) {
-        final long lhsLaunchTime = lhs.getLaunchTime();
-        final long rhsLaunchTime = rhs.getLaunchTime();
-        final int compare;
-
-        if (lhsLaunchTime > rhsLaunchTime) {
-            compare = -1;
-        } else if (lhsLaunchTime < rhsLaunchTime) {
-            compare = 1;
-        } else {
-            compare = 0;
-        }
-
-        return compare;
+        return Long.compare(rhs.getLaunchTime(), lhs.getLaunchTime());
     }
 }

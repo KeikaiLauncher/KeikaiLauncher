@@ -39,11 +39,6 @@
         19
     </style>
 
-    <!-- Application theme. -->
-    <style name="AppTheme" parent="@android:style/Theme.Holo.Light.NoActionBar">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-    </style>
-
     <!-- use this style for a text view that is a caption to a paragraph of text -->
     <style name="CaptionTextBase">
         <item name="android:layout_width">match_parent</item>

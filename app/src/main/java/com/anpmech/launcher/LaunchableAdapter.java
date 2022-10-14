@@ -156,7 +156,7 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
                              final int initialSize) {
         final Resources res = context.getResources();
         mDropDownResource = resource;
-        mObjects = Collections.synchronizedList(new ArrayList<T>(initialSize));
+        mObjects = Collections.synchronizedList(new ArrayList<>(initialSize));
         mIconSizePixels = res.getDimensionPixelSize(R.dimen.app_icon_size);
         mImageLoadingConsumersManager =
                 new SimpleTaskConsumerManager(getOptimalNumberOfThreads(res), 300);
@@ -700,7 +700,6 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
             }
 
             for (int i = current.size() - 1; i >= 0; i--) {
-                //noinspection ConstantConditions
                 component = current.get(i).getComponent();
 
                 if (component.getClassName().startsWith(name)) {
