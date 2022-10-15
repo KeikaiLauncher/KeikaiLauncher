@@ -30,6 +30,7 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.ContentObserver;
+import android.graphics.Insets;
 import android.graphics.drawable.Drawable;
 import android.hardware.display.DisplayManager;
 import android.net.Uri;
@@ -52,6 +53,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -636,7 +638,11 @@ public class SearchActivity extends Activity
         }
 
         setRotation(prefs);
-        setupPadding();
+        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            setupPadding30();
+        } else {
+            setupPadding15();
+        }
         final Uri accUri = Settings.System.getUriFor(Settings.System.ACCELEROMETER_ROTATION);
         getContentResolver().registerContentObserver(accUri, false, mAccSettingObserver);
     }
@@ -780,9 +786,42 @@ public class SearchActivity extends Activity
 
     /**
      * This method dynamically sets the padding for the outer boundaries of the masterLayout and
-     * appContainer.
+     * appContainer for API SDK 30+.
      */
-    private void setupPadding() {
+    @RequiresApi(Build.VERSION_CODES.R)
+    private void setupPadding30() {
+        final Resources resources = getResources();
+        final View masterLayout = findViewById(R.id.masterLayout);
+        final View appContainer = findViewById(R.id.appsContainer);
+        final int appTop = resources.getDimensionPixelSize(R.dimen.activity_vertical_margin);
+
+        if (isInMultiWindowMode()) {
+            masterLayout.setFitsSystemWindows(true);
+            appContainer.setPadding(0, appTop, 0, 0);
+        } else {
+            masterLayout.setFitsSystemWindows(false);
+            final int searchUpperPadding = getDimensionSize(resources, "status_bar_height");
+            final WindowInsets windowInsets = getWindowManager().getCurrentWindowMetrics()
+                    .getWindowInsets();
+            final int navBars = WindowInsets.Type.navigationBars();
+            final Insets insets = windowInsets.getInsets(navBars);
+
+            // If the navigation bar is on the side, don't put apps under it.
+            masterLayout.setPadding(insets.left, searchUpperPadding, insets.right, 0);
+
+            // If the navigation bar is at the bottom, stop the icons above it.
+            appContainer.setPadding(0, appTop, 0, insets.bottom);
+        }
+    }
+
+    /**
+     * This method dynamically sets the padding for the outer boundaries of the masterLayout and
+     * appContainer for API SDK 15-30. This is mostly hacky way around the lack of an API that
+     * was provided in 30. It's resource heavy and ugly, but it works in the vast majority of
+     * cases.
+     */
+    @DeprecatedSinceApi(api = Build.VERSION_CODES.R, message = "Later APIs use setupPadding30().")
+    private void setupPadding15() {
         final Resources resources = getResources();
         final View masterLayout = findViewById(R.id.masterLayout);
         final View appContainer = findViewById(R.id.appsContainer);
@@ -913,7 +952,11 @@ public class SearchActivity extends Activity
 
         @Override
         public void onDisplayChanged(final int displayId) {
-            setupPadding();
+            if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                setupPadding30();
+            } else {
+                setupPadding15();
+            }
         }
 
         @Override

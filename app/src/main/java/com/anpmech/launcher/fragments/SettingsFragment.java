@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.Preference;
@@ -75,6 +76,9 @@ public class SettingsFragment extends PreferenceFragment {
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
         setUsageStatisticsStatus();
+        findPreference("pref_category_tweaks")
+                .setEnabled(Build.VERSION.SDK_INT < Build.VERSION_CODES.R);
+
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
