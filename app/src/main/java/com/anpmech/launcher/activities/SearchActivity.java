@@ -62,6 +62,7 @@ import android.widget.GridView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.anpmech.launcher.BuildConfig;
 import com.anpmech.launcher.LaunchableActivity;
 import com.anpmech.launcher.LaunchableActivityPrefs;
@@ -144,7 +145,7 @@ public class SearchActivity extends Activity
     }
 
     private static Collection<ResolveInfo> getLaunchableResolveInfos(final PackageManager pm,
-            @Nullable final String activityName) {
+                                                                     @Nullable final String activityName) {
         final Intent intent = new Intent();
 
         intent.setAction(Intent.ACTION_MAIN);
@@ -232,8 +233,8 @@ public class SearchActivity extends Activity
     }
 
     private void addToAdapter(@NonNull final LaunchableAdapter<LaunchableActivity> adapter,
-            @NonNull final Iterable<ResolveInfo> infoList,
-            final boolean useReadCache) {
+                              @NonNull final Iterable<ResolveInfo> infoList,
+                              final boolean useReadCache) {
         final SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
         final String thisCanonicalName = getClass().getCanonicalName();
 
@@ -400,7 +401,7 @@ public class SearchActivity extends Activity
 
     @Override
     public void onCreateContextMenu(final ContextMenu menu, final View v,
-            final ContextMenuInfo menuInfo) {
+                                    final ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
         final MenuInflater inflater = getMenuInflater();
@@ -614,7 +615,7 @@ public class SearchActivity extends Activity
 
     @Override
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
-            final String key) {
+                                          final String key) {
         //does this need to run in uiThread?
         if (getString(R.string.pref_key_preferred_order).equals(key)) {
             mAdapter.sortApps(this);
@@ -796,13 +797,13 @@ public class SearchActivity extends Activity
 
         @Override
         public void onItemClick(final AdapterView<?> parent, final View view,
-                final int position, final long id) {
+                                final int position, final long id) {
             launchActivity(view);
         }
 
         @Override
         public void onScroll(final AbsListView view, final int firstVisibleItem,
-                final int visibleItemCount, final int totalItemCount) {
+                             final int visibleItemCount, final int totalItemCount) {
         }
 
         @Override
@@ -847,7 +848,7 @@ public class SearchActivity extends Activity
 
         @Override
         public void beforeTextChanged(final CharSequence s, final int start, final int count,
-                final int after) {
+                                      final int after) {
             //do nothing
         }
 
@@ -870,7 +871,7 @@ public class SearchActivity extends Activity
 
         @Override
         public void onTextChanged(final CharSequence s, final int start, final int before,
-                final int count) {
+                                  final int count) {
             updateFilter(s);
             final View clearButton = findViewById(R.id.clear_button);
 

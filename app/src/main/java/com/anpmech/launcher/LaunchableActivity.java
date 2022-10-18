@@ -54,7 +54,7 @@ public class LaunchableActivity {
     private int mUsagesQuantity;
 
     public LaunchableActivity(@NonNull final Intent intent, @NonNull final String activityLabel,
-            @DrawableRes final int iconResource) {
+                              @DrawableRes final int iconResource) {
         mLaunchIntent = intent;
         mActivityLabel = activityLabel;
         mIconResource = iconResource;
@@ -68,7 +68,7 @@ public class LaunchableActivity {
      * @return A LaunchableActivity based off the ActivityInfo given.
      */
     public static LaunchableActivity getLaunchable(@NonNull final ActivityInfo info,
-            @NonNull final PackageManager pm) {
+                                                   @NonNull final PackageManager pm) {
         final Intent launchIntent = new Intent(Intent.ACTION_MAIN);
         final String label = info.loadLabel(pm).toString();
         final int iconResource = info.getIconResource();
@@ -135,12 +135,24 @@ public class LaunchableActivity {
         return mLastLaunchTime;
     }
 
+    public void setLaunchTime(final long timestamp) {
+        mLastLaunchTime = timestamp;
+    }
+
     public int getPriority() {
         return mPriority;
     }
 
+    public void setPriority(final int priority) {
+        mPriority = priority;
+    }
+
     public int getUsageQuantity() {
         return mUsagesQuantity;
+    }
+
+    public void setUsageQuantity(final int usagesQuantity) {
+        mUsagesQuantity = usagesQuantity;
     }
 
     /**
@@ -155,26 +167,6 @@ public class LaunchableActivity {
         return mUsageTime;
     }
 
-    public boolean isIconLoaded() {
-        return mActivityIcon != null;
-    }
-
-    public void setLaunchTime() {
-        mLastLaunchTime = System.currentTimeMillis() / 1000;
-    }
-
-    public void setLaunchTime(final long timestamp) {
-        mLastLaunchTime = timestamp;
-    }
-
-    public void setPriority(final int priority) {
-        mPriority = priority;
-    }
-
-    public void setUsageQuantity(final int usagesQuantity) {
-        mUsagesQuantity = usagesQuantity;
-    }
-
     /**
      * This method sets the usage time.
      *
@@ -182,6 +174,14 @@ public class LaunchableActivity {
      */
     public void setUsageTime(final long usageTime) {
         mUsageTime = usageTime;
+    }
+
+    public boolean isIconLoaded() {
+        return mActivityIcon != null;
+    }
+
+    public void setLaunchTime() {
+        mLastLaunchTime = System.currentTimeMillis() / 1000;
     }
 
     @Override

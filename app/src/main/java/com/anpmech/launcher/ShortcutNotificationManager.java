@@ -22,6 +22,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+
 import com.anpmech.launcher.activities.SearchActivity;
 import com.anpmech.launcher.activities.SharedLauncherPrefs;
 

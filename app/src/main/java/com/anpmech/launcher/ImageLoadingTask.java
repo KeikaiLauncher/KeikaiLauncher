@@ -19,6 +19,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.widget.ImageView;
+
 import com.anpmech.launcher.threading.SimpleTaskConsumerManager;
 
 
@@ -35,7 +36,7 @@ public final class ImageLoadingTask implements Runnable, SimpleTaskConsumerManag
     private Drawable mActivityIcon;
 
     private ImageLoadingTask(final ImageView imageView, final LaunchableActivity launchableActivity,
-            final int iconSizePixels) {
+                             final int iconSizePixels) {
         mContext = imageView.getContext();
         mImageView = imageView;
         mLaunchableActivity = launchableActivity;
@@ -68,7 +69,7 @@ public final class ImageLoadingTask implements Runnable, SimpleTaskConsumerManag
         }
 
         public SimpleTaskConsumerManager.Task create(final ImageView imageView,
-                final LaunchableActivity activity) {
+                                                     final LaunchableActivity activity) {
             return new ImageLoadingTask(imageView, activity, mIconSizePixels);
         }
     }

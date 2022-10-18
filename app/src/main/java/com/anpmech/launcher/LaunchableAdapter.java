@@ -35,6 +35,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.anpmech.launcher.activities.SharedLauncherPrefs;
 import com.anpmech.launcher.comparators.AlphabeticalOrder;
 import com.anpmech.launcher.comparators.PinToTop;
@@ -147,7 +148,7 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
      *                 instantiating views.
      */
     public LaunchableAdapter(@NonNull final Context context, @LayoutRes final int resource,
-            final int initialSize) {
+                             final int initialSize) {
         final Resources res = context.getResources();
         mDropDownResource = resource;
         mObjects = Collections.synchronizedList(new ArrayList<T>(initialSize));
@@ -170,7 +171,7 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
      */
     @SuppressWarnings("unchecked")
     public LaunchableAdapter(final Object object, @NonNull final Context context,
-            @LayoutRes final int resource) {
+                             @LayoutRes final int resource) {
         this(context, resource, ((List<? extends T>[]) object)[0].size());
 
         final List<? extends T>[] lists = (List<? extends T>[]) object;
@@ -407,7 +408,7 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
 
     @Override
     public View getDropDownView(final int position, @Nullable final View convertView,
-            @NonNull final ViewGroup parent) {
+                                @NonNull final ViewGroup parent) {
         final TextView text;
 
         if (convertView == null) {
@@ -530,7 +531,7 @@ public class LaunchableAdapter<T extends LaunchableActivity> extends BaseAdapter
     @NonNull
     @Override
     public View getView(final int position, final View convertView,
-            @NonNull final ViewGroup parent) {
+                        @NonNull final ViewGroup parent) {
         final View view;
 
         if (convertView == null) {

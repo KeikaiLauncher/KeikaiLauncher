@@ -20,6 +20,7 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.widget.ListView;
+
 import com.anpmech.launcher.fragments.SettingsFragment;
 
 public class SettingsActivity extends PreferenceActivity {

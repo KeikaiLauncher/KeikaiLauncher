@@ -31,6 +31,7 @@ import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.anpmech.launcher.R;
 import com.anpmech.launcher.ShortcutNotificationManager;
 import com.anpmech.launcher.activities.SharedLauncherPrefs;
@@ -76,7 +77,7 @@ public class SettingsFragment extends PreferenceFragment implements
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-            final Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
             findPreference(R.string.pref_key_notification_priority).setEnabled(false);
         }
@@ -110,7 +111,7 @@ public class SettingsFragment extends PreferenceFragment implements
 
     @Override
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
-            final String key) {
+                                          final String key) {
         final Context context = getPreferenceScreen().getContext();
 
         // Fragments suck.

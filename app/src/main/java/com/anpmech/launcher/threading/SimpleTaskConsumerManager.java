@@ -76,7 +76,7 @@ public class SimpleTaskConsumerManager {
     }
 
     public void destroyAllConsumers(final boolean finishCurrentTasks,
-            final boolean blockUntilFinished) {
+                                    final boolean blockUntilFinished) {
         if (mSubmissionsAccepted) {
             mSubmissionsAccepted = false;
 
