@@ -57,11 +57,6 @@
             android:label="@string/title_activity_settings"
             android:theme="@style/AppSettingsTheme" />
 
-        <activity
-            android:name=".activities.AboutActivity"
-            android:label="@string/about_header"
-            android:theme="@android:style/Theme.DeviceDefault.Light.Dialog" />
-
         <receiver
             android:name=".monitor.PackageChangedReceiver"
             android:enabled="false" />

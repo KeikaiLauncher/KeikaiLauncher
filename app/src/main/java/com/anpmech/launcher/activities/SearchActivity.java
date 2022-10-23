@@ -310,10 +310,6 @@ public class SearchActivity extends Activity
 
     }
 
-    public void launchAbout(final MenuItem item) {
-        startActivity(new Intent(this, AboutActivity.class));
-    }
-
     private void launchActivity(final LaunchableActivity launchableActivity) {
         final LaunchableActivityPrefs launchableprefs = new LaunchableActivityPrefs(this);
 

@@ -34,9 +34,4 @@
         android:orderInCategory="4"
         android:showAsAction="never"
         android:title="@string/action_set_wallpaper" />
-    <item
-        android:onClick="launchAbout"
-        android:orderInCategory="5"
-        android:showAsAction="never"
-        android:title="@string/action_about" />
 </menu>

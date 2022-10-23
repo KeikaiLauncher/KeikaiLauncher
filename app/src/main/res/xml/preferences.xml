@@ -59,4 +59,26 @@
             android:key="settings_landscape_270"
             android:title="@string/settings_landscape_270" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/about_header">
+        <Preference
+            android:id="@+id/about_version"
+            android:key="about_version"
+            android:title="@string/about_version_code" />
+
+        <Preference
+            android:id="@+id/about_project_website_url"
+            android:key="about_project_website"
+            android:title="@string/about_project_website" />
+
+        <Preference
+            android:id="@+id/license_type"
+            android:key="license"
+            android:summary="@string/about_license_url"
+            android:title="@string/about_license" />
+
+        <Preference
+            android:id="@+id/list_of_contributors"
+            android:key="contributors"
+            android:title="@string/about_contributors_title" />
+    </PreferenceCategory>
 </PreferenceScreen>

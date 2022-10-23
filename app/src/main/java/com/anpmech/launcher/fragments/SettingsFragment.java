@@ -16,6 +16,7 @@
 package com.anpmech.launcher.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.net.Uri;
@@ -32,6 +33,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.StringRes;
 
+import com.anpmech.launcher.BuildConfig;
 import com.anpmech.launcher.R;
 
 public class SettingsFragment extends PreferenceFragment {
@@ -79,6 +81,26 @@ public class SettingsFragment extends PreferenceFragment {
         findPreference("pref_category_tweaks")
                 .setEnabled(Build.VERSION.SDK_INT < Build.VERSION_CODES.R);
 
+        // Set the version
+        findPreference("about_version").setSummary(BuildConfig.VERSION_NAME);
+
+        // Setup the project name/url
+        final CharSequence githubUrl = "github.com/";
+        final CharSequence projectUrl = "https://www." + githubUrl + BuildConfig.GITHUB_USER +
+                '/' + BuildConfig.GITHUB_PROJECT;
+        final LaunchPreferenceSummary listener = new LaunchPreferenceSummary();
+
+        final Preference about_project = findPreference("about_project_website");
+        about_project.setSummary(projectUrl);
+        about_project.setOnPreferenceClickListener(listener);
+
+        final Preference license = findPreference("license");
+        license.setOnPreferenceClickListener(listener);
+
+        final Preference contributors = findPreference("contributors");
+        contributors.setOnPreferenceClickListener(listener);
+        contributors.setSummary(projectUrl + "/contributors");
+
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -112,5 +134,16 @@ public class SettingsFragment extends PreferenceFragment {
         final PackageManager pm = pref.getContext().getPackageManager();
 
         pref.setEnabled(pref.getIntent().resolveActivity(pm) != null);
+    }
+
+    private final class LaunchPreferenceSummary implements Preference.OnPreferenceClickListener {
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+            final Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(preference.getSummary().toString()));
+
+            startActivity(intent);
+            return true;
+        }
     }
 }
