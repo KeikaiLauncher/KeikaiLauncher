@@ -48,7 +48,6 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Surface;
@@ -63,7 +62,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -109,11 +107,6 @@ public class SearchActivity extends Activity
     };
 
     private LaunchableAdapter<LaunchableActivity> mAdapter;
-
-    /*
-     * Hold the menu state because we need to be able to dismiss it on demand.
-     */
-    private PopupMenu mPopupMenu;
 
     private EditText mSearchEditText;
 
@@ -429,13 +422,6 @@ public class SearchActivity extends Activity
         return adapter;
     }
 
-    public void manageApplications(final MenuItem item) {
-        final Intent intentManageApps = new Intent(Settings.ACTION_APPLICATION_SETTINGS);
-
-        intentManageApps.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intentManageApps);
-    }
-
     @Override
     public void onBackPressed() {
         if (isCurrentLauncher()) {
@@ -450,13 +436,7 @@ public class SearchActivity extends Activity
     }
 
     public void onClickSettingsButton(final View view) {
-        if (mPopupMenu == null) {
-            final View topLeft = findViewById(R.id.overflow_button_topleft);
-            mPopupMenu = new PopupMenu(this, topLeft);
-            mPopupMenu.inflate(R.menu.search_activity_menu);
-        }
-
-        mPopupMenu.show();
+        startActivity(new Intent(this, SettingsActivity.class));
     }
 
     @Override
@@ -487,13 +467,6 @@ public class SearchActivity extends Activity
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
-        getMenuInflater().inflate(R.menu.search_activity_menu, menu);
-
-        return true;
-    }
-
     /**
      * This method is called when the user is already in this activity and presses the {@code home}
      * button. Use this opportunity to return this activity back to a default state.
@@ -511,11 +484,6 @@ public class SearchActivity extends Activity
 
         closeContextMenu();
         closeOptionsMenu();
-
-        if (mPopupMenu != null) {
-            mPopupMenu.dismiss();
-            mPopupMenu = null;
-        }
 
         // If the y coordinate is not at 0, let's reset it.
         final GridView view = findViewById(R.id.appsContainer);
@@ -776,10 +744,6 @@ public class SearchActivity extends Activity
         displayManager.registerDisplayListener(mDisplayListener, handler);
     }
 
-    public void setWallpaper(final MenuItem item) {
-        startActivity(new Intent(Intent.ACTION_SET_WALLPAPER));
-    }
-
     /**
      * This method dynamically sets the padding for the outer boundaries of the masterLayout and
      * appContainer for API SDK 30+.
@@ -889,17 +853,6 @@ public class SearchActivity extends Activity
         appContainer.setOnScrollListener(listener);
         appContainer.setAdapter(mAdapter);
         appContainer.setOnItemClickListener(listener);
-    }
-
-    public void startAppSettings(final MenuItem item) {
-        startActivity(new Intent(this, SettingsActivity.class));
-    }
-
-    public void startSystemSettings(final MenuItem item) {
-        final Intent intentSystemSettings = new Intent(Settings.ACTION_SETTINGS);
-
-        intentSystemSettings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intentSystemSettings);
     }
 
     private void updateFilter(final CharSequence cs) {

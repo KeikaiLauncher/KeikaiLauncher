@@ -38,7 +38,7 @@
             android:background="@null"
             android:contentDescription="@string/search_icon"
             android:padding="@dimen/actionbar_icon_padding"
-            android:src="@drawable/ic_search_black_24dp"
+            android:src="@drawable/ic_baseline_search_24"
             android:tint="@color/hint_grey" />
 
         <EditText
@@ -79,15 +79,15 @@
             android:visibility="gone" />
 
         <ImageButton
-            android:id="@+id/overflow_button"
+            android:id="@+id/settings_button"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
-            android:contentDescription="@string/overflow_menu_button"
+            android:contentDescription="@string/title_activity_settings"
             android:onClick="onClickSettingsButton"
             android:padding="@dimen/actionbar_icon_padding"
-            android:src="@drawable/ic_more_vert_white_24dp"
+            android:src="@drawable/ic_settings_24"
             android:tint="@color/hint_grey" />
     </LinearLayout>
 
