@@ -19,25 +19,25 @@
         android:title="@string/settings_category_general_category">
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="pref_autokeyboard"
+            android:key="@string/pref_key_auto_keyboard"
             android:title="@string/settings_autokeyboard" />
         <ListPreference
             android:defaultValue="@string/pref_app_preferred_order_entries_alphabetical"
             android:dialogTitle="@string/pref_preferred_app_order_dialog"
             android:entries="@array/pref_app_preferred_order_entries"
             android:entryValues="@array/pref_app_preferred_order_values"
-            android:key="pref_app_preferred_order"
+            android:key="@string/pref_key_preferred_order"
             android:title="@string/pref_preferred_app_order_dialog" />
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="pref_disable_icons"
+            android:key="@string/pref_key_disable_icons"
             android:title="@string/settings_disable_icon_loading" />
         <CheckBoxPreference
             android:defaultValue="true"
-            android:key="pref_allow_rotation"
+            android:key="@string/pref_key_allow_rotation"
             android:title="@string/pref_allow_rotation" />
         <Preference
-            android:key="modify_usage_statistics"
+            android:key="@string/pref_key_modify_usage_statistics"
             android:summary="@string/pref_modify_android_usage_summary"
             android:title="@string/pref_modify_android_usage_title">
             <intent android:action="android.settings.USAGE_ACCESS_SETTINGS" />
@@ -50,13 +50,13 @@
             android:defaultValue="@string/pref_value_landscape_right"
             android:entries="@array/pref_landscape_entries"
             android:entryValues="@array/pref_landscape_entries"
-            android:key="settings_landscape_90"
+            android:key="@string/pref_key_landscape_90"
             android:title="@string/settings_landscape_90" />
         <ListPreference
             android:defaultValue="@string/pref_value_landscape_left"
             android:entries="@array/pref_landscape_entries"
             android:entryValues="@array/pref_landscape_entries"
-            android:key="settings_landscape_270"
+            android:key="@string/pref_key_landscape_270"
             android:title="@string/settings_landscape_270" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/about_header">
