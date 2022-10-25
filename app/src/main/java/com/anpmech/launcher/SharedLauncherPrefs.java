@@ -137,6 +137,10 @@ public class SharedLauncherPrefs {
         return mPreferences.getString(prefKey, defaultKey);
     }
 
+    public boolean isActionBarEnabled() {
+        return isPrefEnabled(R.string.pref_key_actionbar, true);
+    }
+
     /**
      * This returns whether the keyboard should be automatically loaded at startup.
      *

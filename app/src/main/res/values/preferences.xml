@@ -14,6 +14,9 @@
   -->
 
 <resources>
+    <!-- This string is the key used to retrieve whether to enable the actionbar -->
+    <string name="pref_key_actionbar" translatable="false">pref_enable_actionbar</string>
+
     <!-- This string is the key used to retrieve the value for rotation preference. -->
     <string name="pref_key_allow_rotation" translatable="false">pref_allow_rotation</string>
 

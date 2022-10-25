@@ -18,7 +18,12 @@
         android:key="pref_category_general"
         android:title="@string/settings_category_general_category">
         <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_key_actionbar"
+            android:title="@string/pref_enable_actionbar" />
+        <CheckBoxPreference
             android:defaultValue="false"
+            android:dependency="@string/pref_key_actionbar"
             android:key="@string/pref_key_auto_keyboard"
             android:title="@string/settings_autokeyboard" />
         <ListPreference

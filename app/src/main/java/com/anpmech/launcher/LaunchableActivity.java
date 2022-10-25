@@ -23,13 +23,11 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.LauncherActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.UserManager;
-import android.util.Log;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -97,11 +95,10 @@ public class LaunchableActivity {
      * @param icon   The icon to use for this object. If null, the Android icon will be loaded.
      */
     public LaunchableActivity(@NonNull final Intent intent, @NonNull final String label,
-                              @Nullable final Drawable icon) {
+                              @DrawableRes final int icon) {
         mLaunchIntent = intent;
         mActivityLabel = label;
-        mActivityIcon = icon;
-        mIconResource = Integer.MIN_VALUE;
+        mIconResource = icon;
         mUserSerial = Long.MIN_VALUE;
     }
 
@@ -164,20 +161,7 @@ public class LaunchableActivity {
     public Drawable getActivityIcon(final Context context, final int iconSizePixels) {
         if (!isIconLoaded()) {
             synchronized (mLock) {
-                try {
-                    final PackageManager pm = context.getPackageManager();
-                    final Resources resources = pm.getResourcesForActivity(getComponent());
-
-                    /*
-                      This is NOT pm.getActivityIcon() because that fails when a application
-                      contains more than one activity. There may be a more structural reason that
-                      I'm not aware of.
-                     */
-                    mActivityIcon = resources.getDrawable(mIconResource);
-
-                } catch (PackageManager.NameNotFoundException | Resources.NotFoundException e) {
-                    Log.e(TAG, "Error when trying to inflate a launcher icon.", e);
-                }
+                mActivityIcon = context.getResources().getDrawable(mIconResource);
 
                 //rescaling the icon if it is bigger than the target size
                 //TODO do this when it is not a bitmap drawable?

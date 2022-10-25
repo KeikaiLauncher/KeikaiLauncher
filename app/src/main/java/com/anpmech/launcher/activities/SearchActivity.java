@@ -413,6 +413,12 @@ public class SearchActivity extends Activity
 
                 addToAdapter15(adapter, infoList, true);
             }
+            final SharedLauncherPrefs prefs = new SharedLauncherPrefs(this);
+
+            if (!prefs.isActionBarEnabled()) {
+                final Intent intent = new Intent(this, SettingsActivity.class);
+                adapter.add(new LaunchableActivity(intent, "Keikai Settings", R.drawable.ic_launcher));
+            }
             adapter.sortApps(this);
             adapter.notifyDataSetChanged();
         } else {
@@ -586,7 +592,8 @@ public class SearchActivity extends Activity
         mAdapter.updateUsageMap(this);
         final Editable searchText = mSearchEditText.getText();
 
-        if (prefs.isKeyboardAutomatic() || searchText.length() > 0) {
+        if ((prefs.isActionBarEnabled() && prefs.isKeyboardAutomatic()) ||
+                searchText.length() > 0) {
             final InputMethodManager imm =
                     (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
@@ -751,21 +758,30 @@ public class SearchActivity extends Activity
      */
     @RequiresApi(Build.VERSION_CODES.R)
     private void setupPadding30() {
+        final SharedLauncherPrefs prefs = new SharedLauncherPrefs(this);
         final Resources resources = getResources();
         final View masterLayout = findViewById(R.id.masterLayout);
         final View appContainer = findViewById(R.id.appsContainer);
-        final int appTop = resources.getDimensionPixelSize(R.dimen.activity_vertical_margin);
+        int appTop = resources.getDimensionPixelSize(R.dimen.activity_vertical_margin);
 
         if (isInMultiWindowMode()) {
             masterLayout.setFitsSystemWindows(true);
             appContainer.setPadding(0, appTop, 0, 0);
         } else {
             masterLayout.setFitsSystemWindows(false);
-            final int searchUpperPadding = getDimensionSize(resources, "status_bar_height");
+
+            final int searchUpperPadding;
             final WindowInsets windowInsets = getWindowManager().getCurrentWindowMetrics()
                     .getWindowInsets();
             final int navBars = WindowInsets.Type.navigationBars();
             final Insets insets = windowInsets.getInsets(navBars);
+
+            if (prefs.isActionBarEnabled()) {
+                searchUpperPadding = getDimensionSize(resources, "status_bar_height");
+            } else {
+                appTop = getDimensionSize(resources, "status_bar_height");
+                searchUpperPadding = 0;
+            }
 
             // If the navigation bar is on the side, don't put apps under it.
             masterLayout.setPadding(insets.left, searchUpperPadding, insets.right, 0);
@@ -844,6 +860,17 @@ public class SearchActivity extends Activity
         return searchEditText;
     }
 
+    private void setupActionBar() {
+        final View view = findViewById(R.id.customActionBar);
+        final SharedLauncherPrefs prefs = new SharedLauncherPrefs(this);
+
+        if (prefs.isActionBarEnabled()) {
+            view.setVisibility(View.VISIBLE);
+        } else {
+            view.setVisibility(View.GONE);
+        }
+    }
+
     private void setupViews() {
         final GridView appContainer = findViewById(R.id.appsContainer);
         final AppContainerListener listener = new AppContainerListener();
@@ -854,6 +881,7 @@ public class SearchActivity extends Activity
         appContainer.setOnScrollListener(listener);
         appContainer.setAdapter(mAdapter);
         appContainer.setOnItemClickListener(listener);
+        setupActionBar();
     }
 
     private void updateFilter(final CharSequence cs) {

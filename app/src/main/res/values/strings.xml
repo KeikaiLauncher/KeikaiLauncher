@@ -58,6 +58,7 @@
     <string name="pref_app_preferred_order_entries_usages">Most used first</string>
     <string name="action_set_wallpaper">Set wallpaper</string>
     <string name="pref_allow_rotation">Allow orientation change</string>
+    <string name="pref_enable_actionbar">Enable action bar</string>
 
     <string name="pref_modify_android_usage_title">Set Android usage statistics support</string>
     <string name="pref_modify_android_usage_summary">
