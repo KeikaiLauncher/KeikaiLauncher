@@ -31,7 +31,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.graphics.Insets;
-import android.graphics.drawable.Drawable;
+import android.graphics.Point;
 import android.hardware.display.DisplayManager;
 import android.net.Uri;
 import android.os.Build;
@@ -47,10 +47,10 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.Surface;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowManager;
@@ -61,6 +61,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -79,6 +80,7 @@ import com.anpmech.launcher.SharedLauncherPrefs;
 import com.anpmech.launcher.monitor.PackageChangeCallback;
 import com.anpmech.launcher.monitor.PackageChangedReceiver;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.ListIterator;
 
@@ -160,75 +162,84 @@ public class SearchActivity extends Activity
      * @param resources The resources for the device.
      * @return The height of the navigation bar.
      */
-    private static int getNavigationBarHeight(final Resources resources) {
+    @DeprecatedSinceApi(api = Build.VERSION_CODES.R, message =
+            "Later APIs use get getNavigationBarHeight30()")
+    private static int getNavigationBarHeight15(final Resources resources) {
         final int navBarHeight;
+        final Configuration configuration = resources.getConfiguration();
 
-        if (hasNavBar(resources)) {
-            final Configuration configuration = resources.getConfiguration();
+        //Only phone between 0-599 has navigationbar can move
+        final boolean isSmartphone = configuration.smallestScreenWidthDp < 600;
+        final boolean isPortrait =
+                configuration.orientation == Configuration.ORIENTATION_PORTRAIT;
 
-            //Only phone between 0-599 has navigationbar can move
-            final boolean isSmartphone = configuration.smallestScreenWidthDp < 600;
-            final boolean isPortrait =
-                    configuration.orientation == Configuration.ORIENTATION_PORTRAIT;
-
-            if (isSmartphone && !isPortrait) {
-                navBarHeight = 0;
-            } else if (isPortrait) {
-                navBarHeight = getDimensionSize(resources, "navigation_bar_height");
-            } else {
-                navBarHeight = getDimensionSize(resources, "navigation_bar_height_landscape");
-            }
-        } else {
+        if (isSmartphone && !isPortrait) {
             navBarHeight = 0;
+        } else if (isPortrait) {
+            navBarHeight = getDimensionSize(resources, "navigation_bar_height");
+        } else {
+            navBarHeight = getDimensionSize(resources, "navigation_bar_height_landscape");
         }
 
         return navBarHeight;
     }
 
-    /**
-     * Get the navigation bar width.
-     *
-     * @param resources The resources for the device.
-     * @return The width of the navigation bar.
-     */
-    private static int getNavigationBarWidth(final Resources resources) {
-        final int navBarWidth;
+    public static int getAppUsableScreenSizeWidth(final Display defaultDisplay) {
+        Point size = new Point();
+        defaultDisplay.getSize(size);
 
-        if (hasNavBar(resources)) {
-            final Configuration configuration = resources.getConfiguration();
+        return size.x;
+    }
 
-            //Only phone between 0-599 has navigationbar can move
-            final boolean isSmartphone = configuration.smallestScreenWidthDp < 600;
+    public static int getRealScreenWidth(final Display defaultDisplay) {
+        final Point size = new Point();
 
-            if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE && isSmartphone) {
-                navBarWidth = getDimensionSize(resources, "navigation_bar_width");
-            } else {
-                navBarWidth = 0;
+        if (Build.VERSION.SDK_INT >= 17) {
+            defaultDisplay.getRealSize(size);
+        } else if (Build.VERSION.SDK_INT >= 14) {
+            try {
+                size.x = (Integer) Display.class.getMethod("getRawWidth").invoke(defaultDisplay);
+            } catch (IllegalAccessException e) {
+            } catch (InvocationTargetException e) {
+            } catch (NoSuchMethodException e) {
             }
-        } else {
-            navBarWidth = 0;
         }
 
-        return navBarWidth;
+        return size.x;
     }
 
     /**
-     * Retrieves the visibility status of the navigation bar.
+     * This is a workaround. Unfortunately, Android does not have a way in it's API to
+     * accurately detect the position of the navigation bar when it's translucent.
+     * This becomes highly problematic in landscape where we really don't want Launchables
+     * underneath the navigation bar when in landscape mode. This forces the master layout outside
+     * of the status bar and the navigation bar. Ideally, we would be forced outside of the
+     * navigation bar alone and be able to travel underneath the status bar. The inconsistency of
+     * this layout which affects landscape orientation and non-gesture mode is outweighed by the
+     * really crappy hacks that used to try to work around this.
      *
-     * @param resources The resources for the device.
-     * @return {@code True} if the navigation bar is enabled, {@code false} otherwise.
+     * @param context The current context.
+     * @return True if the navigation bar is not in gesture mode, the device is in landscape, and
+     * the application usable space is less than the real space.
      */
-    private static boolean hasNavBar(final Resources resources) {
-        final boolean hasNavBar;
-        final int id = resources.getIdentifier("config_showNavigationBar", "bool", "android");
+    public static boolean isNavBarProblematic(final Context context) {
+        final Resources resources = context.getResources();
+        final boolean isLandscape = resources.getConfiguration().orientation ==
+                Configuration.ORIENTATION_LANDSCAPE;
 
-        if (id > 0) {
-            hasNavBar = resources.getBoolean(id);
-        } else {
-            hasNavBar = false;
-        }
+        return !isInGestureMode(resources) && isLandscape && isRealSizeDifferentThanUsable(context);
+    }
 
-        return hasNavBar;
+    public static boolean isInGestureMode(final Resources resources) {
+        final int resourceId = resources.getIdentifier("config_navBarInteractionMode", "integer", "android");
+
+        return resourceId != 0 && resources.getInteger(resourceId) == 2;
+    }
+
+    private static boolean isRealSizeDifferentThanUsable(final Context context) {
+        final Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+
+        return getAppUsableScreenSizeWidth(display) < getRealScreenWidth(display);
     }
 
     /**
@@ -259,7 +270,8 @@ public class SearchActivity extends Activity
      * @param infoList     The ResolveInfo object to add to the adapter.
      * @param useReadCache Whether to use a read cache.
      */
-    @DeprecatedSinceApi(api = Build.VERSION_CODES.N, message = "Later APIs use addToAdapter24()")
+    @DeprecatedSinceApi(api = Build.VERSION_CODES.N, message =
+            "Later APIs use addToAdapter(LaunchableActivity, Iterable<LauncherActivityInfo>)")
     private void addToAdapter15(@NonNull final LaunchableAdapter<LaunchableActivity> adapter,
                                 @NonNull final Iterable<ResolveInfo> infoList,
                                 final boolean useReadCache) {
@@ -372,16 +384,8 @@ public class SearchActivity extends Activity
      */
     private LaunchableActivity getWebLaunchable() {
         final Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-        final boolean shouldLoadIcons = new SharedLauncherPrefs(this).areIconsEnabled();
-        final Drawable icon;
 
-        if (shouldLoadIcons) {
-            icon = getResources().getDrawable(R.drawable.ic_baseline_search_24);
-        } else {
-            icon = null;
-        }
-
-        return new LaunchableActivity(intent, getString(R.string.web_search), icon);
+        return new LaunchableActivity(intent, getString(R.string.web_search), R.drawable.ic_baseline_search_24);
     }
 
     private LaunchableAdapter<LaunchableActivity> loadLaunchableAdapter() {
@@ -451,7 +455,6 @@ public class SearchActivity extends Activity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_search);
-
     }
 
     @Override
@@ -589,6 +592,7 @@ public class SearchActivity extends Activity
     protected void onResume() {
         super.onResume();
         final SharedLauncherPrefs prefs = new SharedLauncherPrefs(this);
+
         mAdapter.updateUsageMap(this);
         final Editable searchText = mSearchEditText.getText();
 
@@ -609,12 +613,6 @@ public class SearchActivity extends Activity
             hideKeyboard();
         }
 
-        setRotation(prefs);
-        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            setupPadding30();
-        } else {
-            setupPadding15();
-        }
         final Uri accUri = Settings.System.getUriFor(Settings.System.ACCELEROMETER_ROTATION);
         getContentResolver().registerContentObserver(accUri, false, mAccSettingObserver);
     }
@@ -691,6 +689,8 @@ public class SearchActivity extends Activity
     protected void onStart() {
         super.onStart();
 
+        final SharedLauncherPrefs prefs = new SharedLauncherPrefs(this);
+
         // In a perfect world, this all could happen in onCreate(), but there are problems
         // with BroadcastReceiver registration and unregistration with that scenario.
         mSearchEditText = findViewById(R.id.user_search_input);
@@ -703,8 +703,12 @@ public class SearchActivity extends Activity
         registerReceiver(mPackageChangeReceiver, PackageChangedReceiver.getFilter());
         PackageChangedReceiver.setCallback(this);
 
+        setupPadding();
         setupPreferences();
         setupViews();
+        setRotation(prefs);
+
+        setupPadding();
     }
 
     @Override
@@ -752,94 +756,68 @@ public class SearchActivity extends Activity
         displayManager.registerDisplayListener(mDisplayListener, handler);
     }
 
-    /**
-     * This method dynamically sets the padding for the outer boundaries of the masterLayout and
-     * appContainer for API SDK 30+.
-     */
-    @RequiresApi(Build.VERSION_CODES.R)
-    private void setupPadding30() {
-        final SharedLauncherPrefs prefs = new SharedLauncherPrefs(this);
-        final Resources resources = getResources();
-        final View masterLayout = findViewById(R.id.masterLayout);
-        final View appContainer = findViewById(R.id.appsContainer);
-        int appTop = resources.getDimensionPixelSize(R.dimen.activity_vertical_margin);
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    private int getNavigationBarHeight30() {
+        final int navBars = WindowInsets.Type.navigationBars();
+        final Insets insets = getWindowManager().getCurrentWindowMetrics()
+                .getWindowInsets().getInsets(navBars);
 
-        if (isInMultiWindowMode()) {
-            masterLayout.setFitsSystemWindows(true);
-            appContainer.setPadding(0, appTop, 0, 0);
-        } else {
-            masterLayout.setFitsSystemWindows(false);
-
-            final int searchUpperPadding;
-            final WindowInsets windowInsets = getWindowManager().getCurrentWindowMetrics()
-                    .getWindowInsets();
-            final int navBars = WindowInsets.Type.navigationBars();
-            final Insets insets = windowInsets.getInsets(navBars);
-
-            if (prefs.isActionBarEnabled()) {
-                searchUpperPadding = getDimensionSize(resources, "status_bar_height");
-            } else {
-                appTop = getDimensionSize(resources, "status_bar_height");
-                searchUpperPadding = 0;
-            }
-
-            // If the navigation bar is on the side, don't put apps under it.
-            masterLayout.setPadding(insets.left, searchUpperPadding, insets.right, 0);
-
-            // If the navigation bar is at the bottom, stop the icons above it.
-            appContainer.setPadding(0, appTop, 0, insets.bottom);
-        }
+        return insets.bottom;
     }
 
-    /**
-     * This method dynamically sets the padding for the outer boundaries of the masterLayout and
-     * appContainer for API SDK 15-30. This is mostly hacky way around the lack of an API that
-     * was provided in 30. It's resource heavy and ugly, but it works in the vast majority of
-     * cases.
-     */
-    @DeprecatedSinceApi(api = Build.VERSION_CODES.R, message = "Later APIs use setupPadding30().")
-    private void setupPadding15() {
-        final Resources resources = getResources();
-        final View masterLayout = findViewById(R.id.masterLayout);
-        final View appContainer = findViewById(R.id.appsContainer);
-        final int appTop = resources.getDimensionPixelSize(R.dimen.activity_vertical_margin);
-        final boolean noMultiWindow = Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
-                !isInMultiWindowMode();
-        final boolean transparentPossible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+    private static void setupMasterLayoutPadding(final View masterLayout, final int padding) {
+        masterLayout.setFitsSystemWindows(isNavBarProblematic(masterLayout.getContext()));
+        final FrameLayout.LayoutParams masterParams =
+                (FrameLayout.LayoutParams) masterLayout.getLayoutParams();
 
-        if (transparentPossible && noMultiWindow) {
-            masterLayout.setFitsSystemWindows(false);
-            final int navBarWidth = getNavigationBarWidth(resources);
-            final int searchUpperPadding = getDimensionSize(resources, "status_bar_height");
-            final int navBarHeight = getNavigationBarHeight(resources);
-            final SharedLauncherPrefs prefs = new SharedLauncherPrefs(this);
-            final int orientation = getWindowManager().getDefaultDisplay().getRotation();
-            int leftPadding = 0;
-            int rightPadding = 0;
+        masterParams.setMargins(padding, 0, padding, 0);
+    }
 
-            if (orientation == Surface.ROTATION_90) {
-                if ("right".equals(prefs.get90NavBarPosition())) {
-                    rightPadding = navBarWidth;
-                } else if ("left".equals(prefs.get90NavBarPosition())) {
-                    leftPadding = navBarWidth;
-                }
-            } else if (orientation == Surface.ROTATION_270) {
-                if ("right".equals(prefs.get270NavBarPosition())) {
-                    rightPadding = navBarWidth;
-                } else if ("left".equals(prefs.get270NavBarPosition())) {
-                    leftPadding = navBarWidth;
-                }
-            }
+    private static int setupActionBarLayout(final View customActionBar, final int padding) {
+        final Context context = customActionBar.getContext();
+        final FrameLayout.LayoutParams searchParams =
+                (FrameLayout.LayoutParams) customActionBar.getLayoutParams();
+        final int searchTop;
 
-            // If the navigation bar is on the side, don't put apps under it.
-            masterLayout.setPadding(leftPadding, searchUpperPadding, rightPadding, 0);
-
-            // If the navigation bar is at the bottom, stop the icons above it.
-            appContainer.setPadding(0, appTop, 0, navBarHeight);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && !isNavBarProblematic(context)) {
+            searchTop = getDimensionSize(context.getResources(), "status_bar_height") +
+                    padding;
         } else {
-            masterLayout.setFitsSystemWindows(true);
-            appContainer.setPadding(0, appTop, 0, 0);
+            searchTop = padding;
         }
+
+        searchParams.setMargins(0, searchTop, 0, 0);
+
+        return searchTop + context.getResources().getDimensionPixelSize(R.dimen.app_icon_size) + padding;
+    }
+
+    private void setupPadding() {
+        final View appContainer = findViewById(R.id.appsContainer);
+        final int appContainerTop, appContainerBottom;
+        final int dp16 = getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);
+        final boolean isNavBarProblematic = isNavBarProblematic(this);
+        setupMasterLayoutPadding(findViewById(R.id.masterLayout), dp16);
+
+        if (new SharedLauncherPrefs(this).isActionBarEnabled()) {
+            appContainerTop = setupActionBarLayout(findViewById(R.id.customActionBar), dp16);
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && !isNavBarProblematic) {
+                appContainerTop = getDimensionSize(getResources(), "status_bar_height") +
+                        dp16;
+            } else {
+                appContainerTop = dp16;
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            appContainerBottom = getNavigationBarHeight30() + dp16;
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            appContainerBottom = getNavigationBarHeight15(getResources()) + dp16;
+        } else {
+            appContainerBottom = dp16;
+        }
+
+        appContainer.setPadding(0, appContainerTop, 0, appContainerBottom);
     }
 
     private void setupPreferences() {
@@ -930,11 +908,7 @@ public class SearchActivity extends Activity
 
         @Override
         public void onDisplayChanged(final int displayId) {
-            if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                setupPadding30();
-            } else {
-                setupPadding15();
-            }
+            setupPadding();
         }
 
         @Override

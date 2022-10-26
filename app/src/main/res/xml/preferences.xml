@@ -48,22 +48,6 @@
             <intent android:action="android.settings.USAGE_ACCESS_SETTINGS" />
         </Preference>
     </PreferenceCategory>
-    <PreferenceCategory
-        android:key="pref_category_tweaks"
-        android:title="Tweaks">
-        <ListPreference
-            android:defaultValue="@string/pref_value_landscape_right"
-            android:entries="@array/pref_landscape_entries"
-            android:entryValues="@array/pref_landscape_entries"
-            android:key="@string/pref_key_landscape_90"
-            android:title="@string/settings_landscape_90" />
-        <ListPreference
-            android:defaultValue="@string/pref_value_landscape_left"
-            android:entries="@array/pref_landscape_entries"
-            android:entryValues="@array/pref_landscape_entries"
-            android:key="@string/pref_key_landscape_270"
-            android:title="@string/settings_landscape_270" />
-    </PreferenceCategory>
     <PreferenceCategory android:title="@string/about_header">
         <Preference
             android:id="@+id/about_version"

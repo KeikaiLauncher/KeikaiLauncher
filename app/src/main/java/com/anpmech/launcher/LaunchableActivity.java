@@ -29,6 +29,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.UserManager;
 
+import androidx.annotation.DeprecatedSinceApi;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -112,6 +113,7 @@ public class LaunchableActivity {
      * @param manager The {@link PackageManager} to load the label for this from. If null, the
      *                local store will not cache the label.
      */
+    @DeprecatedSinceApi(api = Build.VERSION_CODES.N, message = "Later APIs use addToAdapter24()")
     public LaunchableActivity(@NonNull final ResolveInfo info,
                               @NonNull final SharedPreferences prefs,
                               @Nullable final PackageManager manager) {
