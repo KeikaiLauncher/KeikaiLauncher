@@ -84,6 +84,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.ListIterator;
 
+/**
+ * This class is the main {@link Activity} for this launcher.
+ */
 public class SearchActivity extends Activity
         implements SharedPreferences.OnSharedPreferenceChangeListener, PackageChangeCallback {
 
@@ -95,9 +98,19 @@ public class SearchActivity extends Activity
      * threads.
      */
     private final Object mLock = new Object();
+
+    /**
+     * This {@link BroadcastReceiver} implements an updater for package changes.
+     */
     private final BroadcastReceiver mPackageChangeReceiver = new PackageChangedReceiver();
+
+    /**
+     * This implements a listener for orientation change, see {@link DisplayChangeListener} for
+     * more information.
+     */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     private DisplayManager.DisplayListener mDisplayListener = null;
+
     /**
      * This ContentObserver is used by the ContentResolver to register a callback to set rotation in case it changes
      * in the system settings.
@@ -109,6 +122,10 @@ public class SearchActivity extends Activity
         }
     };
 
+    /**
+     * An adapter, based off {@link android.widget.ArrayAdapter}, to handle
+     * {@link LaunchableActivity} items.
+     */
     private LaunchableAdapter<LaunchableActivity> mAdapter;
 
     private EditText mSearchEditText;
@@ -570,7 +587,6 @@ public class SearchActivity extends Activity
             manager.unregisterDisplayListener(mDisplayListener);
         }
 
-
         getContentResolver().unregisterContentObserver(mAccSettingObserver);
         super.onPause();
     }
@@ -719,6 +735,11 @@ public class SearchActivity extends Activity
         super.onStop();
     }
 
+    /**
+     * This method clears the {@link LaunchableActivity} icons from memory on trim.
+     *
+     * @param level The level of memory trim requested.
+     */
     @Override
     public void onTrimMemory(final int level) {
         super.onTrimMemory(level);
@@ -728,6 +749,11 @@ public class SearchActivity extends Activity
 
     }
 
+    /**
+     * This method prioritizes a {@link LaunchableActivity} to the top of the order when sorting.
+     *
+     * @param item The {@link MenuItem} containing the {@link LaunchableActivity} to be ordered.
+     */
     public void pinToTop(final MenuItem item) {
         final LaunchableActivity activity = getLaunchableActivity(item);
         final LaunchableActivityPrefs prefs = new LaunchableActivityPrefs(this);
