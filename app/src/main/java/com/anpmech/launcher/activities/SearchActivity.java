@@ -75,6 +75,7 @@ import com.anpmech.launcher.LaunchableActivity;
 import com.anpmech.launcher.LaunchableActivityPrefs;
 import com.anpmech.launcher.LaunchableAdapter;
 import com.anpmech.launcher.R;
+import com.anpmech.launcher.SharedLauncherPrefs;
 import com.anpmech.launcher.monitor.PackageChangeCallback;
 import com.anpmech.launcher.monitor.PackageChangedReceiver;
 

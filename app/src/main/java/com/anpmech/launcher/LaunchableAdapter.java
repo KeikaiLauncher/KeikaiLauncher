@@ -38,7 +38,6 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.anpmech.launcher.activities.SharedLauncherPrefs;
 import com.anpmech.launcher.comparators.AlphabeticalOrder;
 import com.anpmech.launcher.comparators.PinToTop;
 import com.anpmech.launcher.comparators.RecentOrder;

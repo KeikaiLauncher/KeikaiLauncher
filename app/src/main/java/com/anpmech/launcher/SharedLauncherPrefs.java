@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.anpmech.launcher.activities;
+package com.anpmech.launcher;
 
 import android.content.Context;
 import android.content.SharedPreferences;
