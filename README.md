@@ -1,5 +1,7 @@
 # KeikaiLauncher
 
+*This project is now archived. Consider migration to the spiritual sucessor [Kvaesitso](https://github.com/MM2-0/Kvaesitso).*
+
 [<img src="https://f-droid.org/badge/get-it-on.png"
       alt="Get it on F-Droid"
       height="80">](https://f-droid.org/app/com.anpmech.launcher)
